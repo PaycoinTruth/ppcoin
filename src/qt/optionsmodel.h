@@ -27,6 +27,10 @@ public:
         DisplayUnit, // BitcoinUnits::Unit
         DisplayAddresses, // bool
         DetachDatabases, // bool
+<<<<<<< HEAD
+=======
+        CoinControlFeatures, // bool
+>>>>>>> origin/Paycoin-master
         OptionIDRowCount,
     };
 
@@ -45,16 +49,30 @@ public:
     bool getMinimizeOnClose();
     int getDisplayUnit();
     bool getDisplayAddresses();
+<<<<<<< HEAD
+=======
+    bool getCoinControlFeatures();
+
+>>>>>>> origin/Paycoin-master
 private:
     int nDisplayUnit;
     bool bDisplayAddresses;
     bool fMinimizeToTray;
     bool fMinimizeOnClose;
+<<<<<<< HEAD
 signals:
     void displayUnitChanged(int unit);
 
 public slots:
 
+=======
+    bool fCoinControlFeatures;
+
+signals:
+    void displayUnitChanged(int unit);
+    void transactionFeeChanged(qint64);
+    void coinControlFeaturesChanged(bool);
+>>>>>>> origin/Paycoin-master
 };
 
 #endif // OPTIONSMODEL_H

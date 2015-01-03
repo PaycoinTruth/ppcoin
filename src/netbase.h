@@ -17,6 +17,23 @@ extern int nConnectTimeout;
 #undef SetPort
 #endif
 
+<<<<<<< HEAD
+=======
+enum Network
+{
+    NET_UNROUTABLE,
+    NET_IPV4,
+    NET_IPV6,
+    NET_TOR,
+    NET_I2P,
+
+    NET_MAX
+};
+
+enum Network ParseNetwork(std::string net);
+void SetNoProxy(enum Network net, bool fNoProxy = true);
+
+>>>>>>> origin/Paycoin-master
 /** IP address (IPv6, or IPv4 using mapped IPv6 range (::FFFF:0:0/96)) */
 class CNetAddr
 {
@@ -31,6 +48,10 @@ class CNetAddr
         void Init();
         void SetIP(const CNetAddr& ip);
         bool IsIPv4() const;    // IPv4 mapped address (::FFFF:0:0/96, 0.0.0.0/0)
+<<<<<<< HEAD
+=======
+        bool IsIPv6() const;    // IPv6 address (not IPv4)
+>>>>>>> origin/Paycoin-master
         bool IsRFC1918() const; // IPv4 private networks (10.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12)
         bool IsRFC3849() const; // IPv6 documentation address (2001:0DB8::/32)
         bool IsRFC3927() const; // IPv4 autoconfig (169.254.0.0/16)
@@ -41,16 +62,29 @@ class CNetAddr
         bool IsRFC4862() const; // IPv6 autoconfig (FE80::/64)
         bool IsRFC6052() const; // IPv6 well-known prefix (64:FF9B::/96)
         bool IsRFC6145() const; // IPv6 IPv4-translated address (::FFFF:0:0:0/96)
+<<<<<<< HEAD
+=======
+        bool IsOnionCat() const;
+        bool IsGarliCat() const;
+>>>>>>> origin/Paycoin-master
         bool IsLocal() const;
         bool IsRoutable() const;
         bool IsValid() const;
         bool IsMulticast() const;
+<<<<<<< HEAD
+=======
+        enum Network GetNetwork() const;
+>>>>>>> origin/Paycoin-master
         std::string ToString() const;
         std::string ToStringIP() const;
         int GetByte(int n) const;
         int64 GetHash() const;
         bool GetInAddr(struct in_addr* pipv4Addr) const;
         std::vector<unsigned char> GetGroup() const;
+<<<<<<< HEAD
+=======
+        int GetReachabilityFrom(const CNetAddr *paddrPartner = NULL) const;
+>>>>>>> origin/Paycoin-master
         void print() const;
 
 #ifdef USE_IPV6
@@ -86,7 +120,12 @@ class CService : public CNetAddr
         void Init();
         void SetPort(unsigned short portIn);
         unsigned short GetPort() const;
+<<<<<<< HEAD
         bool GetSockAddr(struct sockaddr_in* paddr) const;
+=======
+        bool GetSockAddr(struct sockaddr* paddr, socklen_t *addrlen) const;
+        bool SetSockAddr(const struct sockaddr* paddr);
+>>>>>>> origin/Paycoin-master
         friend bool operator==(const CService& a, const CService& b);
         friend bool operator!=(const CService& a, const CService& b);
         friend bool operator<(const CService& a, const CService& b);
@@ -98,7 +137,10 @@ class CService : public CNetAddr
 
 #ifdef USE_IPV6
         CService(const struct in6_addr& ipv6Addr, unsigned short port);
+<<<<<<< HEAD
         bool GetSockAddr6(struct sockaddr_in6* paddr) const;
+=======
+>>>>>>> origin/Paycoin-master
         CService(const struct sockaddr_in6& addr);
 #endif
 
@@ -119,9 +161,19 @@ bool Lookup(const char *pszName, CService& addr, int portDefault = 0, bool fAllo
 bool Lookup(const char *pszName, std::vector<CService>& vAddr, int portDefault = 0, bool fAllowLookup = true, unsigned int nMaxSolutions = 0);
 bool LookupNumeric(const char *pszName, CService& addr, int portDefault = 0);
 bool ConnectSocket(const CService &addr, SOCKET& hSocketRet, int nTimeout = nConnectTimeout);
+<<<<<<< HEAD
 
 // Settings
 extern int fUseProxy;
+=======
+bool ConnectSocketByName(CService &addr, SOCKET& hSocketRet, const char *pszDest, int portDefault = 0, int nTimeout = nConnectTimeout);
+
+// Settings
+extern int nSocksVersion;
+extern int fUseProxy;
+extern bool fProxyNameLookup;
+extern bool fNameLookup;
+>>>>>>> origin/Paycoin-master
 extern CService addrProxy;
 
 #endif

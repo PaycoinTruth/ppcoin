@@ -1,11 +1,20 @@
 // Copyright (c) 2009-2012 Bitcoin Developers
+<<<<<<< HEAD
 // Copyright (c) 2012-2013 The PPCoin developers
+=======
+// Copyright (c) 2012-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "init.h" // for pwalletMain
 #include "bitcoinrpc.h"
 #include "ui_interface.h"
+<<<<<<< HEAD
+=======
+#include "base58.h"
+>>>>>>> origin/Paycoin-master
 
 #include <boost/lexical_cast.hpp>
 
@@ -43,7 +52,11 @@ Value importprivkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
+<<<<<<< HEAD
             "importprivkey <ppcoinprivkey> [label]\n"
+=======
+            "importprivkey <paycoinprivkey> [label]\n"
+>>>>>>> origin/Paycoin-master
             "Adds a private key (as returned by dumpprivkey) to your wallet.");
 
     string strSecret = params[0].get_str();
@@ -56,15 +69,23 @@ Value importprivkey(const Array& params, bool fHelp)
     if (!fGood) throw JSONRPCError(-5,"Invalid private key");
     if (pwalletMain->IsLocked())
         throw JSONRPCError(-13, "Error: Please enter the wallet passphrase with walletpassphrase first.");
+<<<<<<< HEAD
     if (fWalletUnlockMintOnly) // ppcoin: no importprivkey in mint-only mode
+=======
+    if (fWalletUnlockMintOnly) // paycoin: no importprivkey in mint-only mode
+>>>>>>> origin/Paycoin-master
         throw JSONRPCError(-102, "Wallet is unlocked for minting only.");
 
     CKey key;
     bool fCompressed;
     CSecret secret = vchSecret.GetSecret(fCompressed);
     key.SetSecret(secret, fCompressed);
+<<<<<<< HEAD
     CBitcoinAddress vchAddress = CBitcoinAddress(key.GetPubKey());
 
+=======
+    CKeyID vchAddress = key.GetPubKey().GetID();
+>>>>>>> origin/Paycoin-master
     {
         LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -87,12 +108,18 @@ Value dumpprivkey(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
+<<<<<<< HEAD
             "dumpprivkey <ppcoinaddress>\n"
             "Reveals the private key corresponding to <ppcoinaddress>.");
+=======
+            "dumpprivkey <paycoinaddress>\n"
+            "Reveals the private key corresponding to <paycoinaddress>.");
+>>>>>>> origin/Paycoin-master
 
     string strAddress = params[0].get_str();
     CBitcoinAddress address;
     if (!address.SetString(strAddress))
+<<<<<<< HEAD
         throw JSONRPCError(-5, "Invalid ppcoin address");
     if (pwalletMain->IsLocked())
         throw JSONRPCError(-13, "Error: Please enter the wallet passphrase with walletpassphrase first.");
@@ -101,6 +128,19 @@ Value dumpprivkey(const Array& params, bool fHelp)
     CSecret vchSecret;
     bool fCompressed;
     if (!pwalletMain->GetSecret(address, vchSecret, fCompressed))
+=======
+        throw JSONRPCError(-5, "Invalid Paycoin address");
+    if (pwalletMain->IsLocked())
+        throw JSONRPCError(-13, "Error: Please enter the wallet passphrase with walletpassphrase first.");
+    if (fWalletUnlockMintOnly) // paycoin: no dumpprivkey in mint-only mode
+        throw JSONRPCError(-102, "Wallet is unlocked for minting only.");
+    CKeyID keyID;
+    if (!address.GetKeyID(keyID))
+        throw JSONRPCError(-3, "Address does not refer to a key");
+    CSecret vchSecret;
+    bool fCompressed;
+    if (!pwalletMain->GetSecret(keyID, vchSecret, fCompressed))
+>>>>>>> origin/Paycoin-master
         throw JSONRPCError(-4,"Private key for address " + strAddress + " is not known");
     return CBitcoinSecret(vchSecret, fCompressed).ToString();
 }

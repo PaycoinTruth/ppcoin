@@ -1,6 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2011-2013 The PPCoin developers
+=======
+// Copyright (c) 2011-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_MAIN_H
@@ -29,21 +34,55 @@ class CRequestTracker;
 class CNode;
 
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
+<<<<<<< HEAD
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE/2;
 static const unsigned int MAX_BLOCK_SIGOPS = MAX_BLOCK_SIZE/50;
 static const unsigned int MAX_ORPHAN_TRANSACTIONS = MAX_BLOCK_SIZE/100;
 static const int64 MIN_TX_FEE = CENT;
 static const int64 MIN_RELAY_TX_FEE = CENT;
+=======
+//static const unsigned int MAX_BLOCK_SIZE = 100000000;
+static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE/2;
+static const unsigned int MAX_BLOCK_SIGOPS = MAX_BLOCK_SIZE/50;
+static const unsigned int MAX_ORPHAN_TRANSACTIONS = MAX_BLOCK_SIZE/100;
+static const int64 MIN_TX_FEE = 0.1 * CENT;
+static const int64 MIN_RELAY_TX_FEE = 0.1 * CENT;
+>>>>>>> origin/Paycoin-master
 static const int64 MAX_MONEY = 2000000000 * COIN;
 static const int64 MAX_MINT_PROOF_OF_WORK = 9999 * COIN;
 static const int64 MIN_TXOUT_AMOUNT = MIN_TX_FEE;
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
+<<<<<<< HEAD
 static const int COINBASE_MATURITY_PPC = 500;
 // Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
 static const int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 static const int STAKE_TARGET_SPACING = 10 * 60; // 10-minute block spacing 
 static const int STAKE_MIN_AGE = 60 * 60 * 24 * 30; // minimum age for coin age
 static const int STAKE_MAX_AGE = 60 * 60 * 24 * 90; // stake age of full weight
+=======
+static const int COINBASE_MATURITY_PPC = 100;
+// Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp.
+static const int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
+static const int STAKE_TARGET_SPACING = 1 * 60; // 1-minute block
+//static const int STAKE_TARGET_SPACING = 1; // 1 second block spacing
+static const int STAKE_MIN_AGE = 60 * 60; // minimum age for coin age
+//static const int STAKE_MIN_AGE = 60; // minimum age for coin age
+static const int STAKE_MAX_AGE = 60 * 60 * 24 * 5; // stake age of full weight
+//static const int STAKE_MAX_AGE = 60 * 2; // stake age of full weight
+static const int STAKE_START_TIME = 1418470264; // Sat 13 Dec 2014 06:31:04 AM EST
+//static const int STAKE_START_TIME = 1418345400; // Thu 11 Dec 2014 05:30:00 PM EST
+static const unsigned int POW_START_TIME = 1418403600; // Fri 12 Dec 2014 12:00:00 PM EST
+//static const unsigned int POW_START_TIME = 1418345100; // Thu 11 Dec 2014 05:00:00 PM EST
+static const unsigned int POW_END_TIME = 1419181200; // Sun 21 Dec 2014 12:00:00 PM EST
+//static const unsigned int POW_END_TIME = 1418345700; // Thu 11 Dec 2014 05:40:00 PM EST
+// MODIFIER_INTERVAL: time to elapse before new modifier is computed
+//static const unsigned int MODIFIER_INTERVAL = 6 * 60 * 60;
+static const unsigned int MODIFIER_INTERVAL = 10 * 60;
+//static const unsigned int MODIFIER_INTERVAL = 10;
+static const int64 NUMBER_OF_PRIMENODE = 50;
+static const int64 MINIMUM_FOR_ORION = 50 * COIN;
+static const int64 MINIMUM_FOR_PRIMENODE = 125000 * COIN;
+>>>>>>> origin/Paycoin-master
 
 #ifdef USE_UPNP
 static const int fHaveUPnP = true;
@@ -51,8 +90,14 @@ static const int fHaveUPnP = true;
 static const int fHaveUPnP = false;
 #endif
 
+<<<<<<< HEAD
 static const uint256 hashGenesisBlockOfficial("0x0000000032fe677166d54963b62a4677d8957e87c508eaa4fd7eb1c880cd27e3");
 static const uint256 hashGenesisBlockTestNet("0x00000001f757bb737f6596503e17cd17b0658ce630cc727c0cca81aec47c9f06");
+=======
+static const uint256 hashGenesisBlockOfficial("0x00000e5695fbec8e36c10064491946ee3b723a9fa640fc0e25d3b8e4737e53e3");
+static const uint256 hashGenesisBlockTestNet("0x0000000f6bb18c77c5b39a25fa03e4c90bffa5cc10d6d9758a1bed5adcee9404");
+
+>>>>>>> origin/Paycoin-master
 
 static const int64 nMaxClockDrift = 2 * 60 * 60;        // two hours
 
@@ -100,6 +145,10 @@ class CTxIndex;
 
 void RegisterWallet(CWallet* pwalletIn);
 void UnregisterWallet(CWallet* pwalletIn);
+<<<<<<< HEAD
+=======
+void SyncWithWallets(const CTransaction& tx, const CBlock* pblock = NULL, bool fUpdate = false, bool fConnect = true);
+>>>>>>> origin/Paycoin-master
 bool ProcessBlock(CNode* pfrom, CBlock* pblock);
 bool CheckDiskSpace(uint64 nAdditionalBytes=0);
 FILE* OpenBlockFile(unsigned int nFile, unsigned int nBlockPos, const char* pszMode="rb");
@@ -115,17 +164,27 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
 bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey);
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 int64 GetProofOfWorkReward(unsigned int nBits);
+<<<<<<< HEAD
 int64 GetProofOfStakeReward(int64 nCoinAge);
 unsigned int ComputeMinWork(unsigned int nBase, int64 nTime);
+=======
+int64 GetProofOfStakeReward(int64 nCoinAge, int primeNodeRate=-1);
+unsigned int ComputeMinWork(unsigned int nBase, int64 nTime, bool fProofOfStake);
+>>>>>>> origin/Paycoin-master
 int GetNumBlocksOfPeers();
 bool IsInitialBlockDownload();
 std::string GetWarnings(std::string strFor);
 uint256 WantedByOrphan(const CBlock* pblockOrphan);
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake);
 void BitcoinMiner(CWallet *pwallet, bool fProofOfStake);
+<<<<<<< HEAD
 
 
 
+=======
+bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock);
+double GetBlockDifficulty(const CBlockIndex* blockindex = NULL);
+>>>>>>> origin/Paycoin-master
 
 
 
@@ -527,8 +586,23 @@ public:
 
     bool IsCoinStake() const
     {
+<<<<<<< HEAD
         // ppcoin: the coin stake transaction is marked with the first output empty
         return (vin.size() > 0 && (!vin[0].prevout.IsNull()) && vout.size() >= 2 && vout[0].IsEmpty());
+=======
+        if(!vout[0].IsEmpty() && vout[0].scriptPubKey[0] == OP_PRIMENODE350){
+            return (vin.size() > 0 && (!vin[0].prevout.IsNull()) && vout.size() >= 2 && vout[0].scriptPubKey[0] == OP_PRIMENODE350);
+        }else if(!vout[0].IsEmpty() && vout[0].scriptPubKey[0] == OP_PRIMENODE100){
+            return (vin.size() > 0 && (!vin[0].prevout.IsNull()) && vout.size() >= 2 && vout[0].scriptPubKey[0] == OP_PRIMENODE100);
+        }else if(!vout[0].IsEmpty() && vout[0].scriptPubKey[0] == OP_PRIMENODE20){
+            return (vin.size() > 0 && (!vin[0].prevout.IsNull()) && vout.size() >= 2 && vout[0].scriptPubKey[0] == OP_PRIMENODE20);
+        }else if(!vout[0].IsEmpty() && vout[0].scriptPubKey[0] == OP_PRIMENODE10){
+            return (vin.size() > 0 && (!vin[0].prevout.IsNull()) && vout.size() >= 2 && vout[0].scriptPubKey[0] == OP_PRIMENODE10);
+        }else{
+            return (vin.size() > 0 && (!vin[0].prevout.IsNull()) && vout.size() >= 2 && vout[0].IsEmpty());
+        }
+
+>>>>>>> origin/Paycoin-master
     }
 
     /** Check for standard transaction types
@@ -589,6 +663,7 @@ public:
         return dPriority > COIN * 144 / 250;
     }
 
+<<<<<<< HEAD
     int64 GetMinFee(unsigned int nBlockSize=1, bool fAllowFree=false, enum GetMinFee_mode mode=GMF_BLOCK) const
     {
         // Base fee is either MIN_TX_FEE or MIN_RELAY_TX_FEE
@@ -636,6 +711,9 @@ public:
         return nMinFee;
     }
 
+=======
+    int64 GetMinFee(unsigned int nBlockSize=1, bool fAllowFree=false, enum GetMinFee_mode mode=GMF_BLOCK, unsigned int nBytes=0) const;
+>>>>>>> origin/Paycoin-master
 
     bool ReadFromDisk(CDiskTxPos pos, FILE** pfileRet=NULL)
     {
@@ -710,6 +788,10 @@ public:
     }
 
 
+<<<<<<< HEAD
+=======
+    bool ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txindexRet);
+>>>>>>> origin/Paycoin-master
     bool ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet);
     bool ReadFromDisk(CTxDB& txdb, COutPoint prevout);
     bool ReadFromDisk(COutPoint prevout);
@@ -746,7 +828,11 @@ public:
     bool ClientConnectInputs();
     bool CheckTransaction() const;
     bool AcceptToMemoryPool(CTxDB& txdb, bool fCheckInputs=true, bool* pfMissingInputs=NULL);
+<<<<<<< HEAD
     bool GetCoinAge(CTxDB& txdb, uint64& nCoinAge) const;  // ppcoin: get transaction coin age
+=======
+    bool GetCoinAge(CTxDB& txdb, uint64& nCoinAge) const;  // paycoin: get transaction coin age
+>>>>>>> origin/Paycoin-master
 
 protected:
     const CTxOut& GetOutputFor(const CTxIn& input, const MapPrevTx& inputs) const;
@@ -890,7 +976,11 @@ public:
     // network and disk
     std::vector<CTransaction> vtx;
 
+<<<<<<< HEAD
     // ppcoin: block signature - signed by coin base txout[0]'s owner
+=======
+    // paycoin: block signature - signed by coin base txout[0]'s owner
+>>>>>>> origin/Paycoin-master
     std::vector<unsigned char> vchBlockSig;
 
     // memory only
@@ -959,7 +1049,11 @@ public:
 
     void UpdateTime(const CBlockIndex* pindexPrev);
 
+<<<<<<< HEAD
     // ppcoin: two types of block: proof-of-work or proof-of-stake
+=======
+    // paycoin: two types of block: proof-of-work or proof-of-stake
+>>>>>>> origin/Paycoin-master
     bool IsProofOfStake() const
     {
         return (vtx.size() > 1 && vtx[1].IsCoinStake());
@@ -975,7 +1069,11 @@ public:
         return IsProofOfStake()? std::make_pair(vtx[1].vin[0].prevout, vtx[1].nTime) : std::make_pair(COutPoint(), (unsigned int)0);
     }
 
+<<<<<<< HEAD
     // ppcoin: get max transaction timestamp
+=======
+    // paycoin: get max transaction timestamp
+>>>>>>> origin/Paycoin-master
     int64 GetMaxTransactionTime() const
     {
         int64 maxTransactionTime = 0;
@@ -1124,12 +1222,21 @@ public:
     bool ReadFromDisk(const CBlockIndex* pindex, bool fReadTransactions=true);
     bool SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew);
     bool AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos);
+<<<<<<< HEAD
     bool CheckBlock() const;
     bool AcceptBlock();
     bool GetCoinAge(uint64& nCoinAge) const; // ppcoin: calculate total coin age spent in block
     bool SignBlock(const CKeyStore& keystore);
     bool CheckBlockSignature() const;
     unsigned int GetStakeEntropyBit() const; // ppcoin: entropy bit for stake modifier if chosen by modifier
+=======
+    bool CheckBlock(int64 nHeight=-1) const;
+    bool AcceptBlock();
+    bool GetCoinAge(uint64& nCoinAge) const; // paycoin: calculate total coin age spent in block
+    bool SignBlock(const CKeyStore& keystore);
+    bool CheckBlockSignature() const;
+    unsigned int GetStakeEntropyBit() const; // paycoin: entropy bit for stake modifier if chosen by modifier
+>>>>>>> origin/Paycoin-master
 
 private:
     bool SetBestChainInner(CTxDB& txdb, CBlockIndex *pindexNew);
@@ -1155,12 +1262,20 @@ public:
     CBlockIndex* pnext;
     unsigned int nFile;
     unsigned int nBlockPos;
+<<<<<<< HEAD
     CBigNum bnChainTrust; // ppcoin: trust score of block chain
+=======
+    CBigNum bnChainTrust; // paycoin: trust score of block chain
+>>>>>>> origin/Paycoin-master
     int nHeight;
     int64 nMint;
     int64 nMoneySupply;
 
+<<<<<<< HEAD
     unsigned int nFlags;  // ppcoin: block index flags
+=======
+    unsigned int nFlags;  // paycoin: block index flags
+>>>>>>> origin/Paycoin-master
     enum  
     {
         BLOCK_PROOF_OF_STAKE = (1 << 0), // is proof-of-stake block
@@ -1266,6 +1381,35 @@ public:
         return (int64)nTime;
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Duplicate from bitcoinrpc that originaly define this method.
+     * May require some cleanup since this method should be available both for rpc
+     * and qt clients.
+     */
+    double GetBlockDifficulty() const
+    {
+        int nShift = (nBits >> 24) & 0xff;
+
+        double dDiff =
+            (double)0x0000ffff / (double)(nBits & 0x00ffffff);
+
+        while (nShift < 29)
+        {
+            dDiff *= 256.0;
+            nShift++;
+        }
+        while (nShift > 29)
+        {
+            dDiff /= 256.0;
+            nShift--;
+        }
+
+        return dDiff;
+    }
+
+>>>>>>> origin/Paycoin-master
     CBigNum GetBlockTrust() const
     {
         CBigNum bnTarget;
@@ -1801,7 +1945,11 @@ public:
     bool CheckSignature()
     {
         CKey key;
+<<<<<<< HEAD
         if (!key.SetPubKey(ParseHex("04a0a849dd49b113d3179a332dd77715c43be4d0076e2f19e66de23dd707e56630f792f298dfd209bf042bb3561f4af6983f3d81e439737ab0bf7f898fecd21aab")))
+=======
+        if (!key.SetPubKey(ParseHex("045dc635516bcd6c75152473bef99e700f364f4aac8fd1951c35e4696c9be8487e750e5efcc67e6e3f71a17696a6d9bd12e97c239bd00cd3fdea8296905c9b7dcf")))
+>>>>>>> origin/Paycoin-master
             return error("CAlert::CheckSignature() : SetPubKey failed");
         if (!key.Verify(Hash(vchMsg.begin(), vchMsg.end()), vchSig))
             return error("CAlert::CheckSignature() : verify signature failed");
@@ -1826,6 +1974,10 @@ public:
                 bool fCheckInputs, bool* pfMissingInputs);
     bool addUnchecked(CTransaction &tx);
     bool remove(CTransaction &tx);
+<<<<<<< HEAD
+=======
+    void queryHashes(std::vector<uint256>& vtxid);
+>>>>>>> origin/Paycoin-master
 
     unsigned long size()
     {

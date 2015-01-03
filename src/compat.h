@@ -25,7 +25,13 @@
 #include <ifaddrs.h>
 #endif
 
+<<<<<<< HEAD
 typedef u_int SOCKET;
+=======
+#ifndef _WIN64
+typedef u_int SOCKET;
+#endif
+>>>>>>> origin/Paycoin-master
 #ifdef WIN32
 #define MSG_NOSIGNAL        0
 #define MSG_DONTWAIT        0

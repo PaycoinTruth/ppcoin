@@ -54,7 +54,11 @@ void setupAmountWidget(QLineEdit *widget, QWidget *parent)
 
 bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out)
 {
+<<<<<<< HEAD
     if(uri.scheme() != QString("ppcoin"))
+=======
+    if(uri.scheme() != QString("paycoin"))
+>>>>>>> origin/Paycoin-master
         return false;
 
     SendCoinsRecipient rv;
@@ -103,9 +107,15 @@ bool parseBitcoinURI(QString uri, SendCoinsRecipient *out)
     //
     //    Cannot handle this later, because bitcoin:// will cause Qt to see the part after // as host,
     //    which will lowercase it (and thus invalidate the address).
+<<<<<<< HEAD
     if(uri.startsWith("ppcoin://"))
     {
         uri.replace(0, 9, "ppcoin:");
+=======
+    if(uri.startsWith("paycoin://"))
+    {
+        uri.replace(0, 9, "paycoin:");
+>>>>>>> origin/Paycoin-master
     }
     QUrl uriInstance(uri);
     return parseBitcoinURI(uriInstance, out);

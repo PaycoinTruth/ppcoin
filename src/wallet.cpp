@@ -1,6 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2011-2013 The PPCoin developers
+=======
+// Copyright (c) 2011-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,7 +13,14 @@
 #include "walletdb.h"
 #include "crypter.h"
 #include "ui_interface.h"
+<<<<<<< HEAD
 #include "kernel.h"
+=======
+#include "base58.h"
+#include "coincontrol.h" 
+#include "kernel.h"
+#include <boost/algorithm/string/replace.hpp>
+>>>>>>> origin/Paycoin-master
 
 using namespace std;
 
@@ -18,7 +30,11 @@ using namespace std;
 // mapWallet
 //
 
+<<<<<<< HEAD
 std::vector<unsigned char> CWallet::GenerateNewKey()
+=======
+CPubKey CWallet::GenerateNewKey()
+>>>>>>> origin/Paycoin-master
 {
     bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
 
@@ -46,7 +62,11 @@ bool CWallet::AddKey(const CKey& key)
     return true;
 }
 
+<<<<<<< HEAD
 bool CWallet::AddCryptedKey(const vector<unsigned char> &vchPubKey, const vector<unsigned char> &vchCryptedSecret)
+=======
+bool CWallet::AddCryptedKey(const CPubKey &vchPubKey, const vector<unsigned char> &vchCryptedSecret)
+>>>>>>> origin/Paycoin-master
 {
     if (!CCryptoKeyStore::AddCryptedKey(vchPubKey, vchCryptedSecret))
         return false;
@@ -71,7 +91,11 @@ bool CWallet::AddCScript(const CScript& redeemScript)
     return CWalletDB(strWalletFile).WriteCScript(Hash160(redeemScript), redeemScript);
 }
 
+<<<<<<< HEAD
 // ppcoin: optional setting to unlock wallet for block minting only;
+=======
+// paycoin: optional setting to unlock wallet for block minting only;
+>>>>>>> origin/Paycoin-master
 //         serves to disable the trivial sendmoney when OS account compromised
 bool fWalletUnlockMintOnly = false;
 
@@ -300,10 +324,17 @@ void CWallet::WalletUpdateSpent(const CTransaction &tx)
                 CWalletTx& wtx = (*mi).second;
                 if (!wtx.IsSpent(txin.prevout.n) && IsMine(wtx.vout[txin.prevout.n]))
                 {
+<<<<<<< HEAD
                     printf("WalletUpdateSpent found spent coin %sppc %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
                     wtx.MarkSpent(txin.prevout.n);
                     wtx.WriteToDisk();
                     vWalletUpdated.push_back(txin.prevout.hash);
+=======
+                    printf("WalletUpdateSpent found spent coin %sxpy %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
+                    wtx.MarkSpent(txin.prevout.n);
+                    wtx.WriteToDisk();
+                    UpdatedTransaction(txin.prevout.hash);
+>>>>>>> origin/Paycoin-master
                 }
             }
         }
@@ -365,25 +396,53 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn)
 #ifndef QT_GUI
         // If default receiving address gets used, replace it with a new one
         CScript scriptDefaultKey;
+<<<<<<< HEAD
         scriptDefaultKey.SetBitcoinAddress(vchDefaultKey);
+=======
+        scriptDefaultKey.SetDestination(vchDefaultKey.GetID());
+>>>>>>> origin/Paycoin-master
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
             if (txout.scriptPubKey == scriptDefaultKey)
             {
+<<<<<<< HEAD
                 std::vector<unsigned char> newDefaultKey;
                 if (GetKeyFromPool(newDefaultKey, false))
                 {
                     SetDefaultKey(newDefaultKey);
                     SetAddressBookName(CBitcoinAddress(vchDefaultKey), "");
+=======
+                CPubKey newDefaultKey;
+                if (GetKeyFromPool(newDefaultKey, false))
+                {
+                    SetDefaultKey(newDefaultKey);
+                    SetAddressBookName(vchDefaultKey.GetID(), "");
+>>>>>>> origin/Paycoin-master
                 }
             }
         }
 #endif
         // Notify UI
+<<<<<<< HEAD
         vWalletUpdated.push_back(hash);
 
         // since AddToWallet is called directly for self-originating transactions, check for consumption of own coins
         WalletUpdateSpent(wtx);
+=======
+        UpdatedTransaction(hash);
+
+        // since AddToWallet is called directly for self-originating transactions, check for consumption of own coins
+        WalletUpdateSpent(wtx);
+
+        // notify an external script when a wallet transaction comes in or is updated
+        std::string strCmd = GetArg("-walletnotify", "");
+
+        if ( !strCmd.empty())
+        {
+            boost::replace_all(strCmd, "%s", wtxIn.GetHash().GetHex());
+            boost::thread t(runCommand, strCmd); // thread runs free
+        }
+>>>>>>> origin/Paycoin-master
     }
 
     // Refresh UI
@@ -462,7 +521,11 @@ int64 CWallet::GetDebit(const CTxIn &txin) const
 
 bool CWallet::IsChange(const CTxOut& txout) const
 {
+<<<<<<< HEAD
     CBitcoinAddress address;
+=======
+    CTxDestination address;
+>>>>>>> origin/Paycoin-master
 
     // TODO: fix handling of 'change' outputs. The assumption is that any
     // payment to a TX_PUBKEYHASH that is mine but isn't in the address book
@@ -471,7 +534,11 @@ bool CWallet::IsChange(const CTxOut& txout) const
     // a better way of identifying which outputs are 'the send' and which are
     // 'the change' will need to be implemented (maybe extend CWalletTx to remember
     // which output, if any, was change).
+<<<<<<< HEAD
     if (ExtractAddress(txout.scriptPubKey, address) && HaveKey(address))
+=======
+    if (ExtractDestination(txout.scriptPubKey, address) && ::IsMine(*this, address))
+>>>>>>> origin/Paycoin-master
     {
         LOCK(cs_wallet);
         if (!mapAddressBook.count(address))
@@ -524,8 +591,13 @@ int CWalletTx::GetRequestCount() const
     return nRequests;
 }
 
+<<<<<<< HEAD
 void CWalletTx::GetAmounts(int64& nGeneratedImmature, int64& nGeneratedMature, list<pair<CBitcoinAddress, int64> >& listReceived,
                            list<pair<CBitcoinAddress, int64> >& listSent, int64& nFee, string& strSentAccount) const
+=======
+void CWalletTx::GetAmounts(int64& nGeneratedImmature, int64& nGeneratedMature, list<pair<CTxDestination, int64> >& listReceived,
+                           list<pair<CTxDestination, int64> >& listSent, int64& nFee, string& strSentAccount) const
+>>>>>>> origin/Paycoin-master
 {
     nGeneratedImmature = nGeneratedMature = nFee = 0;
     listReceived.clear();
@@ -552,6 +624,7 @@ void CWalletTx::GetAmounts(int64& nGeneratedImmature, int64& nGeneratedMature, l
     // Sent/received.
     BOOST_FOREACH(const CTxOut& txout, vout)
     {
+<<<<<<< HEAD
         CBitcoinAddress address;
         vector<unsigned char> vchPubKey;
         if (!ExtractAddress(txout.scriptPubKey, address))
@@ -559,6 +632,14 @@ void CWalletTx::GetAmounts(int64& nGeneratedImmature, int64& nGeneratedMature, l
             printf("CWalletTx::GetAmounts: Unknown transaction type found, txid %s\n",
                    this->GetHash().ToString().c_str());
             address = " unknown ";
+=======
+        CTxDestination address;
+        vector<unsigned char> vchPubKey;
+        if (!ExtractDestination(txout.scriptPubKey, address))
+        {
+            printf("CWalletTx::GetAmounts: Unknown transaction type found, txid %s\n",
+                   this->GetHash().ToString().c_str());
+>>>>>>> origin/Paycoin-master
         }
 
         // Don't report 'change' txouts
@@ -582,25 +663,42 @@ void CWalletTx::GetAccountAmounts(const string& strAccount, int64& nGenerated, i
     int64 allGeneratedImmature, allGeneratedMature, allFee;
     allGeneratedImmature = allGeneratedMature = allFee = 0;
     string strSentAccount;
+<<<<<<< HEAD
     list<pair<CBitcoinAddress, int64> > listReceived;
     list<pair<CBitcoinAddress, int64> > listSent;
+=======
+    list<pair<CTxDestination, int64> > listReceived;
+    list<pair<CTxDestination, int64> > listSent;
+>>>>>>> origin/Paycoin-master
     GetAmounts(allGeneratedImmature, allGeneratedMature, listReceived, listSent, allFee, strSentAccount);
 
     if (strAccount == "")
         nGenerated = allGeneratedMature;
     if (strAccount == strSentAccount)
     {
+<<<<<<< HEAD
         BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress,int64)& s, listSent)
+=======
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination,int64)& s, listSent)
+>>>>>>> origin/Paycoin-master
             nSent += s.second;
         nFee = allFee;
     }
     {
         LOCK(pwallet->cs_wallet);
+<<<<<<< HEAD
         BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress,int64)& r, listReceived)
         {
             if (pwallet->mapAddressBook.count(r.first))
             {
                 map<CBitcoinAddress, string>::const_iterator mi = pwallet->mapAddressBook.find(r.first);
+=======
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination,int64)& r, listReceived)
+        {
+            if (pwallet->mapAddressBook.count(r.first))
+            {
+                map<CTxDestination, string>::const_iterator mi = pwallet->mapAddressBook.find(r.first);
+>>>>>>> origin/Paycoin-master
                 if (mi != pwallet->mapAddressBook.end() && (*mi).second == strAccount)
                     nReceived += r.second;
             }
@@ -749,7 +847,11 @@ void CWallet::ReacceptWalletTransactions()
                 }
                 if (fUpdated)
                 {
+<<<<<<< HEAD
                     printf("ReacceptWalletTransactions found spent coin %sppc %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
+=======
+                    printf("ReacceptWalletTransactions found spent coin %sxpy %s\n", FormatMoney(wtx.GetCredit()).c_str(), wtx.GetHash().ToString().c_str());
+>>>>>>> origin/Paycoin-master
                     wtx.MarkDirty();
                     wtx.WriteToDisk();
                 }
@@ -878,15 +980,52 @@ int64 CWallet::GetUnconfirmedBalance() const
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
         {
             const CWalletTx* pcoin = &(*it).second;
+<<<<<<< HEAD
             if (pcoin->IsFinal() && pcoin->IsConfirmed())
                 continue;
             nTotal += pcoin->GetAvailableCredit();
+=======
+            if (!pcoin->IsFinal() || !pcoin->IsConfirmed())
+                nTotal += pcoin->GetAvailableCredit();
+>>>>>>> origin/Paycoin-master
         }
     }
     return nTotal;
 }
 
+<<<<<<< HEAD
 // ppcoin: total coins staked (non-spendable until maturity)
+=======
+// populate vCoins with vector of spendable COutputs
+void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const CCoinControl *coinControl) const
+{
+    vCoins.clear();
+
+    {
+        LOCK(cs_wallet);
+        for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
+        {
+            const CWalletTx* pcoin = &(*it).second;
+
+            if (!pcoin->IsFinal())
+                continue;
+
+            if (fOnlyConfirmed && !pcoin->IsConfirmed())
+                continue;
+
+            if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
+                continue;
+
+            for (unsigned int i = 0; i < pcoin->vout.size(); i++)
+                if (!(pcoin->IsSpent(i)) && IsMine(pcoin->vout[i]) && pcoin->vout[i].nValue > 0 &&
+                (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
+                    vCoins.push_back(COutput(pcoin, i, pcoin->GetDepthInMainChain()));
+        }
+    }
+}
+
+// paycoin: total coins staked (non-spendable until maturity)
+>>>>>>> origin/Paycoin-master
 int64 CWallet::GetStake() const
 {
     int64 nTotal = 0;
@@ -952,7 +1091,11 @@ bool CWallet::SelectCoinsMinConf(int64 nTargetValue, unsigned int nSpendTime, in
                     continue;
 
                 if (pcoin->nTime > nSpendTime)
+<<<<<<< HEAD
                     continue;  // ppcoin: timestamp must not exceed spend time
+=======
+                    continue;  // paycoin: timestamp must not exceed spend time
+>>>>>>> origin/Paycoin-master
 
                 int64 n = pcoin->vout[i].nValue;
 
@@ -1065,8 +1208,27 @@ bool CWallet::SelectCoinsMinConf(int64 nTargetValue, unsigned int nSpendTime, in
     return true;
 }
 
+<<<<<<< HEAD
 bool CWallet::SelectCoins(int64 nTargetValue, unsigned int nSpendTime, set<pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet) const
 {
+=======
+bool CWallet::SelectCoins(int64 nTargetValue, unsigned int nSpendTime, set<pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet, const CCoinControl* coinControl) const
+{
+    vector<COutput> vCoins;
+    AvailableCoins(vCoins, true, coinControl);
+
+    // coin control -> return all selected outputs (we want all selected to go into the transaction for sure)
+    if (coinControl && coinControl->HasSelected())
+    {
+        BOOST_FOREACH(const COutput& out, vCoins)
+        {
+            nValueRet += out.tx->vout[out.i].nValue;
+            setCoinsRet.insert(make_pair(out.tx, out.i));
+        }
+        return (nValueRet >= nTargetValue);
+    }
+
+>>>>>>> origin/Paycoin-master
     return (SelectCoinsMinConf(nTargetValue, nSpendTime, 1, 6, setCoinsRet, nValueRet) ||
             SelectCoinsMinConf(nTargetValue, nSpendTime, 1, 1, setCoinsRet, nValueRet) ||
             SelectCoinsMinConf(nTargetValue, nSpendTime, 0, 1, setCoinsRet, nValueRet));
@@ -1075,7 +1237,11 @@ bool CWallet::SelectCoins(int64 nTargetValue, unsigned int nSpendTime, set<pair<
 
 
 
+<<<<<<< HEAD
 bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet)
+=======
+bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, const CCoinControl* coinControl)
+>>>>>>> origin/Paycoin-master
 {
     int64 nValue = 0;
     BOOST_FOREACH (const PAIRTYPE(CScript, int64)& s, vecSend)
@@ -1110,7 +1276,11 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                 // Choose coins to use
                 set<pair<const CWalletTx*,unsigned int> > setCoins;
                 int64 nValueIn = 0;
+<<<<<<< HEAD
                 if (!SelectCoins(nTotalValue, wtxNew.nTime, setCoins, nValueIn))
+=======
+                if (!SelectCoins(nTotalValue, wtxNew.nTime, setCoins, nValueIn, coinControl))
+>>>>>>> origin/Paycoin-master
                     return false;
                 CScript scriptChange;
                 BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
@@ -1131,7 +1301,11 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                     nFeeRet += nMoveToFee;
                 }
 
+<<<<<<< HEAD
                 // ppcoin: sub-cent change is moved to fee
+=======
+                // paycoin: sub-cent change is moved to fee
+>>>>>>> origin/Paycoin-master
                 if (nChange > 0 && nChange < MIN_TXOUT_AMOUNT)
                 {
                     nFeeRet += nChange;
@@ -1140,6 +1314,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
 
                 if (nChange > 0)
                 {
+<<<<<<< HEAD
                     // Note: We use a new key here to keep it from being obvious which side is the change.
                     //  The drawback is that by not reusing a previous key, the change may be lost if a
                     //  backup is restored, if the backup doesn't have the new private key for the change.
@@ -1157,6 +1332,33 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
                         // TODO: pass in scriptChange instead of reservekey so
                         // change transaction isn't always pay-to-bitcoin-address
                         scriptChange.SetBitcoinAddress(vchPubKey);
+=======
+                    if (!GetBoolArg("-avatar")) // paycoin: not avatar mode
+                    {
+                        // Fill a vout to ourself
+                        // TODO: pass in scriptChange instead of reservekey so
+                        // change transaction isn't always pay-to-bitcoin-address
+
+                        // coin control: send change to custom address
+                        if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
+                            scriptChange.SetDestination(coinControl->destChange);
+                        
+                        // no coin control: send change to newly generated address
+                        else
+                        {
+                            // Note: We use a new key here to keep it from being obvious which side is the change.
+                            //  The drawback is that by not reusing a previous key, the change may be lost if a
+                            //  backup is restored, if the backup doesn't have the new private key for the change.
+                            //  If we reused the old key, it would be possible to add code to look for and
+                            //  rediscover unknown transactions that were written with keys of ours to recover
+                            //  post-backup change.
+
+                            // Reserve a new key pair from key pool
+                            CPubKey vchPubKey = reservekey.GetReservedKey();
+
+                            scriptChange.SetDestination(vchPubKey.GetID());
+                        }
+>>>>>>> origin/Paycoin-master
                     }
 
                     // Insert change txn at random position:
@@ -1184,7 +1386,12 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
 
                 // Check that enough fee is included
                 int64 nPayFee = nTransactionFee * (1 + (int64)nBytes / 1000);
+<<<<<<< HEAD
                 int64 nMinFee = wtxNew.GetMinFee(1, false, GMF_SEND);
+=======
+                int64 nMinFee = wtxNew.GetMinFee(1, false, GMF_SEND, nBytes);
+
+>>>>>>> origin/Paycoin-master
                 if (nFeeRet < max(nPayFee, nMinFee))
                 {
                     nFeeRet = max(nPayFee, nMinFee);
@@ -1202,6 +1409,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, int64> >& vecSend, CW
     return true;
 }
 
+<<<<<<< HEAD
 bool CWallet::CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet)
 {
     vector< pair<CScript, int64> > vecSend;
@@ -1216,6 +1424,25 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     // Should not be adjusted if you don't understand the consequences
     static unsigned int nStakeSplitAge = (60 * 60 * 24 * 90);
     int64 nCombineThreshold = GetProofOfWorkReward(GetLastBlockIndex(pindexBest, false)->nBits) / 3;
+=======
+bool CWallet::CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, const CCoinControl* coinControl)
+{
+    vector< pair<CScript, int64> > vecSend;
+    vecSend.push_back(make_pair(scriptPubKey, nValue));
+    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, coinControl);
+}
+
+// paycoin: create coin stake transaction
+bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64 nSearchInterval, CTransaction& txNew, int64 nMoneySupply)
+{
+    // The following split & combine thresholds are important to security
+    // Should not be adjusted if you don't understand the consequences
+    static unsigned int nStakeSplitAge = (60 * 60 * 24 * 15);
+    // static unsigned int nStakeSplitAge = (60 * 6);
+    // orion controller
+    int64 nCombineThreshold = MINIMUM_FOR_ORION;
+
+>>>>>>> origin/Paycoin-master
 
     CBigNum bnTargetPerCoinDay;
     bnTargetPerCoinDay.SetCompact(nBits);
@@ -1223,10 +1450,59 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     LOCK2(cs_main, cs_wallet);
     txNew.vin.clear();
     txNew.vout.clear();
+<<<<<<< HEAD
     // Mark coin stake transaction
     CScript scriptEmpty;
     scriptEmpty.clear();
     txNew.vout.push_back(CTxOut(0, scriptEmpty));
+=======
+
+    // Make variable interested rate
+    unsigned int primeNodeRate = 0;
+
+    if (mapArgs.count("-primenodekey") && mapArgs.count("-primenoderate")) // paycoin: primenode priv key
+    {
+            std::string strPrivKey = GetArg("-primenodekey", "");
+            std::vector<unsigned char> vchPrivKey = ParseHex(strPrivKey);
+            CKey key;
+            key.SetPrivKey(CPrivKey(vchPrivKey.begin(), vchPrivKey.end())); // if key is not correct openssl may crash
+            CScript scriptTime;
+            scriptTime << txNew.nTime;
+            uint256 hashScriptTime = Hash(scriptTime.begin(), scriptTime.end());
+            std::vector<unsigned char> vchSig;
+            if(!key.Sign(hashScriptTime, vchSig)){
+                return error("CreateCoinStake : Unable to sign checkpoint, wrong primenodekey?");
+            }
+            CScript scriptPrimeNode;
+            std::string primeNodeRateArg = GetArg("-primenoderate", "");
+            if (primeNodeRateArg.compare("350") == 0){
+                scriptPrimeNode << OP_PRIMENODE350 << vchSig;
+                primeNodeRate = 350;
+                nCombineThreshold = MINIMUM_FOR_PRIMENODE;
+            }else if (primeNodeRateArg.compare("100") == 0){
+                scriptPrimeNode << OP_PRIMENODE100 << vchSig;
+                primeNodeRate = 100;
+                nCombineThreshold = MINIMUM_FOR_PRIMENODE;
+            }else if (primeNodeRateArg.compare("20") == 0){
+                scriptPrimeNode << OP_PRIMENODE20 << vchSig;
+                primeNodeRate = 20;
+                nCombineThreshold = MINIMUM_FOR_PRIMENODE;
+            }else if (primeNodeRateArg.compare("10") == 0){
+                scriptPrimeNode << OP_PRIMENODE10 << vchSig;
+                primeNodeRate = 10;
+                nCombineThreshold = MINIMUM_FOR_PRIMENODE;
+            }else{
+                return error("CreateCoinStake : Primenode rate configuration is wrong or missing");
+            }
+            txNew.vout.push_back(CTxOut(0, scriptPrimeNode));
+     }else{
+         // Mark coin stake transaction
+         CScript scriptEmpty;
+         scriptEmpty.clear();
+         txNew.vout.push_back(CTxOut(0, scriptEmpty));
+     }
+
+>>>>>>> origin/Paycoin-master
     // Choose coins to use
     int64 nBalance = GetBalance();
     int64 nReserveBalance = 0;
@@ -1329,6 +1605,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             && pcoin.first->GetHash() != txNew.vin[0].prevout.hash)
         {
             // Stop adding more inputs if already too many inputs
+<<<<<<< HEAD
             if (txNew.vin.size() >= 100)
                 break;
             // Stop adding more inputs if value is already pretty significant
@@ -1343,10 +1620,35 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             // Do not add input that is still too young
             if (pcoin.first->nTime + STAKE_MAX_AGE > txNew.nTime)
                 continue;
+=======
+            if (txNew.vin.size() >= 100){
+                break;
+            }
+            // Stop adding more inputs if value is already pretty significant
+            if (nCredit >= nCombineThreshold){
+                break;
+            }
+            // Stop adding inputs if reached reserve limit
+            if (nCredit + pcoin.first->vout[pcoin.second].nValue > nBalance - nReserveBalance){
+                break;
+            }
+            // Do not add additional significant input
+            if (pcoin.first->vout[pcoin.second].nValue >= nCombineThreshold){
+                continue;
+            }
+            // Do not add input that is still too young
+            if (pcoin.first->nTime + STAKE_MAX_AGE > txNew.nTime){
+                continue;
+            }
+>>>>>>> origin/Paycoin-master
             txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
             nCredit += pcoin.first->vout[pcoin.second].nValue;
             vwtxPrev.push_back(pcoin.first);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Paycoin-master
     }
     // Calculate coin age reward
     {
@@ -1354,7 +1656,24 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         CTxDB txdb("r");
         if (!txNew.GetCoinAge(txdb, nCoinAge))
             return error("CreateCoinStake : failed to calculate coin age");
+<<<<<<< HEAD
         nCredit += GetProofOfStakeReward(nCoinAge);
+=======
+
+        if (primeNodeRate != 0 && nCredit < MINIMUM_FOR_PRIMENODE){
+            return error("CreateCoinStake : credit doesn't meet requirement for primenode; credit = %lld; requirement = %lld nCombineThreshold = %lld\n", nCredit, MINIMUM_FOR_PRIMENODE, nCombineThreshold);
+        }else if (primeNodeRate == 0 && nCredit < MINIMUM_FOR_ORION){
+            return error("CreateCoinStake : credit doesn't meet requirement for orion controller; credit = %lld; requirement = %lld nCombineThreshold = %lld\n", nCredit, MINIMUM_FOR_ORION, nCombineThreshold);
+        }
+
+        int64 nReward = GetProofOfStakeReward(nCoinAge, primeNodeRate);
+
+        // Refuse to create mint that has zero or negative reward
+        if(nReward <= 0) {
+          return false;
+        }
+        nCredit += nReward;
+>>>>>>> origin/Paycoin-master
     }
 
     int64 nMinFee = 0;
@@ -1427,7 +1746,11 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey)
                 coin.BindWallet(this);
                 coin.MarkSpent(txin.prevout.n);
                 coin.WriteToDisk();
+<<<<<<< HEAD
                 vWalletUpdated.push_back(coin.GetHash());
+=======
+                UpdatedTransaction(coin.GetHash());
+>>>>>>> origin/Paycoin-master
             }
 
             if (fFileBacked)
@@ -1493,7 +1816,11 @@ string CWallet::SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew,
 
 
 
+<<<<<<< HEAD
 string CWallet::SendMoneyToBitcoinAddress(const CBitcoinAddress& address, int64 nValue, CWalletTx& wtxNew, bool fAskFee)
+=======
+string CWallet::SendMoneyToDestination(const CTxDestination& address, int64 nValue, CWalletTx& wtxNew, bool fAskFee)
+>>>>>>> origin/Paycoin-master
 {
     // Check amount
     if (nValue <= 0)
@@ -1503,7 +1830,11 @@ string CWallet::SendMoneyToBitcoinAddress(const CBitcoinAddress& address, int64 
 
     // Parse bitcoin address
     CScript scriptPubKey;
+<<<<<<< HEAD
     scriptPubKey.SetBitcoinAddress(address);
+=======
+    scriptPubKey.SetDestination(address);
+>>>>>>> origin/Paycoin-master
 
     return SendMoney(scriptPubKey, nValue, wtxNew, fAskFee);
 }
@@ -1531,29 +1862,48 @@ int CWallet::LoadWallet(bool& fFirstRunRet)
 
     if (nLoadWalletRet != DB_LOAD_OK)
         return nLoadWalletRet;
+<<<<<<< HEAD
     fFirstRunRet = vchDefaultKey.empty();
+=======
+    fFirstRunRet = !vchDefaultKey.IsValid();
+>>>>>>> origin/Paycoin-master
 
     CreateThread(ThreadFlushWalletDB, &strWalletFile);
     return DB_LOAD_OK;
 }
 
 
+<<<<<<< HEAD
 bool CWallet::SetAddressBookName(const CBitcoinAddress& address, const string& strName)
+=======
+bool CWallet::SetAddressBookName(const CTxDestination& address, const string& strName)
+>>>>>>> origin/Paycoin-master
 {
     mapAddressBook[address] = strName;
     AddressBookRepaint();
     if (!fFileBacked)
         return false;
+<<<<<<< HEAD
     return CWalletDB(strWalletFile).WriteName(address.ToString(), strName);
 }
 
 bool CWallet::DelAddressBookName(const CBitcoinAddress& address)
+=======
+    return CWalletDB(strWalletFile).WriteName(CBitcoinAddress(address).ToString(), strName);
+}
+
+bool CWallet::DelAddressBookName(const CTxDestination& address)
+>>>>>>> origin/Paycoin-master
 {
     mapAddressBook.erase(address);
     AddressBookRepaint();
     if (!fFileBacked)
         return false;
+<<<<<<< HEAD
     return CWalletDB(strWalletFile).EraseName(address.ToString());
+=======
+    return CWalletDB(strWalletFile).EraseName(CBitcoinAddress(address).ToString());
+>>>>>>> origin/Paycoin-master
 }
 
 
@@ -1589,7 +1939,11 @@ bool CWallet::GetTransaction(const uint256 &hashTx, CWalletTx& wtx)
     return false;
 }
 
+<<<<<<< HEAD
 bool CWallet::SetDefaultKey(const std::vector<unsigned char> &vchPubKey)
+=======
+bool CWallet::SetDefaultKey(const CPubKey &vchPubKey)
+>>>>>>> origin/Paycoin-master
 {
     if (fFileBacked)
     {
@@ -1665,7 +2019,11 @@ bool CWallet::TopUpKeyPool()
 void CWallet::ReserveKeyFromKeyPool(int64& nIndex, CKeyPool& keypool)
 {
     nIndex = -1;
+<<<<<<< HEAD
     keypool.vchPubKey.clear();
+=======
+    keypool.vchPubKey = CPubKey();
+>>>>>>> origin/Paycoin-master
     {
         LOCK(cs_wallet);
 
@@ -1682,11 +2040,18 @@ void CWallet::ReserveKeyFromKeyPool(int64& nIndex, CKeyPool& keypool)
         setKeyPool.erase(setKeyPool.begin());
         if (!walletdb.ReadPool(nIndex, keypool))
             throw runtime_error("ReserveKeyFromKeyPool() : read failed");
+<<<<<<< HEAD
         if (!HaveKey(Hash160(keypool.vchPubKey)))
             throw runtime_error("ReserveKeyFromKeyPool() : unknown key in key pool");
         assert(!keypool.vchPubKey.empty());
         if (fDebug && GetBoolArg("-printkeypool"))
             printf("keypool reserve %"PRI64d"\n", nIndex);
+=======
+        if (!HaveKey(keypool.vchPubKey.GetID()))
+            throw runtime_error("ReserveKeyFromKeyPool() : unknown key in key pool");
+        assert(keypool.vchPubKey.IsValid());
+        printf("keypool reserve %"PRI64d"\n", nIndex);
+>>>>>>> origin/Paycoin-master
     }
 }
 
@@ -1727,7 +2092,11 @@ void CWallet::ReturnKey(int64 nIndex)
         printf("keypool return %"PRI64d"\n", nIndex);
 }
 
+<<<<<<< HEAD
 bool CWallet::GetKeyFromPool(vector<unsigned char>& result, bool fAllowReuse)
+=======
+bool CWallet::GetKeyFromPool(CPubKey& result, bool fAllowReuse)
+>>>>>>> origin/Paycoin-master
 {
     int64 nIndex = 0;
     CKeyPool keypool;
@@ -1736,7 +2105,11 @@ bool CWallet::GetKeyFromPool(vector<unsigned char>& result, bool fAllowReuse)
         ReserveKeyFromKeyPool(nIndex, keypool);
         if (nIndex == -1)
         {
+<<<<<<< HEAD
             if (fAllowReuse && !vchDefaultKey.empty())
+=======
+            if (fAllowReuse && vchDefaultKey.IsValid())
+>>>>>>> origin/Paycoin-master
             {
                 result = vchDefaultKey;
                 return true;
@@ -1762,8 +2135,13 @@ int64 CWallet::GetOldestKeyPoolTime()
     return keypool.nTime;
 }
 
+<<<<<<< HEAD
 // ppcoin: check 'spent' consistency between wallet and txindex
 // ppcoin: fix wallet spent state according to txindex
+=======
+// paycoin: check 'spent' consistency between wallet and txindex
+// paycoin: fix wallet spent state according to txindex
+>>>>>>> origin/Paycoin-master
 void CWallet::FixSpentCoins(int& nMismatchFound, int64& nBalanceInQuestion, bool fCheckOnly)
 {
     nMismatchFound = 0;
@@ -1786,7 +2164,11 @@ void CWallet::FixSpentCoins(int& nMismatchFound, int64& nBalanceInQuestion, bool
         {
             if (IsMine(pcoin->vout[n]) && pcoin->IsSpent(n) && (txindex.vSpent.size() <= n || txindex.vSpent[n].IsNull()))
             {
+<<<<<<< HEAD
                 printf("FixSpentCoins found lost coin %sppc %s[%d], %s\n",
+=======
+                printf("FixSpentCoins found lost coin %sxpy %s[%d], %s\n",
+>>>>>>> origin/Paycoin-master
                     FormatMoney(pcoin->vout[n].nValue).c_str(), pcoin->GetHash().ToString().c_str(), n, fCheckOnly? "repair not attempted" : "repairing");
                 nMismatchFound++;
                 nBalanceInQuestion += pcoin->vout[n].nValue;
@@ -1798,7 +2180,11 @@ void CWallet::FixSpentCoins(int& nMismatchFound, int64& nBalanceInQuestion, bool
             }
             else if (IsMine(pcoin->vout[n]) && !pcoin->IsSpent(n) && (txindex.vSpent.size() > n && !txindex.vSpent[n].IsNull()))
             {
+<<<<<<< HEAD
                 printf("FixSpentCoins found spent coin %sppc %s[%d], %s\n",
+=======
+                printf("FixSpentCoins found spent coin %sxpy %s[%d], %s\n",
+>>>>>>> origin/Paycoin-master
                     FormatMoney(pcoin->vout[n].nValue).c_str(), pcoin->GetHash().ToString().c_str(), n, fCheckOnly? "repair not attempted" : "repairing");
                 nMismatchFound++;
                 nBalanceInQuestion += pcoin->vout[n].nValue;
@@ -1812,7 +2198,11 @@ void CWallet::FixSpentCoins(int& nMismatchFound, int64& nBalanceInQuestion, bool
     }
 }
 
+<<<<<<< HEAD
 // ppcoin: disable transaction (only for coinstake)
+=======
+// paycoin: disable transaction (only for coinstake)
+>>>>>>> origin/Paycoin-master
 void CWallet::DisableTransaction(const CTransaction &tx)
 {
     if (!tx.IsCoinStake() || !IsFromMe(tx))
@@ -1834,7 +2224,11 @@ void CWallet::DisableTransaction(const CTransaction &tx)
     }
 }
 
+<<<<<<< HEAD
 vector<unsigned char> CReserveKey::GetReservedKey()
+=======
+CPubKey CReserveKey::GetReservedKey()
+>>>>>>> origin/Paycoin-master
 {
     if (nIndex == -1)
     {
@@ -1848,7 +2242,11 @@ vector<unsigned char> CReserveKey::GetReservedKey()
             vchPubKey = pwallet->vchDefaultKey;
         }
     }
+<<<<<<< HEAD
     assert(!vchPubKey.empty());
+=======
+    assert(vchPubKey.IsValid());
+>>>>>>> origin/Paycoin-master
     return vchPubKey;
 }
 
@@ -1857,7 +2255,11 @@ void CReserveKey::KeepKey()
     if (nIndex != -1)
         pwallet->KeepKey(nIndex);
     nIndex = -1;
+<<<<<<< HEAD
     vchPubKey.clear();
+=======
+    vchPubKey = CPubKey();
+>>>>>>> origin/Paycoin-master
 }
 
 void CReserveKey::ReturnKey()
@@ -1865,10 +2267,17 @@ void CReserveKey::ReturnKey()
     if (nIndex != -1)
         pwallet->ReturnKey(nIndex);
     nIndex = -1;
+<<<<<<< HEAD
     vchPubKey.clear();
 }
 
 void CWallet::GetAllReserveAddresses(set<CBitcoinAddress>& setAddress)
+=======
+    vchPubKey = CPubKey();
+}
+
+void CWallet::GetAllReserveKeys(set<CKeyID>& setAddress)
+>>>>>>> origin/Paycoin-master
 {
     setAddress.clear();
 
@@ -1880,6 +2289,7 @@ void CWallet::GetAllReserveAddresses(set<CBitcoinAddress>& setAddress)
         CKeyPool keypool;
         if (!walletdb.ReadPool(id, keypool))
             throw runtime_error("GetAllReserveKeyHashes() : read failed");
+<<<<<<< HEAD
         CBitcoinAddress address(keypool.vchPubKey);
         assert(!keypool.vchPubKey.empty());
         if (!HaveKey(address))
@@ -1887,3 +2297,99 @@ void CWallet::GetAllReserveAddresses(set<CBitcoinAddress>& setAddress)
         setAddress.insert(address);
     }
 }
+=======
+        assert(keypool.vchPubKey.IsValid());
+        CKeyID keyID = keypool.vchPubKey.GetID();
+        if (!HaveKey(keyID))
+            throw runtime_error("GetAllReserveKeyHashes() : unknown key in key pool");
+        setAddress.insert(keyID);
+    }
+}
+
+void CWallet::ClearOrphans()
+{
+    list<uint256> orphans;
+
+    LOCK(cs_wallet);
+    for(map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
+    {
+        const CWalletTx *wtx = &(*it).second;
+        if((wtx->IsCoinBase() || wtx->IsCoinStake()) && !wtx->IsInMainChain())
+        {
+          orphans.push_back(wtx->GetHash());
+        }
+    }
+
+    for(list<uint256>::const_iterator it = orphans.begin(); it != orphans.end(); ++it)
+        EraseFromWallet(*it);
+}
+
+// Get time weight
+int64 GetWeight(int64 nIntervalBeginning, int64 nIntervalEnd)
+{
+    // Kernel hash weight starts from 0 at the min age
+    // this change increases active coins participating the hash and helps
+    // to secure the network when proof-of-stake difficulty is low
+
+    return min(nIntervalEnd - nIntervalBeginning - STAKE_MIN_AGE, (int64)STAKE_MAX_AGE);
+}
+
+bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint64& nMaxWeight, uint64& nWeight)
+{
+    // Choose coins to use
+    int64 nBalance = GetBalance();
+
+    int64 nReserveBalance = 0;
+    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+        return error("GetStakeWeight : invalid reserve balance amount");
+
+    if (nBalance <= nReserveBalance)
+        return false;
+
+    vector<const CWalletTx*> vwtxPrev;
+
+    set<pair<const CWalletTx*,unsigned int> > setCoins;
+    int64 nValueIn = 0;
+
+    if (!SelectCoins(nBalance - nReserveBalance, GetTime(), setCoins, nValueIn))
+        return false;
+
+    if (setCoins.empty())
+        return false;
+
+    CTxDB txdb("r");
+    BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins)
+    {
+        CTxIndex txindex;
+        {
+            LOCK2(cs_main, cs_wallet);
+            if (!txdb.ReadTxIndex(pcoin.first->GetHash(), txindex))
+                continue;
+        }
+
+        int64 nTimeWeight = GetWeight((int64)pcoin.first->nTime, (int64)GetTime());
+        CBigNum bnCoinDayWeight = CBigNum(pcoin.first->vout[pcoin.second].nValue) * nTimeWeight / COIN / (24 * 60 * 60);
+
+        // Weight is greater than zero
+        if (nTimeWeight > 0)
+        {
+            nWeight += bnCoinDayWeight.getuint64();
+        }
+
+        // Weight is greater than zero, but the maximum value isn't reached yet
+        if (nTimeWeight > 0 && nTimeWeight < STAKE_MAX_AGE)
+        {
+            nMinWeight += bnCoinDayWeight.getuint64();
+        }
+
+        // Maximum weight was reached
+        if (nTimeWeight == STAKE_MAX_AGE)
+        {
+            nMaxWeight += bnCoinDayWeight.getuint64();
+        }
+    }
+
+    return true;
+}
+
+>>>>>>> origin/Paycoin-master

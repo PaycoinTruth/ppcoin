@@ -2,6 +2,10 @@
 #define SENDCOINSDIALOG_H
 
 #include <QDialog>
+<<<<<<< HEAD
+=======
+#include <QString>
+>>>>>>> origin/Paycoin-master
 
 namespace Ui {
     class SendCoinsDialog;
@@ -49,6 +53,23 @@ private slots:
     void on_sendButton_clicked();
 
     void removeEntry(SendCoinsEntry* entry);
+<<<<<<< HEAD
+=======
+    void updateDisplayUnit();
+    void coinControlFeatureChanged(bool);
+    void coinControlButtonClicked();
+    void coinControlChangeChecked(int);
+    void coinControlChangeEdited(const QString &);
+    void coinControlUpdateLabels();
+    void coinControlClipboardQuantity();
+    void coinControlClipboardAmount();
+    void coinControlClipboardFee();
+    void coinControlClipboardAfterFee();
+    void coinControlClipboardBytes();
+    void coinControlClipboardPriority();
+    void coinControlClipboardLowOutput();
+    void coinControlClipboardChange(); 
+>>>>>>> origin/Paycoin-master
 };
 
 #endif // SENDCOINSDIALOG_H

@@ -7,6 +7,10 @@
 #include "wallet.h"
 #include "db.h"
 #include "ui_interface.h"
+<<<<<<< HEAD
+=======
+#include "base58.h"
+>>>>>>> origin/Paycoin-master
 
 #include <QString>
 
@@ -85,14 +89,23 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                 {
                     if (wallet->IsMine(txout))
                     {
+<<<<<<< HEAD
                         CBitcoinAddress address;
                         if (ExtractAddress(txout.scriptPubKey, address) && wallet->HaveKey(address))
+=======
+                        CTxDestination address;
+                        if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address))
+>>>>>>> origin/Paycoin-master
                         {
                             if (wallet->mapAddressBook.count(address))
                             {
                                 strHTML += tr("<b>From:</b> ") + tr("unknown") + "<br>";
                                 strHTML += tr("<b>To:</b> ");
+<<<<<<< HEAD
                                 strHTML += GUIUtil::HtmlEscape(address.ToString());
+=======
+                                strHTML += GUIUtil::HtmlEscape(CBitcoinAddress(address).ToString());
+>>>>>>> origin/Paycoin-master
                                 if (!wallet->mapAddressBook[address].empty())
                                     strHTML += tr(" (yours, label: ") + GUIUtil::HtmlEscape(wallet->mapAddressBook[address]) + ")";
                                 else
@@ -115,8 +128,14 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
             // Online transaction
             strAddress = wtx.mapValue["to"];
             strHTML += tr("<b>To:</b> ");
+<<<<<<< HEAD
             if (wallet->mapAddressBook.count(strAddress) && !wallet->mapAddressBook[strAddress].empty())
                 strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[strAddress]) + " ";
+=======
+            CTxDestination dest = CBitcoinAddress(strAddress).Get();
+            if (wallet->mapAddressBook.count(dest) && !wallet->mapAddressBook[dest].empty())
+                strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[dest]) + " ";
+>>>>>>> origin/Paycoin-master
             strHTML += GUIUtil::HtmlEscape(strAddress) + "<br>";
         }
 
@@ -170,13 +189,22 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                     if (wtx.mapValue["to"].empty())
                     {
                         // Offline transaction
+<<<<<<< HEAD
                         CBitcoinAddress address;
                         if (ExtractAddress(txout.scriptPubKey, address))
+=======
+                        CTxDestination address;
+                        if (ExtractDestination(txout.scriptPubKey, address))
+>>>>>>> origin/Paycoin-master
                         {
                             strHTML += tr("<b>To:</b> ");
                             if (wallet->mapAddressBook.count(address) && !wallet->mapAddressBook[address].empty())
                                 strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address]) + " ";
+<<<<<<< HEAD
                             strHTML += GUIUtil::HtmlEscape(address.ToString());
+=======
+                            strHTML += GUIUtil::HtmlEscape(CBitcoinAddress(address).ToString());
+>>>>>>> origin/Paycoin-master
                             strHTML += "<br>";
                         }
                     }
@@ -211,7 +239,16 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
             }
         }
 
+<<<<<<< HEAD
         strHTML += tr("<b>Net amount:</b> ") + BitcoinUnits::formatWithUnit(BitcoinUnits::BTC,nNet, true) + "<br>";
+=======
+        if((!wtx.IsCoinStake() && !wtx.IsCoinBase()) || wtx.GetBlocksToMaturity() == 0)
+        {
+            strHTML += tr("<b>Net amount:</b> ") + BitcoinUnits::formatWithUnit(BitcoinUnits::BTC,nNet, true) + "<br>";
+        }else{
+            strHTML += tr("<b>Retained amount:</b> %1 until %2 more blocks<br>").arg(BitcoinUnits::formatWithUnit(BitcoinUnits::BTC,-nNet)).arg(wtx.GetBlocksToMaturity());
+        }
+>>>>>>> origin/Paycoin-master
 
         //
         // Message
@@ -224,9 +261,15 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
         strHTML += QString("<b>") + tr("Transaction ID:") + "</b> " + wtx.GetHash().ToString().c_str() + "<br>";
 
         if (wtx.IsCoinBase())
+<<<<<<< HEAD
             strHTML += QString("<br>") + tr("Generated coins must wait 520 blocks before they can be spent.  When you generated this block, it was broadcast to the network to be added to the block chain.  If it fails to get into the chain, it will change to \"not accepted\" and not be spendable.  This may occasionally happen if another node generates a block within a few seconds of yours.") + "<br>";
         if (wtx.IsCoinStake())
             strHTML += QString("<br>") + tr("Staked coins must wait 520 blocks before they can return to balance and be spent.  When you generated this proof-of-stake block, it was broadcast to the network to be added to the block chain.  If it fails to get into the chain, it will change to \"not accepted\" and not be a valid stake.  This may occasionally happen if another node generates a proof-of-stake block within a few seconds of yours.") + "<br>";
+=======
+            strHTML += QString("<br>") + tr("Generated coins must wait 120 blocks before they can be spent.  When you generated this block, it was broadcast to the network to be added to the block chain.  If it fails to get into the chain, it will change to \"not accepted\" and not be spendable.  This may occasionally happen if another node generates a block within a few seconds of yours.") + "<br>";
+        if (wtx.IsCoinStake())
+            strHTML += QString("<br>") + tr("Staked coins must wait 120 blocks before they can return to balance and be spent.  When you generated this proof-of-stake block, it was broadcast to the network to be added to the block chain.  If it fails to get into the chain, it will change to \"not accepted\" and not be a valid stake.  This may occasionally happen if another node generates a proof-of-stake block within a few seconds of yours.") + "<br>";
+>>>>>>> origin/Paycoin-master
 
         //
         // Debug view
@@ -262,12 +305,21 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
                         {
                             strHTML += "<li>";
                             const CTxOut &vout = prev.vout[prevout.n];
+<<<<<<< HEAD
                             CBitcoinAddress address;
                             if (ExtractAddress(vout.scriptPubKey, address))
                             {
                                 if (wallet->mapAddressBook.count(address) && !wallet->mapAddressBook[address].empty())
                                     strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address]) + " ";
                                 strHTML += QString::fromStdString(address.ToString());
+=======
+                            CTxDestination address;
+                            if (ExtractDestination(vout.scriptPubKey, address))
+                            {
+                                if (wallet->mapAddressBook.count(address) && !wallet->mapAddressBook[address].empty())
+                                    strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address]) + " ";
+                                strHTML += QString::fromStdString(CBitcoinAddress(address).ToString());
+>>>>>>> origin/Paycoin-master
                             }
                             strHTML = strHTML + " Amount=" + BitcoinUnits::formatWithUnit(BitcoinUnits::BTC,vout.nValue);
                             strHTML = strHTML + " IsMine=" + (wallet->IsMine(vout) ? "true" : "false") + "</li>";

@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 IDI_ICON1 ICON DISCARDABLE "icons/ppcoin.ico"
+=======
+IDI_ICON1 ICON DISCARDABLE "icons/paycoin.ico"
+>>>>>>> origin/Paycoin-master

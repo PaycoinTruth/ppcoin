@@ -15,7 +15,11 @@ void AboutDialog::setModel(ClientModel *model)
 {
     if(model)
     {
+<<<<<<< HEAD
         ui->versionLabel->setText(model->formatFullVersion());
+=======
+        ui->versionLabel->setText( model->formatFullVersion());
+>>>>>>> origin/Paycoin-master
     }
 }
 

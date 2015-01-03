@@ -1,6 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2011-2013 The PPCoin developers
+=======
+// Copyright (c) 2011-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -32,8 +37,17 @@ unsigned int nTransactionsUpdated = 0;
 map<uint256, CBlockIndex*> mapBlockIndex;
 set<pair<COutPoint, unsigned int> > setStakeSeen;
 uint256 hashGenesisBlock = hashGenesisBlockOfficial;
+<<<<<<< HEAD
 static CBigNum bnProofOfWorkLimit(~uint256(0) >> 32);
 static CBigNum bnInitialHashTarget(~uint256(0) >> 40);
+=======
+static CBigNum bnProofOfWorkLimit(~uint256(0) >> 20);
+static CBigNum bnInitialHashTarget(~uint256(0) >> 28);
+static CBigNum bn227HashTarget(~uint256(0) >> 32);
+//static CBigNum bn227HashTarget(~uint256(0) >> 20);
+//static CBigNum bnProofOfStakeLimit(~uint256(0) >> 16);
+static CBigNum bnProofOfStakeLimit(~uint256(0) >> 4);
+>>>>>>> origin/Paycoin-master
 unsigned int nStakeMinAge = STAKE_MIN_AGE;
 int nCoinbaseMaturity = COINBASE_MATURITY_PPC;
 CBlockIndex* pindexGenesisBlock = NULL;
@@ -57,7 +71,11 @@ map<uint256, map<uint256, CDataStream*> > mapOrphanTransactionsByPrev;
 // Constant stuff for coinbase transactions we create:
 CScript COINBASE_FLAGS;
 
+<<<<<<< HEAD
 const string strMessageMagic = "PPCoin Signed Message:\n";
+=======
+const string strMessageMagic = "Paycoin Signed Message:\n";
+>>>>>>> origin/Paycoin-master
 
 double dHashesPerSec;
 int64 nHPSTimerStart;
@@ -117,11 +135,19 @@ void static EraseFromWallets(uint256 hash)
 }
 
 // make sure all wallets know about the given transaction, in the given block
+<<<<<<< HEAD
 void static SyncWithWallets(const CTransaction& tx, const CBlock* pblock = NULL, bool fUpdate = false, bool fConnect = true)
 {
     if (!fConnect)
     {
         // ppcoin: wallets need to refund inputs when disconnecting coinstake
+=======
+void SyncWithWallets(const CTransaction& tx, const CBlock* pblock, bool fUpdate, bool fConnect)
+{
+    if (!fConnect)
+    {
+        // paycoin: wallets need to refund inputs when disconnecting coinstake
+>>>>>>> origin/Paycoin-master
         if (tx.IsCoinStake())
         {
             BOOST_FOREACH(CWallet* pwallet, setpwalletRegistered)
@@ -258,6 +284,7 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 // CTransaction and CTxIndex
 //
 
+<<<<<<< HEAD
 bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet)
 {
     SetNull();
@@ -265,6 +292,21 @@ bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txinde
         return false;
     if (!ReadFromDisk(txindexRet.pos))
         return false;
+=======
+bool CTransaction::ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txindexRet)
+{
+    SetNull();
+    if (!txdb.ReadTxIndex(hash, txindexRet))
+        return false;
+    if (!ReadFromDisk(txindexRet.pos))
+        return false;
+    return true;
+}
+bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet)
+{
+    if (!ReadFromDisk(txdb, prevout.hash, txindexRet))
+        return false;
+>>>>>>> origin/Paycoin-master
     if (prevout.n >= vout.size())
     {
         SetNull();
@@ -272,13 +314,19 @@ bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txinde
     }
     return true;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/Paycoin-master
 bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout)
 {
     CTxIndex txindex;
     return ReadFromDisk(txdb, prevout, txindex);
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/Paycoin-master
 bool CTransaction::ReadFromDisk(COutPoint prevout)
 {
     CTxDB txdb("r");
@@ -460,9 +508,17 @@ bool CTransaction::CheckTransaction() const
         const CTxOut& txout = vout[i];
         if (txout.IsEmpty() && (!IsCoinBase()) && (!IsCoinStake()))
             return DoS(100, error("CTransaction::CheckTransaction() : txout empty for user transaction"));
+<<<<<<< HEAD
         // ppcoin: enforce minimum output amount
         if ((!txout.IsEmpty()) && txout.nValue < MIN_TXOUT_AMOUNT)
             return DoS(100, error("CTransaction::CheckTransaction() : txout.nValue below minimum"));
+=======
+        // paycoin: enforce minimum output amount
+        if ((!IsCoinBase() && (!IsCoinStake()) && txout.nValue < MIN_TXOUT_AMOUNT))
+            return DoS(100, error("CTransaction::CheckTransaction() : txout.nValue below minimum"));
+        if ((!txout.IsEmpty()) && txout.nValue < 0)
+            return DoS(100, error("CTransaction::CheckTransaction() : txout.nValue negative"));
+>>>>>>> origin/Paycoin-master
         if (txout.nValue > MAX_MONEY)
             return DoS(100, error("CTransaction::CheckTransaction() : txout.nValue too high"));
         nValueOut += txout.nValue;
@@ -494,6 +550,56 @@ bool CTransaction::CheckTransaction() const
     return true;
 }
 
+<<<<<<< HEAD
+=======
+int64 CTransaction::GetMinFee(unsigned int nBlockSize, bool fAllowFree,
+                              enum GetMinFee_mode mode, unsigned int nBytes) const
+{
+    // Base fee is either MIN_TX_FEE or MIN_RELAY_TX_FEE
+    int64 nBaseFee = (mode == GMF_RELAY) ? MIN_RELAY_TX_FEE : MIN_TX_FEE;
+
+    unsigned int nNewBlockSize = nBlockSize + nBytes;
+    int64 nMinFee = (1 + (int64)nBytes / 1000) * nBaseFee;
+
+    if (fAllowFree)
+    {
+        if (nBlockSize == 1)
+        {
+            // Transactions under 10K are free
+            // (about 4500 BTC if made of 50 BTC inputs)
+            if (nBytes < 10000)
+                nMinFee = 0;
+        }
+        else
+        {
+            // Free transaction area
+            if (nNewBlockSize < 27000)
+                nMinFee = 0;
+        }
+    }
+
+    // To limit dust spam, require MIN_TX_FEE/MIN_RELAY_TX_FEE if any output is less than 0.01
+    if (nMinFee < nBaseFee)
+    {
+        BOOST_FOREACH(const CTxOut& txout, vout)
+            if (txout.nValue < CENT)
+                nMinFee = nBaseFee;
+    }
+
+    // Raise the price as the block approaches full
+    if (nBlockSize != 1 && nNewBlockSize >= MAX_BLOCK_SIZE_GEN/2)
+    {
+        if (nNewBlockSize >= MAX_BLOCK_SIZE_GEN)
+            return MAX_MONEY;
+        nMinFee *= MAX_BLOCK_SIZE_GEN / (MAX_BLOCK_SIZE_GEN - nNewBlockSize);
+    }
+
+    if (!MoneyRange(nMinFee))
+        nMinFee = MAX_MONEY;
+    return nMinFee;
+}
+
+>>>>>>> origin/Paycoin-master
 bool CTxMemPool::accept(CTxDB& txdb, CTransaction &tx, bool fCheckInputs,
                         bool* pfMissingInputs)
 {
@@ -506,7 +612,11 @@ bool CTxMemPool::accept(CTxDB& txdb, CTransaction &tx, bool fCheckInputs,
     // Coinbase is only valid in a block, not as a loose transaction
     if (tx.IsCoinBase())
         return tx.DoS(100, error("CTxMemPool::accept() : coinbase as individual tx"));
+<<<<<<< HEAD
     // ppcoin: coinstake is also only valid in a block, not as a loose transaction
+=======
+    // paycoin: coinstake is also only valid in a block, not as a loose transaction
+>>>>>>> origin/Paycoin-master
     if (tx.IsCoinStake())
         return tx.DoS(100, error("CTxMemPool::accept() : coinstake as individual tx"));
 
@@ -583,8 +693,16 @@ bool CTxMemPool::accept(CTxDB& txdb, CTransaction &tx, bool fCheckInputs,
         unsigned int nSize = ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
 
         // Don't accept it if it can't get into a block
+<<<<<<< HEAD
         if (nFees < tx.GetMinFee(1000, false, GMF_RELAY))
             return error("CTxMemPool::accept() : not enough fees");
+=======
+        int64 txMinFee = tx.GetMinFee(1000, false, GMF_RELAY, nSize);
+        if (nFees < txMinFee)
+            return error("CTxMemPool::accept() : not enough fees %s, %"PRI64d" < %"PRI64d,
+                         hash.ToString().c_str(),
+                         nFees, txMinFee);
+>>>>>>> origin/Paycoin-master
 
         // Continuously rate-limit free transactions
         // This mitigates 'penny-flooding' -- sending thousands of free transactions just to
@@ -679,6 +797,21 @@ bool CTxMemPool::remove(CTransaction &tx)
 }
 
 
+<<<<<<< HEAD
+=======
+void CTxMemPool::queryHashes(std::vector<uint256>& vtxid)
+{
+    vtxid.clear();
+
+    LOCK(cs);
+    vtxid.reserve(mapTx.size());
+    for (map<uint256, CTransaction>::iterator mi = mapTx.begin(); mi != mapTx.end(); ++mi)
+        vtxid.push_back((*mi).first);
+}
+
+
+
+>>>>>>> origin/Paycoin-master
 
 
 
@@ -781,6 +914,7 @@ int CTxIndex::GetDepthInMainChain() const
     return 1 + nBestHeight - pindex->nHeight;
 }
 
+<<<<<<< HEAD
 
 
 
@@ -788,6 +922,51 @@ int CTxIndex::GetDepthInMainChain() const
 
 
 
+=======
+// Return transaction in tx, and if it was found inside a block, its hash is placed in hashBlock
+bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock)
+{
+    {
+        LOCK(cs_main);
+        {
+            LOCK(mempool.cs);
+            if (mempool.exists(hash))
+            {
+                tx = mempool.lookup(hash);
+                return true;
+            }
+        }
+        CTxDB txdb("r");
+        CTxIndex txindex;
+        if (tx.ReadFromDisk(txdb, hash, txindex))
+        {
+            CBlock block;
+            if (block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
+                hashBlock = block.GetHash();
+            return true;
+        }
+        // look for transaction in disconnected blocks to find orphaned CoinBase and CoinStake transactions
+        BOOST_FOREACH(PAIRTYPE(const uint256, CBlockIndex*)& item, mapBlockIndex)
+        {
+            CBlockIndex* pindex = item.second;
+            if (pindex == pindexBest || pindex->pnext != 0)
+                continue;
+            CBlock block;
+            if (!block.ReadFromDisk(pindex))
+                continue;
+            BOOST_FOREACH(const CTransaction& txOrphan, block.vtx)
+            {
+                if (txOrphan.GetHash() == hash)
+                {
+                    tx = txOrphan;
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+>>>>>>> origin/Paycoin-master
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -817,7 +996,11 @@ uint256 static GetOrphanRoot(const CBlock* pblock)
     return pblock->GetHash();
 }
 
+<<<<<<< HEAD
 // ppcoin: find block wanted by given orphan block
+=======
+// paycoin: find block wanted by given orphan block
+>>>>>>> origin/Paycoin-master
 uint256 WantedByOrphan(const CBlock* pblockOrphan)
 {
     // Work back to the first block in the orphan chain
@@ -826,6 +1009,7 @@ uint256 WantedByOrphan(const CBlock* pblockOrphan)
     return pblockOrphan->hashPrevBlock;
 }
 
+<<<<<<< HEAD
 int64 GetProofOfWorkReward(unsigned int nBits)
 {
     CBigNum bnSubsidyLimit = MAX_MINT_PROOF_OF_WORK;
@@ -870,11 +1054,62 @@ int64 GetProofOfStakeReward(int64 nCoinAge)
 
 static const int64 nTargetTimespan = 7 * 24 * 60 * 60;  // one week
 static const int64 nTargetSpacingWorkMax = 12 * STAKE_TARGET_SPACING; // 2-hour
+=======
+int64 GetProofOfWorkReward(int nHeight, unsigned int nTime)
+{
+    int64 nSubsidy = 0;
+    if(nHeight == 1){
+        nSubsidy = 12000000 * COIN;
+    }else if(nTime <= POW_START_TIME){
+        nSubsidy = 0 * COIN;
+    }else if(nTime < POW_END_TIME - 86400){ // reward is 0 before ending PoW 1 day
+        nSubsidy = 49 * COIN;
+    }
+    
+    if(nHeight > 277 && nHeight < 400){
+        nSubsidy = 0 * COIN;
+    }
+    return nSubsidy;
+}
+
+
+// paycoin: miner's coin stake is rewarded based on coin age spent (coin-days)
+int64 GetProofOfStakeReward(int64 nCoinAge, int primeNodeRate)
+{
+
+    int64 nSubsidy = 0;
+    int64 nRewardCoinYear = 0;  // creation amount per coin-year
+
+    if (primeNodeRate == 0)
+        nRewardCoinYear = 5 * CENT;
+    else if (primeNodeRate == 10)
+        nRewardCoinYear = 10 * CENT;
+    else if (primeNodeRate == 20)
+        nRewardCoinYear = 20 * CENT;
+    else if (primeNodeRate == 100)
+        nRewardCoinYear = 100 * CENT;
+    else if (primeNodeRate == 350)
+        nRewardCoinYear = 350 * CENT;
+
+    nSubsidy = nCoinAge * nRewardCoinYear * 33 / (365 * 33 + 8);
+
+    if (fDebug && GetBoolArg("-printcreation"))
+        printf("GetProofOfStakeReward(): primeNodeRate=%d create=%s nCoinAge=%"PRI64d"\n", primeNodeRate, FormatMoney(nSubsidy).c_str(), nCoinAge);
+    return nSubsidy;
+}
+
+
+/*static const int64 nTargetTimespan = 7 * 24 * 60 * 60;  // one week
+static const int64 nTargetSpacingWorkMax = 12 * STAKE_TARGET_SPACING; // 2-hour*/
+static const int64 nTargetTimespan = 2 * 60;  // one week
+static const int64 nTargetSpacingWorkMax = STAKE_TARGET_SPACING; // 2-hour
+>>>>>>> origin/Paycoin-master
 
 //
 // minimum amount of work that could possibly be required nTime after
 // minimum work required was nBase
 //
+<<<<<<< HEAD
 unsigned int ComputeMinWork(unsigned int nBase, int64 nTime)
 {
     CBigNum bnResult;
@@ -892,6 +1127,27 @@ unsigned int ComputeMinWork(unsigned int nBase, int64 nTime)
 }
 
 // ppcoin: find last block index up to pindex
+=======
+unsigned int ComputeMinWork(unsigned int nBase, int64 nTime, bool fProofOfStake)
+{
+    CBigNum bnResult, bnLimit;
+    bnLimit = fProofOfStake ? bnProofOfStakeLimit : bnProofOfWorkLimit;
+    bnResult.SetCompact(nBase);
+    bnResult *= 2;
+    while (nTime > 0 && bnResult < bnLimit)
+    {
+        // Maximum 25600% adjustment per day...
+        bnResult *= 256;
+        nTime -= nTargetTimespan * 4;
+    }
+    if (bnResult > bnLimit)
+        bnResult = bnLimit;
+    return bnResult.GetCompact();
+}
+
+
+// paycoin: find last block index up to pindex
+>>>>>>> origin/Paycoin-master
 const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake)
 {
     while (pindex && pindex->pprev && (pindex->IsProofOfStake() != fProofOfStake))
@@ -906,6 +1162,7 @@ unsigned int static GetNextTargetRequired(const CBlockIndex* pindexLast, bool fP
 
     const CBlockIndex* pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
     if (pindexPrev->pprev == NULL)
+<<<<<<< HEAD
         return bnInitialHashTarget.GetCompact(); // first block
     const CBlockIndex* pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
     if (pindexPrevPrev->pprev == NULL)
@@ -918,6 +1175,30 @@ unsigned int static GetNextTargetRequired(const CBlockIndex* pindexLast, bool fP
     CBigNum bnNew;
     bnNew.SetCompact(pindexPrev->nBits);
     int64 nTargetSpacing = fProofOfStake? STAKE_TARGET_SPACING : min(nTargetSpacingWorkMax, (int64) STAKE_TARGET_SPACING * (1 + pindexLast->nHeight - pindexPrev->nHeight));
+=======
+        return fProofOfStake ? bnProofOfStakeLimit.GetCompact() : bnInitialHashTarget.GetCompact(); // first block
+    const CBlockIndex* pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
+    if (pindexPrevPrev->pprev == NULL)
+        return fProofOfStake ? bnProofOfStakeLimit.GetCompact() : bnInitialHashTarget.GetCompact(); // second block
+
+    if (!fProofOfStake && pindexLast->nHeight >= 23 && pindexLast->nHeight < 120)
+        return bnProofOfWorkLimit.GetCompact(); // most of the 1st 120 blocks
+
+        // paycoin: block stuck at 227
+    if (!fProofOfStake && pindexLast->nHeight >= 277 && pindexLast->nHeight < 400)
+        return bn227HashTarget.GetCompact();
+
+    int64 nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
+
+    // paycoin: target change every block
+    // paycoin: retarget with exponential moving toward target spacing
+    CBigNum bnNew;
+    bnNew.SetCompact(pindexPrev->nBits);
+    int64 nTargetSpacing = fProofOfStake? STAKE_TARGET_SPACING : min(nTargetSpacingWorkMax, (int64) STAKE_TARGET_SPACING * (1 + pindexLast->nHeight - pindexPrev->nHeight));
+    if (pindexLast->GetBlockTime() >= STAKE_START_TIME && nActualSpacing < 0)
+        nActualSpacing = nTargetSpacing;
+
+>>>>>>> origin/Paycoin-master
     int64 nInterval = nTargetTimespan / nTargetSpacing;
     bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
     bnNew /= ((nInterval + 1) * nTargetSpacing);
@@ -928,6 +1209,10 @@ unsigned int static GetNextTargetRequired(const CBlockIndex* pindexLast, bool fP
     return bnNew.GetCompact();
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Paycoin-master
 bool CheckProofOfWork(uint256 hash, unsigned int nBits)
 {
     CBigNum bnTarget;
@@ -975,7 +1260,11 @@ void static InvalidChainFound(CBlockIndex* pindexNew)
     }
     printf("InvalidChainFound: invalid block=%s  height=%d  trust=%s\n", pindexNew->GetBlockHash().ToString().substr(0,20).c_str(), pindexNew->nHeight, CBigNum(pindexNew->bnChainTrust).ToString().c_str());
     printf("InvalidChainFound:  current best=%s  height=%d  trust=%s\n", hashBestChain.ToString().substr(0,20).c_str(), nBestHeight, CBigNum(bnBestChainTrust).ToString().c_str());
+<<<<<<< HEAD
     // ppcoin: should not enter safe mode for longer invalid chain
+=======
+    // paycoin: should not enter safe mode for longer invalid chain
+>>>>>>> origin/Paycoin-master
 }
 
 void CBlock::UpdateTime(const CBlockIndex* pindexPrev)
@@ -1174,7 +1463,11 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs,
                     if (pindex->nBlockPos == txindex.pos.nBlockPos && pindex->nFile == txindex.pos.nFile)
                         return error("ConnectInputs() : tried to spend coinbase/coinstake at depth %d", pindexBlock->nHeight - pindex->nHeight);
 
+<<<<<<< HEAD
             // ppcoin: check transaction timestamp
+=======
+            // paycoin: check transaction timestamp
+>>>>>>> origin/Paycoin-master
             if (txPrev.nTime > nTime)
                 return DoS(100, error("ConnectInputs() : transaction timestamp earlier than input transaction"));
 
@@ -1229,13 +1522,180 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs,
 
         if (IsCoinStake())
         {
+<<<<<<< HEAD
             // ppcoin: coin stake tx earns reward instead of paying fee
+=======
+            // paycoin: coin stake tx earns reward instead of paying fee
+>>>>>>> origin/Paycoin-master
             uint64 nCoinAge;
             if (!GetCoinAge(txdb, nCoinAge))
                 return error("ConnectInputs() : %s unable to get coin age for coinstake", GetHash().ToString().substr(0,10).c_str());
             int64 nStakeReward = GetValueOut() - nValueIn;
+<<<<<<< HEAD
             if (nStakeReward > GetProofOfStakeReward(nCoinAge) - GetMinFee() + MIN_TX_FEE)
                 return DoS(100, error("ConnectInputs() : %s stake reward exceeded", GetHash().ToString().substr(0,10).c_str()));
+=======
+            // todo : using accumulator in later version; make it short please
+            if (!vout[0].IsEmpty() && vout[0].scriptPubKey[0] == OP_PRIMENODE350){
+                std::vector<string> pubKeyList;
+                pubKeyList.push_back("0427096f2e3123970010d97a1f0e210499435482927b12b1d6a209f0c383e03b444a244e372cad494c144b47ac3686fc4feea2aec2df3ba77f41cc27dbf8f3c4ff");
+                pubKeyList.push_back("04d96b945eca3ea23e1dfd414d2a4772c66e6c7297d0d4f88b7a3b7c285931c36f16ef26299704d49bda770621d9145d96365e02380b4329aceafe7b81012bef48");
+                pubKeyList.push_back("040057901e3de5e6429912047c2b5175dde2586b981397a0e434d43accf2e49c108fb3361b3957fcbbfa39930d50aeff56c690e91ffb2d953eefa46aa50fcb6917");
+                pubKeyList.push_back("0486022d6dd5c8d17c411cf28add879e5c738b64090e83a43cca1699ececdb8f3524379aa71bb76a2af2d7e8294c9d7b8179d98215afe589c921e4507f63c5c802");
+                pubKeyList.push_back("0436639ad108f7630881fb3af5f540ded3bb4653dab695f1716e71ea5838bcee7c238fa624bc2f1bfe0990cea4c3ee3e9f949bbc61e347b5887815eb51468b5c88");
+                pubKeyList.push_back("04d04183c8caad2f41edffbabd5b6a266e886457ef0621283b3418979d841bc2425e6b273ce0ea2b461b9797a7d3edd74a4407af9995a9702018cf69df8eee6aba");
+                pubKeyList.push_back("04a8b4a8c55361f37cad732da49b2bccadb9be522dd84f9c2329a7dbfaac8c5dd093b803d791719c413196694c97fcb360b7935034dcc4b1b3c2e45a39e67b8dd6");
+                pubKeyList.push_back("04b7930cd8bda83097841cfa0a2b5317ecc029a512bbf056a130421ee500773f16850f74e2cbffa4e8aa2a0b0a25009ea619e49839e8608db4469de285d6ee781d");
+                pubKeyList.push_back("04d0e3e0e688659d07d4510e25a9884c12931e581b8a2bcdd8ad6c4362ae219b08089761e88e17109aa6618dfca152f854e880ca66414d7f8e5d1d95e70dc95dee");
+                pubKeyList.push_back("04025f944a31226086da4f0f49188bfe12d29a304986d909b00560a5f8c84c09ab0f6d0e16926d42a07eaa522dad74404ef25ca863fbd78d45ecdb6da282caf9da");
+                pubKeyList.push_back("04983ebed643535907ebbea93387ca38c262778d21dab385f0d0c5dc49b66ebe54c27d9e318ea2798800a067dc3ad8e414684d477e7633f261b08522a0f81b3c5e");
+                pubKeyList.push_back("04512b7f555a89e73cd1f9d5138d8e46b81c49a184e0cb7b538167e046dea93689101f076c59874c085642b33b2ad58ff1dee34ffa1d03880c0272686291bd64b5");
+                pubKeyList.push_back("045f46a60dd9c3c3e68a127aee68a4ad59d303f9cfe91e2015156fe25a42687855a6de4ccb53756f06e7c3cf66e295fd84d8c3c0fd73c7cee44966aaae3d033652");
+                pubKeyList.push_back("049a0e427b86663cc928d6475d0e591fd6dbaf686e2b6a140e79e646fbaa0c88481984f61de390c9fc73c9f58d2c26bd8bdadbdd400a8cc96b4d7a6f52fbe1209d");
+                pubKeyList.push_back("040da5d570e39531f25ae747a1698d67470c0d7fb4941f104d081235f7425cefb95b5eca24daf80a732cb267bd13d47b62ce4102394c180b2a792216f4a087d320");
+                pubKeyList.push_back("04672dbddcb26bc82028652a5ff042f98c5c5f58f7330d49ad4a22268f9a93e2cca8ce2ed7a93012b83903f4ddcef5f1a0ea5fb90df3ae38528489d9b69cd0dd39");
+                pubKeyList.push_back("04fb8a251640f766ec63aee35f74f49e46b5ae7f61f7bcabe6103d13ab56086c884c525b96e10741704a3c44982aa9c6577184f0259a36f18e4ca8325ff2cd8330");
+                pubKeyList.push_back("04f9644ebc672e382eb45a82e221f2ab9d5124fea1de7de2d417c863ddd760c5c778f8fe39e09e7937ac99172a3a9d0b013020c1256b935da171b66864a1e16b9c");
+                pubKeyList.push_back("048a58fe8de7c123f6f816667fb1bfe6d99b9f0ac415bde1fdf4e9725fc80d2699c30b362faf992cd00edb586df9f459081c3f586becbabdd33bdd8becf31f85c2");
+                pubKeyList.push_back("0475a43388b6023722d93c03128541b3877153736a9ac7f48bf1d1a37e46aa1381a450aa0a6c40e2f4e317a4212c37c18bd1cf99ea3f70ecec83c30f4ceca65201");
+                pubKeyList.push_back("04bf85a4920b6fb89868fac40c4917af40546867221f2da2de84b9a9f26c569cee689c2eafe0c911c31ac88d9005badb8f32fb0650ffe2e272194ef5df162b35ac");
+                pubKeyList.push_back("04e75eda3a94f74d684a7239b8c6cc056e75fba2690888855f81810c439270265f4c3c46c3aedfaff81da2dfb236e091cc36b5759e6a0513898ad443cf91ff6631");
+                pubKeyList.push_back("04c62eb46a011e45f0069d8881894ac22889988b384ba7234c5caeed42d4f11d16e2ba0b55198cec0a0a710714d0602e1ccaada5284ae07fa0ae43b0cb1e7d59b1");
+                pubKeyList.push_back("043d60413953d4a9e144d86390c8ddb51b674df65ce1a05a26e400b3bc27cbc55c6c6b05d5030e60dfe59101dc9614e4298c33716be751feb0d494a788e00ad627");
+                pubKeyList.push_back("041c10a07fa1799e8d43d4a0b74b89614722fabcfd90dac380d170ebfddd0b5f0462e67c0704172cbe925c77c1890af68000d44fed56d628cceea6101fcaf74d38");
+                pubKeyList.push_back("04640a129ecf82ed28875881c28f59bf46b82aba8e8be77ad39bb1dd0ffd7944f49da4dc3de9cac50d88763167583b030d7df0e234e8a6e9de725aa337fcb1f0ed");
+                pubKeyList.push_back("04e5cba6da1d31076d42db494613e6c8587ba4252693c8d8dbcdae033479e8cab10921c147b91127ef4b36d0209a8de917f3c51fd231b07acdcce47d0ac3a14de8");
+                pubKeyList.push_back("0479502526431508d1edcb054bfb49dfed971e144ff1d3d89384f1af8c95a2ee3d6f296cade67c2dfb8c43b324ed6cc079395a5ec4118f0b8c5737fe8988d4ecfc");
+                pubKeyList.push_back("04048059da03e2ecca976fb0c8e8ea408ea3a8e2b45c55c9ee095011077ded701f9b8639b265e1dc1eb0ac08f990f67b99da03f4bb5c68bef182488d49f5e27762");
+                pubKeyList.push_back("04f3b1f9c8b07034eb3f7f609d150561ee4ae05a1051816060974221f5c36a1e3db4b79b46146da9bae303648dbf94bf740ad41d6e3297eeae6829bd2d9f3e3a5e");
+                pubKeyList.push_back("048f400e748d54d8fdf148a270adcb7aa4b73c9d49f3c8bbdf57df6a8a349c54abaae8e223bab43cb1770e8a80c00cb11904e301f32ea0aeec5d59ce8a9b9dc5c1");
+                pubKeyList.push_back("04cf206b074a8da673f6b06cdbd28b82253ef4b4aeb6689745bf9e42a5d9007269b18a3ba5becfabb3a2d5f7b4e84ad9f6d6283856fc315ddf4fd8e5797a4d8be7");
+                pubKeyList.push_back("04ae324ce3d313a42a76ec17f09625185c53bfa99c5f06920105291bea676220203d3f1b7c0de605c2bbcaa760a632f5b9a55dd86d8f36b6b985932d61a9a88946");
+                pubKeyList.push_back("040ba9aeeff11561fa33827d17957fc40ed5b1b8d260140535e0350ba431609abf3a31166a9e014d26553520f59de730dbcf5944fb433d1abfadb3f4f30668ab48");
+                pubKeyList.push_back("0416683a0796c3dfda8065c6011a61747488345bf0a0f559836104b4e9074e6c40b206797850603862baac60ba61bea930db1f2b4362c117d54472dc2a8b93bbd4");
+
+                bool isVerify = false;
+                BOOST_FOREACH(std::string strPubKey, pubKeyList){
+                    std::vector<unsigned char> vchPubKey = ParseHex(strPubKey);
+                    CKey key;
+                    key.SetPubKey(vchPubKey);
+                    CScript scriptTime;
+                    scriptTime << nTime;
+                    uint256 hashScriptTime = Hash(scriptTime.begin(), scriptTime.end());
+                    std::vector<unsigned char> vchSig;
+                    vchSig.insert(vchSig.end(), vout[0].scriptPubKey.begin() + 2, vout[0].scriptPubKey.end());
+                    if(key.Verify(hashScriptTime, vchSig)){
+                        isVerify = true;
+                        break;
+                    }
+                }
+                if(!isVerify)
+                    return DoS(10, error("CTransaction::ConnectInputs() : verify signature failed"));
+                if (GetValueOut() < MINIMUM_FOR_PRIMENODE)
+                    return DoS(100, error("ConnectInputs() : credit doesn't meet requirement for primenode = %lld while you only have %lld", MINIMUM_FOR_PRIMENODE, GetValueOut()));
+                if (nStakeReward > GetProofOfStakeReward(nCoinAge, 350) - GetMinFee() + MIN_TX_FEE)
+                    return DoS(100, error("ConnectInputs() : %s stake reward exceeded", GetHash().ToString().substr(0,10).c_str()));
+
+            }else if (!vout[0].IsEmpty() && vout[0].scriptPubKey[0] == OP_PRIMENODE100){
+                std::vector<string> pubKeyList;
+                pubKeyList.push_back("046ebc739ff7d6a0dbb3ae9bb9260a17b9d2fc40ca77d9c018784834ef863414c17b4fd3a580d9721ec0ee12c823f1eb48821b8135cd32aee26ba3be9cb22f7a31");
+                pubKeyList.push_back("04ffcd9e3acffbd40d6472f354e76f03a5c806623a5fbe341796b92e71ad59f5c4a4ad5f04c4fe7d6e50f6546d361a06020f8670eae020e8a7a1d036155e75d10a");
+                pubKeyList.push_back("04a61c5b67927c4a0389baa1089a87a93d60fbf15cc345823097245d0c331525d273a03544720f3a4e8f9afb443793f3ea595d5f0af7e17d764385750a9eb54d19");
+                pubKeyList.push_back("04f9f78f1dcdb6f76ba0a962aba3058a605691e2ecd63e16b5e0e39d19c5821f8eda421d06b4bf1159bcee989f01b273a4337ba0bc9fc749ef35c32e6e4a7bc1e9");
+                pubKeyList.push_back("0444b7d2aa1b9c74710325735df89692d1fa686a3a67d95462cbf4cb0d8f47eb9ac18da92bcce99b58e1be020c36736d9a1f85fa191c2ddcc779c53c4ede7c73b9");
+                pubKeyList.push_back("0426bbbd25a4dc0a295b64d4f1d3787d39cba04534109cd145c5229a8cc3285d097462131dd6fa1968eb510d53fee8a012250390ef6149c2003784f5585fef97a2");
+                pubKeyList.push_back("04ab438d669c7ed7db2e0eef61bd7ae4937ac32347d39adfb204f4d6e4e2a5adfa4548f69dc4cdc2ff3da0506e9382f69175138163328d445f110081dfa5d5d416");
+                pubKeyList.push_back("04406932519cd5e47333a049922eb8bcddc6b722c31440f36ca2851e119314b375914b08c635837e47c7cbf6ace95acbadee62acb054551bc4255c81d03c485e95");
+                pubKeyList.push_back("0454d677fbe06d5f56920db9bd124015edfd1fb32786c88a1a15cf0a84204d4386bd48fb31239eb3e594b13ca952b3c5f25aca9f3f702ad5b0120160dc355a6fbd");
+                pubKeyList.push_back("0452f030183dffd2b53d639b16488bd451ba2dc9d1791464300f28abf5414036530735b6a8de119443e3875f2e67514b6b2678ed3966629d354e6aabdb8251ed19");
+
+                bool isVerify = false;
+                BOOST_FOREACH(std::string strPubKey, pubKeyList){
+                    std::vector<unsigned char> vchPubKey = ParseHex(strPubKey);
+                    CKey key;
+                    key.SetPubKey(vchPubKey);
+                    CScript scriptTime;
+                    scriptTime << nTime;
+                    uint256 hashScriptTime = Hash(scriptTime.begin(), scriptTime.end());
+                    std::vector<unsigned char> vchSig;
+                    vchSig.insert(vchSig.end(), vout[0].scriptPubKey.begin() + 2, vout[0].scriptPubKey.end());
+                    if(key.Verify(hashScriptTime, vchSig)){
+                        isVerify = true;
+                        break;
+                    }
+                }
+                if(!isVerify)
+                    return DoS(10, error("CTransaction::ConnectInputs() : verify signature failed"));
+                if (GetValueOut() < MINIMUM_FOR_PRIMENODE)
+                    return DoS(100, error("ConnectInputs() : credit doesn't meet requirement for primenode = %lld while you only have %lld", MINIMUM_FOR_PRIMENODE, GetValueOut()));
+               if (nStakeReward > GetProofOfStakeReward(nCoinAge, 100) - GetMinFee() + MIN_TX_FEE)
+                    return DoS(100, error("ConnectInputs() : %s stake reward exceeded", GetHash().ToString().substr(0,10).c_str()));
+
+            }else if (!vout[0].IsEmpty() && vout[0].scriptPubKey[0] == OP_PRIMENODE20){
+                std::vector<string> pubKeyList;
+                pubKeyList.push_back("04ce27308191e2e0274459bb191ba2cb93ef4dc8a838e8e8310083fcf7e2be9c7c20b3b15e2dc2a1482275ee55138c2350771231b00d7740e1e495269987faa24b");
+                pubKeyList.push_back("04311cc5333eeadbb3b18f6c70832df159796b1872bfa66bf214030ced65f8a33c4c6b4da48ffebb111a09129b337c9ed5129256995a4fa315fab3b81666cf2bad");
+
+                bool isVerify = false;
+                BOOST_FOREACH(std::string strPubKey, pubKeyList){
+                    std::vector<unsigned char> vchPubKey = ParseHex(strPubKey);
+                    CKey key;
+                    key.SetPubKey(vchPubKey);
+                    CScript scriptTime;
+                    scriptTime << nTime;
+                    uint256 hashScriptTime = Hash(scriptTime.begin(), scriptTime.end());
+                    std::vector<unsigned char> vchSig;
+                    vchSig.insert(vchSig.end(), vout[0].scriptPubKey.begin() + 2, vout[0].scriptPubKey.end());
+                    printf("CTransaction::ConnectInputs() hashScriptTime.GetHex().c_str() = %s\n", hashScriptTime.GetHex().c_str());
+                    if(key.Verify(hashScriptTime, vchSig)){
+                        isVerify = true;
+                        break;
+                    }
+                }
+                if(!isVerify)
+                    return DoS(10, error("CTransaction::ConnectInputs() : verify signature failed"));
+                if (GetValueOut() < MINIMUM_FOR_PRIMENODE)
+                    return DoS(100, error("ConnectInputs() : credit doesn't meet requirement for primenode = %lld while you only have %lld", MINIMUM_FOR_PRIMENODE, GetValueOut()));
+                if (nStakeReward > GetProofOfStakeReward(nCoinAge, 20) - GetMinFee() + MIN_TX_FEE)
+                    return DoS(100, error("ConnectInputs() : %s stake reward exceeded", GetHash().ToString().substr(0,10).c_str()));
+
+            }else if (!vout[0].IsEmpty() && vout[0].scriptPubKey[0] == OP_PRIMENODE10){
+                std::vector<string> pubKeyList;
+                pubKeyList.push_back("0428588850c9361e7f5848807ef40ac839d5cd664db6183cbc53f63b0e8682a5b4b6caa6782db2b314e3cab43503f05df280b9e98e82b2235a00e4dd24997b49a0");
+                pubKeyList.push_back("04bf2832da17137215912a1173b3ad2675e1b03c4df22bb93f2f2fdb92bdd0097e0a267d8813799fe335d1b80ff23fa48809dea4517211b48eacadc85147d5c643");
+                pubKeyList.push_back("04c8ad33bb094d7bee52ec9d08e4eea8ef33d49c1d871e6a4ee56f2fd6f44bb87a28a903bf1306cd855c4fa19baa42d604e2f6aa571b4a6a603ab7769162e7fcb8");
+
+                bool isVerify = false;
+                BOOST_FOREACH(std::string strPubKey, pubKeyList){
+                    std::vector<unsigned char> vchPubKey = ParseHex(strPubKey);
+                    CKey key;
+                    key.SetPubKey(vchPubKey);
+                    CScript scriptTime;
+                    scriptTime << nTime;
+                    uint256 hashScriptTime = Hash(scriptTime.begin(), scriptTime.end());
+                    std::vector<unsigned char> vchSig;
+                    vchSig.insert(vchSig.end(), vout[0].scriptPubKey.begin() + 2, vout[0].scriptPubKey.end());
+                    if(key.Verify(hashScriptTime, vchSig)){
+                        isVerify = true;
+                        break;
+                    }
+                }
+                if(!isVerify)
+                    return DoS(10, error("CTransaction::ConnectInputs() : verify signature failed"));
+                if (GetValueOut() < MINIMUM_FOR_PRIMENODE)
+                    return DoS(100, error("ConnectInputs() : credit doesn't meet requirement for primenode = %lld while you only have %lld", MINIMUM_FOR_PRIMENODE, GetValueOut()));
+                if (nStakeReward > GetProofOfStakeReward(nCoinAge, 10) - GetMinFee() + MIN_TX_FEE)
+                    return DoS(100, error("ConnectInputs() : %s stake reward exceeded", GetHash().ToString().substr(0,10).c_str()));
+
+            }else if (vout[0].IsEmpty()) {
+                if(GetValueOut() <= MINIMUM_FOR_ORION){
+                    return DoS(100, error("ConnectInputs() : credit doesn't meet requirement for orion controller = %lld while you only have %lld", MINIMUM_FOR_ORION, GetValueOut()));
+                }
+                if(nStakeReward > GetProofOfStakeReward(nCoinAge, 0) - GetMinFee() + MIN_TX_FEE){
+                    return DoS(100, error("ConnectInputs() : %s stake reward exceeded", GetHash().ToString().substr(0,10).c_str()));
+                }
+            }
+>>>>>>> origin/Paycoin-master
         }
         else
         {
@@ -1246,7 +1706,11 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs,
             int64 nTxFee = nValueIn - GetValueOut();
             if (nTxFee < 0)
                 return DoS(100, error("ConnectInputs() : %s nTxFee < 0", GetHash().ToString().substr(0,10).c_str()));
+<<<<<<< HEAD
             // ppcoin: enforce transaction fees for every block
+=======
+            // paycoin: enforce transaction fees for every block
+>>>>>>> origin/Paycoin-master
             if (nTxFee < GetMinFee())
                 return fBlock? DoS(100, error("ConnectInputs() : %s not paying required fee=%s, paid=%s", GetHash().ToString().substr(0,10).c_str(), FormatMoney(GetMinFee()).c_str(), FormatMoney(nTxFee).c_str())) : false;
             nFees += nTxFee;
@@ -1325,7 +1789,11 @@ bool CBlock::DisconnectBlock(CTxDB& txdb, CBlockIndex* pindex)
             return error("DisconnectBlock() : WriteBlockIndex failed");
     }
 
+<<<<<<< HEAD
     // ppcoin: clean up wallet after disconnecting coinstake
+=======
+    // paycoin: clean up wallet after disconnecting coinstake
+>>>>>>> origin/Paycoin-master
     BOOST_FOREACH(CTransaction& tx, vtx)
         SyncWithWallets(tx, this, false, false);
 
@@ -1416,7 +1884,11 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex)
         mapQueuedChanges[tx.GetHash()] = CTxIndex(posThisTx, tx.vout.size());
     }
 
+<<<<<<< HEAD
     // ppcoin: track money supply and mint amount info
+=======
+    // paycoin: track money supply and mint amount info
+>>>>>>> origin/Paycoin-master
     pindex->nMint = nValueOut - nValueIn + nFees;
     pindex->nMoneySupply = (pindex->pprev? pindex->pprev->nMoneySupply : 0) + nValueOut - nValueIn;
     if (!txdb.WriteBlockIndex(CDiskBlockIndex(pindex)))
@@ -1429,8 +1901,13 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex)
             return error("ConnectBlock() : UpdateTxIndex failed");
     }
 
+<<<<<<< HEAD
     // ppcoin: fees are not collected by miners as in bitcoin
     // ppcoin: fees are destroyed to compensate the entire network
+=======
+    // paycoin: fees are not collected by miners as in bitcoin
+    // paycoin: fees are destroyed to compensate the entire network
+>>>>>>> origin/Paycoin-master
     if (fDebug && GetBoolArg("-printcreation"))
         printf("ConnectBlock() : destroy=%s nFees=%"PRI64d"\n", FormatMoney(nFees).c_str(), nFees);
 
@@ -1549,6 +2026,7 @@ bool Reorganize(CTxDB& txdb, CBlockIndex* pindexNew)
 }
 
 
+<<<<<<< HEAD
 static void
 runCommand(std::string strCommand)
 {
@@ -1557,6 +2035,8 @@ runCommand(std::string strCommand)
         printf("runCommand error: system(%s) returned %d\n", strCommand.c_str(), nErr);
 }
 
+=======
+>>>>>>> origin/Paycoin-master
 // Called from inside SetBestChain: attaches a block to the new best chain being built
 bool CBlock::SetBestChainInner(CTxDB& txdb, CBlockIndex *pindexNew)
 {
@@ -1676,7 +2156,11 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
 }
 
 
+<<<<<<< HEAD
 // ppcoin: total coin age spent in transaction, in the unit of coin-days.
+=======
+// paycoin: total coin age spent in transaction, in the unit of coin-days.
+>>>>>>> origin/Paycoin-master
 // Only those coins meeting minimum age requirement counts. As those
 // transactions not in main chain are not currently indexed so we
 // might not find out about their coin age. Older transactions are 
@@ -1722,7 +2206,11 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, uint64& nCoinAge) const
     return true;
 }
 
+<<<<<<< HEAD
 // ppcoin: total coin age spent in block, in the unit of coin-days.
+=======
+// paycoin: total coin age spent in block, in the unit of coin-days.
+>>>>>>> origin/Paycoin-master
 bool CBlock::GetCoinAge(uint64& nCoinAge) const
 {
     nCoinAge = 0;
@@ -1765,6 +2253,7 @@ bool CBlock::AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos)
         pindexNew->nHeight = pindexNew->pprev->nHeight + 1;
     }
 
+<<<<<<< HEAD
     // ppcoin: compute chain trust score
     pindexNew->bnChainTrust = (pindexNew->pprev ? pindexNew->pprev->bnChainTrust : 0) + pindexNew->GetBlockTrust();
 
@@ -1773,6 +2262,16 @@ bool CBlock::AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos)
         return error("AddToBlockIndex() : SetStakeEntropyBit() failed");
 
     // ppcoin: record proof-of-stake hash value
+=======
+    // paycoin: compute chain trust score
+    pindexNew->bnChainTrust = (pindexNew->pprev ? pindexNew->pprev->bnChainTrust : 0) + pindexNew->GetBlockTrust();
+
+    // paycoin: compute stake entropy bit for stake modifier
+    if (!pindexNew->SetStakeEntropyBit(GetStakeEntropyBit()))
+        return error("AddToBlockIndex() : SetStakeEntropyBit() failed");
+
+    // paycoin: record proof-of-stake hash value
+>>>>>>> origin/Paycoin-master
     if (pindexNew->IsProofOfStake())
     {
         if (!mapProofOfStake.count(hash))
@@ -1780,7 +2279,11 @@ bool CBlock::AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos)
         pindexNew->hashProofOfStake = mapProofOfStake[hash];
     }
 
+<<<<<<< HEAD
     // ppcoin: compute stake modifier
+=======
+    // paycoin: compute stake modifier
+>>>>>>> origin/Paycoin-master
     uint64 nStakeModifier = 0;
     bool fGeneratedStakeModifier = false;
     if (!ComputeNextStakeModifier(pindexNew, nStakeModifier, fGeneratedStakeModifier))
@@ -1826,7 +2329,11 @@ bool CBlock::AddToBlockIndex(unsigned int nFile, unsigned int nBlockPos)
 
 
 
+<<<<<<< HEAD
 bool CBlock::CheckBlock() const
+=======
+bool CBlock::CheckBlock(int64 nHeight) const
+>>>>>>> origin/Paycoin-master
 {
     // These are checks that are independent of context
     // that can be verified before saving an orphan block.
@@ -1850,12 +2357,20 @@ bool CBlock::CheckBlock() const
         if (vtx[i].IsCoinBase())
             return DoS(100, error("CheckBlock() : more than one coinbase"));
 
+<<<<<<< HEAD
     // ppcoin: only the second transaction can be the optional coinstake
+=======
+    // paycoin: only the second transaction can be the optional coinstake
+>>>>>>> origin/Paycoin-master
     for (int i = 2; i < vtx.size(); i++)
         if (vtx[i].IsCoinStake())
             return DoS(100, error("CheckBlock() : coinstake in wrong position"));
 
+<<<<<<< HEAD
     // ppcoin: coinbase output should be empty if proof-of-stake block
+=======
+    // paycoin: coinbase output should be empty if proof-of-stake block
+>>>>>>> origin/Paycoin-master
     if (IsProofOfStake() && (vtx[0].vout.size() != 1 || !vtx[0].vout[0].IsEmpty()))
         return error("CheckBlock() : coinbase output not empty for proof-of-stake block");
 
@@ -1867,18 +2382,41 @@ bool CBlock::CheckBlock() const
     if (IsProofOfStake() && !CheckCoinStakeTimestamp(GetBlockTime(), (int64)vtx[1].nTime))
         return DoS(50, error("CheckBlock() : coinstake timestamp violation nTimeBlock=%u nTimeTx=%u", GetBlockTime(), vtx[1].nTime));
 
+<<<<<<< HEAD
     // Check coinbase reward
     if (vtx[0].GetValueOut() > (IsProofOfWork()? (GetProofOfWorkReward(nBits) - vtx[0].GetMinFee() + MIN_TX_FEE) : 0))
         return DoS(50, error("CheckBlock() : coinbase reward exceeded %s > %s", 
                    FormatMoney(vtx[0].GetValueOut()).c_str(),
                    FormatMoney(IsProofOfWork()? GetProofOfWorkReward(nBits) : 0).c_str()));
+=======
+
+    int64 nHeightTmp = 0;
+    if(nHeight == -1){
+        if(pindexBest != NULL){
+            nHeightTmp = GetLastBlockIndex(pindexBest, false)->nHeight + 1;
+        }
+    }else{
+        nHeightTmp = nHeight;
+    }
+
+    // Check coinbase reward
+    if (vtx[0].GetValueOut() > (IsProofOfWork()? (GetProofOfWorkReward(nHeightTmp, nTime) - vtx[0].GetMinFee() + MIN_TX_FEE) : 0))
+        return DoS(50, error("CheckBlock() : coinbase reward exceeded %s > %s",
+                   FormatMoney(vtx[0].GetValueOut()).c_str(),
+                   FormatMoney(IsProofOfWork()? GetProofOfWorkReward(nHeightTmp, nTime) : 0).c_str()));
+
+>>>>>>> origin/Paycoin-master
 
     // Check transactions
     BOOST_FOREACH(const CTransaction& tx, vtx)
     {
         if (!tx.CheckTransaction())
             return DoS(tx.nDoS, error("CheckBlock() : CheckTransaction failed"));
+<<<<<<< HEAD
         // ppcoin: check transaction timestamp
+=======
+        // paycoin: check transaction timestamp
+>>>>>>> origin/Paycoin-master
         if (GetBlockTime() < (int64)tx.nTime)
             return DoS(50, error("CheckBlock() : block timestamp earlier than transaction timestamp"));
     }
@@ -1905,7 +2443,11 @@ bool CBlock::CheckBlock() const
     if (hashMerkleRoot != BuildMerkleTree())
         return DoS(100, error("CheckBlock() : hashMerkleRoot mismatch"));
 
+<<<<<<< HEAD
     // ppcoin: check block signature
+=======
+    // paycoin: check block signature
+>>>>>>> origin/Paycoin-master
     if (!CheckBlockSignature())
         return DoS(100, error("CheckBlock() : bad block signature"));
 
@@ -1925,6 +2467,10 @@ bool CBlock::AcceptBlock()
         return DoS(10, error("AcceptBlock() : prev block not found"));
     CBlockIndex* pindexPrev = (*mi).second;
     int nHeight = pindexPrev->nHeight+1;
+<<<<<<< HEAD
+=======
+    unsigned int nTimePoW = pindexPrev->nTime+1;
+>>>>>>> origin/Paycoin-master
 
     // Check proof-of-work or proof-of-stake
     if (nBits != GetNextTargetRequired(pindexPrev, IsProofOfStake()))
@@ -1934,6 +2480,12 @@ bool CBlock::AcceptBlock()
     if (GetBlockTime() <= pindexPrev->GetMedianTimePast() || GetBlockTime() + nMaxClockDrift < pindexPrev->GetBlockTime())
         return error("AcceptBlock() : block's timestamp is too early");
 
+<<<<<<< HEAD
+=======
+    if (IsProofOfWork() && nTimePoW > POW_END_TIME)
+        return DoS(100, error("AcceptBlock() : reject proof-of-work at height %d", nHeight));
+
+>>>>>>> origin/Paycoin-master
     // Check that all transactions are finalized
     BOOST_FOREACH(const CTransaction& tx, vtx)
         if (!tx.IsFinal(nHeight, GetBlockTime()))
@@ -1943,7 +2495,11 @@ bool CBlock::AcceptBlock()
     if (!Checkpoints::CheckHardened(nHeight, hash))
         return DoS(100, error("AcceptBlock() : rejected by hardened checkpoint lockin at %d", nHeight));
 
+<<<<<<< HEAD
     // ppcoin: check that the block satisfies synchronized checkpoint
+=======
+    // paycoin: check that the block satisfies synchronized checkpoint
+>>>>>>> origin/Paycoin-master
     if (!Checkpoints::CheckSync(hash, pindexPrev))
         return error("AcceptBlock() : rejected by synchronized checkpoint");
 
@@ -1967,7 +2523,11 @@ bool CBlock::AcceptBlock()
                 pnode->PushInventory(CInv(MSG_BLOCK, hash));
     }
 
+<<<<<<< HEAD
     // ppcoin: check pending sync-checkpoint
+=======
+    // paycoin: check pending sync-checkpoint
+>>>>>>> origin/Paycoin-master
     Checkpoints::AcceptPendingSyncCheckpoint();
 
     return true;
@@ -1982,7 +2542,11 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
     if (mapOrphanBlocks.count(hash))
         return error("ProcessBlock() : already have block (orphan) %s", hash.ToString().substr(0,20).c_str());
 
+<<<<<<< HEAD
     // ppcoin: check proof-of-stake
+=======
+    // paycoin: check proof-of-stake
+>>>>>>> origin/Paycoin-master
     // Limited duplicity on stake: prevents block flood attack
     // Duplicate stake allowed only when there is orphan child block
     if (pblock->IsProofOfStake() && setStakeSeen.count(pblock->GetProofOfStake()) && !mapOrphanBlocksByPrev.count(hash) && !Checkpoints::WantedByPendingSyncCheckpoint(hash))
@@ -1992,7 +2556,11 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
     if (!pblock->CheckBlock())
         return error("ProcessBlock() : CheckBlock FAILED");
 
+<<<<<<< HEAD
     // ppcoin: verify hash target and signature of coinstake tx
+=======
+    // paycoin: verify hash target and signature of coinstake tx
+>>>>>>> origin/Paycoin-master
     if (pblock->IsProofOfStake())
     {
         uint256 hashProofOfStake = 0;
@@ -2013,7 +2581,11 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         CBigNum bnNewBlock;
         bnNewBlock.SetCompact(pblock->nBits);
         CBigNum bnRequired;
+<<<<<<< HEAD
         bnRequired.SetCompact(ComputeMinWork(GetLastBlockIndex(pcheckpoint, pblock->IsProofOfStake())->nBits, deltaTime));
+=======
+        bnRequired.SetCompact(ComputeMinWork(GetLastBlockIndex(pcheckpoint, pblock->IsProofOfStake())->nBits, deltaTime, pblock->IsProofOfStake()));
+>>>>>>> origin/Paycoin-master
 
         if (bnNewBlock > bnRequired)
         {
@@ -2023,7 +2595,11 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         }
     }
 
+<<<<<<< HEAD
     // ppcoin: ask for pending sync-checkpoint if any
+=======
+    // paycoin: ask for pending sync-checkpoint if any
+>>>>>>> origin/Paycoin-master
     if (!IsInitialBlockDownload())
         Checkpoints::AskForPendingSyncCheckpoint(pfrom);
 
@@ -2032,13 +2608,26 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
     {
         printf("ProcessBlock: ORPHAN BLOCK, prev=%s\n", pblock->hashPrevBlock.ToString().substr(0,20).c_str());
         CBlock* pblock2 = new CBlock(*pblock);
+<<<<<<< HEAD
         // ppcoin: check proof-of-stake
+=======
+        // paycoin: check proof-of-stake
+>>>>>>> origin/Paycoin-master
         if (pblock2->IsProofOfStake())
         {
             // Limited duplicity on stake: prevents block flood attack
             // Duplicate stake allowed only when there is orphan child block
             if (setStakeSeenOrphan.count(pblock2->GetProofOfStake()) && !mapOrphanBlocksByPrev.count(hash) && !Checkpoints::WantedByPendingSyncCheckpoint(hash))
+<<<<<<< HEAD
                 return error("ProcessBlock() : duplicate proof-of-stake (%s, %d) for orphan block %s", pblock2->GetProofOfStake().first.ToString().c_str(), pblock2->GetProofOfStake().second, hash.ToString().c_str());
+=======
+            {
+                error("ProcessBlock() : duplicate proof-of-stake (%s, %d) for orphan block %s", pblock2->GetProofOfStake().first.ToString().c_str(), pblock2->GetProofOfStake().second, hash.ToString().c_str());
+                //pblock2 will not be needed, free it
+                delete pblock2;
+                return false;
+            }
+>>>>>>> origin/Paycoin-master
             else
                 setStakeSeenOrphan.insert(pblock2->GetProofOfStake());
         }
@@ -2049,7 +2638,11 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
         if (pfrom)
         {
             pfrom->PushGetBlocks(pindexBest, GetOrphanRoot(pblock2));
+<<<<<<< HEAD
             // ppcoin: getblocks may not obtain the ancestor block rejected
+=======
+            // paycoin: getblocks may not obtain the ancestor block rejected
+>>>>>>> origin/Paycoin-master
             // earlier by duplicate-stake check so we ask for it again directly
             if (!IsInitialBlockDownload())
                 pfrom->AskFor(CInv(MSG_BLOCK, WantedByOrphan(pblock2)));
@@ -2083,14 +2676,22 @@ bool ProcessBlock(CNode* pfrom, CBlock* pblock)
 
     printf("ProcessBlock: ACCEPTED\n");
 
+<<<<<<< HEAD
     // ppcoin: if responsible for sync-checkpoint send it
+=======
+    // paycoin: if responsible for sync-checkpoint send it
+>>>>>>> origin/Paycoin-master
     if (pfrom && !CSyncCheckpoint::strMasterPrivKey.empty())
         Checkpoints::SendSyncCheckpoint(Checkpoints::AutoSelectSyncCheckpoint());
 
     return true;
 }
 
+<<<<<<< HEAD
 // ppcoin: sign block
+=======
+// paycoin: sign block
+>>>>>>> origin/Paycoin-master
 bool CBlock::SignBlock(const CKeyStore& keystore)
 {
     vector<valtype> vSolutions;
@@ -2113,7 +2714,11 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
     return false;
 }
 
+<<<<<<< HEAD
 // ppcoin: check block signature
+=======
+// paycoin: check block signature
+>>>>>>> origin/Paycoin-master
 bool CBlock::CheckBlockSignature() const
 {
     if (GetHash() == hashGenesisBlock)
@@ -2138,7 +2743,11 @@ bool CBlock::CheckBlockSignature() const
     return false;
 }
 
+<<<<<<< HEAD
 // ppcoin: entropy bit for stake modifier if chosen by modifier
+=======
+// paycoin: entropy bit for stake modifier if chosen by modifier
+>>>>>>> origin/Paycoin-master
 unsigned int CBlock::GetStakeEntropyBit() const
 {
     unsigned int nEntropyBit = 0;
@@ -2177,7 +2786,11 @@ bool CheckDiskSpace(uint64 nAdditionalBytes)
         string strMessage = _("Warning: Disk space is low");
         strMiscWarning = strMessage;
         printf("*** %s\n", strMessage.c_str());
+<<<<<<< HEAD
         ThreadSafeMessageBox(strMessage, "PPCoin", wxOK | wxICON_EXCLAMATION | wxMODAL);
+=======
+        ThreadSafeMessageBox(strMessage, "Paycoin", wxOK | wxICON_EXCLAMATION | wxMODAL);
+>>>>>>> origin/Paycoin-master
         StartShutdown();
         return false;
     }
@@ -2238,7 +2851,11 @@ bool LoadBlockIndex(bool fAllowNew)
     }
 
     printf("%s Network: genesis=0x%s nBitsLimit=0x%08x nBitsInitial=0x%08x nStakeMinAge=%d nCoinbaseMaturity=%d nModifierInterval=%d\n",
+<<<<<<< HEAD
            fTestNet? "Test" : "PPCoin", hashGenesisBlock.ToString().substr(0, 20).c_str(), bnProofOfWorkLimit.GetCompact(), bnInitialHashTarget.GetCompact(), nStakeMinAge, nCoinbaseMaturity, nModifierInterval);
+=======
+           fTestNet? "Test" : "Paycoin", hashGenesisBlock.ToString().substr(0, 20).c_str(), bnProofOfWorkLimit.GetCompact(), bnInitialHashTarget.GetCompact(), nStakeMinAge, nCoinbaseMaturity, nModifierInterval);
+>>>>>>> origin/Paycoin-master
 
     //
     // Load block index
@@ -2256,6 +2873,7 @@ bool LoadBlockIndex(bool fAllowNew)
         if (!fAllowNew)
             return false;
 
+<<<<<<< HEAD
         // Genesis Block:
         // CBlock(hash=000000000019d6, ver=1, hashPrevBlock=00000000000000, hashMerkleRoot=4a5e1e, nTime=1231006505, nBits=1d00ffff, nNonce=2083236893, vtx=1)
         //   CTransaction(hash=4a5e1e, ver=1, vin.size=1, vout.size=1, nLockTime=0)
@@ -2267,6 +2885,12 @@ bool LoadBlockIndex(bool fAllowNew)
         const char* pszTimestamp = "Matonis 07-AUG-2012 Parallel Currencies And The Roadmap To Monetary Freedom";
         CTransaction txNew;
         txNew.nTime = 1345083810;
+=======
+        // Genesis block
+        const char* pszTimestamp = "Time 11/29/2014 France Considers Backing Palestinian Statehood";
+        CTransaction txNew;
+        txNew.nTime = 1417219200;
+>>>>>>> origin/Paycoin-master
         txNew.vin.resize(1);
         txNew.vout.resize(1);
         txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(9999) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
@@ -2276,6 +2900,7 @@ bool LoadBlockIndex(bool fAllowNew)
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
+<<<<<<< HEAD
         block.nTime    = 1345084287;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
         block.nNonce   = 2179302059u;
@@ -2284,17 +2909,35 @@ bool LoadBlockIndex(bool fAllowNew)
         {
             block.nTime    = 1345090000;
             block.nNonce   = 122894938;
+=======
+        block.nTime    = 1417219210;
+        block.nBits    = bnProofOfWorkLimit.GetCompact();
+        block.nNonce   = 716560;
+
+        if (fTestNet)
+        {
+            block.nTime    = 1417219210;
+            block.nNonce   = 18631020;
+>>>>>>> origin/Paycoin-master
         }
 
         //// debug print
         printf("%s\n", block.GetHash().ToString().c_str());
         printf("%s\n", hashGenesisBlock.ToString().c_str());
         printf("%s\n", block.hashMerkleRoot.ToString().c_str());
+<<<<<<< HEAD
         assert(block.hashMerkleRoot == uint256("0x3c2d8f85fab4d17aac558cc648a1a58acff0de6deb890c29985690052c5993c2"));
+=======
+        assert(block.hashMerkleRoot == uint256("0x1552f748afb7ff4e04776652c5a17d4073e60b7004e9bca639a99edb82aeb1a0"));
+>>>>>>> origin/Paycoin-master
         block.print();
         assert(block.GetHash() == hashGenesisBlock);
         assert(block.CheckBlock());
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Paycoin-master
         // Start new block file
         unsigned int nFile;
         unsigned int nBlockPos;
@@ -2303,11 +2946,19 @@ bool LoadBlockIndex(bool fAllowNew)
         if (!block.AddToBlockIndex(nFile, nBlockPos))
             return error("LoadBlockIndex() : genesis block not accepted");
 
+<<<<<<< HEAD
         // ppcoin: initialize synchronized checkpoint
         if (!Checkpoints::WriteSyncCheckpoint(hashGenesisBlock))
             return error("LoadBlockIndex() : failed to init sync checkpoint");
 
         // ppcoin: upgrade time set to zero if txdb initialized
+=======
+        // paycoin: initialize synchronized checkpoint
+        if (!Checkpoints::WriteSyncCheckpoint(hashGenesisBlock))
+            return error("LoadBlockIndex() : failed to init sync checkpoint");
+
+        // paycoin: upgrade time set to zero if txdb initialized
+>>>>>>> origin/Paycoin-master
         {
             CTxDB txdb;
             if (!txdb.WriteV04UpgradeTime(0))
@@ -2317,7 +2968,11 @@ bool LoadBlockIndex(bool fAllowNew)
         }
     }
 
+<<<<<<< HEAD
     // ppcoin: if checkpoint master key changed must reset sync-checkpoint
+=======
+    // paycoin: if checkpoint master key changed must reset sync-checkpoint
+>>>>>>> origin/Paycoin-master
     {
         CTxDB txdb;
         string strPubKey = "";
@@ -2335,7 +2990,11 @@ bool LoadBlockIndex(bool fAllowNew)
         txdb.Close();
     }
 
+<<<<<<< HEAD
     // ppcoin: upgrade time set to zero if txdb initialized
+=======
+    // paycoin: upgrade time set to zero if txdb initialized
+>>>>>>> origin/Paycoin-master
     {
         CTxDB txdb;
         if (txdb.ReadV04UpgradeTime(nProtocolV04UpgradeTime))
@@ -2462,7 +3121,11 @@ string GetWarnings(string strFor)
     if (GetBoolArg("-testsafemode"))
         strRPC = "test";
 
+<<<<<<< HEAD
     // ppcoin: wallet lock warning for minting
+=======
+    // paycoin: wallet lock warning for minting
+>>>>>>> origin/Paycoin-master
     if (strMintWarning != "")
     {
         nPriority = 0;
@@ -2476,22 +3139,36 @@ string GetWarnings(string strFor)
         strStatusBar = strMiscWarning;
     }
 
+<<<<<<< HEAD
     // ppcoin: should not enter safe mode for longer invalid chain
     // ppcoin: if sync-checkpoint is too old do not enter safe mode
     if (Checkpoints::IsSyncCheckpointTooOld(60 * 60 * 24 * 10) && !fTestNet)
+=======
+    // paycoin: should not enter safe mode for longer invalid chain
+    // paycoin: if sync-checkpoint is too old do not enter safe mode
+    if (Checkpoints::IsSyncCheckpointTooOld(60 * 60 * 24 * 30) && !fTestNet)
+>>>>>>> origin/Paycoin-master
     {
         nPriority = 100;
         strStatusBar = "WARNING: Checkpoint is too old. Wait for block chain to download, or notify developers of the issue.";
     }
 
+<<<<<<< HEAD
     // ppcoin: if detected invalid checkpoint enter safe mode
+=======
+    // paycoin: if detected invalid checkpoint enter safe mode
+>>>>>>> origin/Paycoin-master
     if (Checkpoints::hashInvalidCheckpoint != 0)
     {
         nPriority = 3000;
         strStatusBar = strRPC = "WARNING: Invalid checkpoint found! Displayed transactions may not be correct! You may need to upgrade, or notify developers of the issue.";
     }
 
+<<<<<<< HEAD
     // ppcoin: if detected unmet upgrade requirement enter safe mode
+=======
+    // paycoin: if detected unmet upgrade requirement enter safe mode
+>>>>>>> origin/Paycoin-master
     // Note: v0.4 upgrade requires blockchain redownload if past protocol switch
     if (IsProtocolV04(nProtocolV04UpgradeTime + 60*60*24)) // 1 day margin
     {
@@ -2510,7 +3187,11 @@ string GetWarnings(string strFor)
                 nPriority = alert.nPriority;
                 strStatusBar = alert.strStatusBar;
                 if (nPriority > 1000)
+<<<<<<< HEAD
                     strRPC = strStatusBar;  // ppcoin: safe mode for high alert
+=======
+                    strRPC = strStatusBar;  // paycoin: safe mode for high alert
+>>>>>>> origin/Paycoin-master
             }
         }
     }
@@ -2612,7 +3293,11 @@ bool static AlreadyHave(CTxDB& txdb, const CInv& inv)
 
 bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 {
+<<<<<<< HEAD
     static map<CService, vector<unsigned char> > mapReuseKey;
+=======
+    static map<CService, CPubKey> mapReuseKey;
+>>>>>>> origin/Paycoin-master
     RandAddSeedPerfmon();
     if (fDebug) {
         printf("%s ", DateTimeStrFormat(GetTime()).c_str());
@@ -2660,6 +3345,15 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         if (!vRecv.empty())
             vRecv >> pfrom->nStartingHeight;
 
+<<<<<<< HEAD
+=======
+        if (pfrom->fInbound && addrMe.IsRoutable())
+        {
+            pfrom->addrLocal = addrMe;
+            SeenLocal(addrMe);
+        }
+
+>>>>>>> origin/Paycoin-master
         // Disconnect if we connected to ourself
         if (nNonce == nLocalHostNonce && nNonce > 1)
         {
@@ -2668,7 +3362,11 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             return true;
         }
 
+<<<<<<< HEAD
         // ppcoin: record my external IP reported by peer
+=======
+        // paycoin: record my external IP reported by peer
+>>>>>>> origin/Paycoin-master
         if (addrFrom.IsRoutable() && addrMe.IsRoutable())
             addrSeenByPeer = addrMe;
 
@@ -2687,6 +3385,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         if (!pfrom->fInbound)
         {
             // Advertise our address
+<<<<<<< HEAD
             if (!fNoListen && !fUseProxy && addrLocalHost.IsRoutable() &&
                 !IsInitialBlockDownload())
             {
@@ -2697,6 +3396,17 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 
             // Get recent addresses
             if (pfrom->nVersion >= CADDR_TIME_VERSION || addrman.size() < 1000)
+=======
+            if (!fNoListen && !fUseProxy && !IsInitialBlockDownload())
+            {
+                CAddress addr = GetLocalAddress(&pfrom->addr);
+                if (addr.IsRoutable())
+                    pfrom->PushAddress(addr);
+            }
+
+            // Get recent addresses
+            if (pfrom->fOneShot || pfrom->nVersion >= CADDR_TIME_VERSION || addrman.size() < 1000)
+>>>>>>> origin/Paycoin-master
             {
                 pfrom->PushMessage("getaddr");
                 pfrom->fGetAddr = true;
@@ -2712,7 +3422,11 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 
         // Ask the first connected node for block updates
         static int nAskedForBlocks = 0;
+<<<<<<< HEAD
         if (!pfrom->fClient &&
+=======
+        if (!pfrom->fClient && !pfrom->fOneShot &&
+>>>>>>> origin/Paycoin-master
             (pfrom->nVersion < NOBLKS_VERSION_START ||
              pfrom->nVersion >= NOBLKS_VERSION_END) &&
              (nAskedForBlocks < 1 || vNodes.size() <= 1))
@@ -2728,7 +3442,11 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                 item.second.RelayTo(pfrom);
         }
 
+<<<<<<< HEAD
         // ppcoin: relay sync-checkpoint
+=======
+        // paycoin: relay sync-checkpoint
+>>>>>>> origin/Paycoin-master
         {
             LOCK(Checkpoints::cs_hashSyncCheckpoint);
             if (!Checkpoints::checkpointMessage.IsNull())
@@ -2741,7 +3459,11 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
 
         cPeerBlockCounts.input(pfrom->nStartingHeight);
 
+<<<<<<< HEAD
         // ppcoin: ask for pending sync-checkpoint if any
+=======
+        // paycoin: ask for pending sync-checkpoint if any
+>>>>>>> origin/Paycoin-master
         if (!IsInitialBlockDownload())
             Checkpoints::AskForPendingSyncCheckpoint(pfrom);
     }
@@ -2776,18 +3498,29 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         }
 
         // Store the new addresses
+<<<<<<< HEAD
+=======
+        vector<CAddress> vAddrOk;
+>>>>>>> origin/Paycoin-master
         int64 nNow = GetAdjustedTime();
         int64 nSince = nNow - 10 * 60;
         BOOST_FOREACH(CAddress& addr, vAddr)
         {
             if (fShutdown)
                 return true;
+<<<<<<< HEAD
             // ignore IPv6 for now, since it isn't implemented anyway
             if (!addr.IsIPv4())
                 continue;
             if (addr.nTime <= 100000000 || addr.nTime > nNow + 10 * 60)
                 addr.nTime = nNow - 5 * 24 * 60 * 60;
             pfrom->AddAddressKnown(addr);
+=======
+            if (addr.nTime <= 100000000 || addr.nTime > nNow + 10 * 60)
+                addr.nTime = nNow - 5 * 24 * 60 * 60;
+            pfrom->AddAddressKnown(addr);
+            bool fReachable = IsReachable(addr);
+>>>>>>> origin/Paycoin-master
             if (addr.nTime > nSince && !pfrom->fGetAddr && vAddr.size() <= 10 && addr.IsRoutable())
             {
                 // Relay to a limited number of other nodes
@@ -2812,15 +3545,31 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                         hashKey = Hash(BEGIN(hashKey), END(hashKey));
                         mapMix.insert(make_pair(hashKey, pnode));
                     }
+<<<<<<< HEAD
                     int nRelayNodes = 2;
+=======
+                    int nRelayNodes = fReachable ? 2 : 1; // limited relaying of addresses outside our network(s)
+>>>>>>> origin/Paycoin-master
                     for (multimap<uint256, CNode*>::iterator mi = mapMix.begin(); mi != mapMix.end() && nRelayNodes-- > 0; ++mi)
                         ((*mi).second)->PushAddress(addr);
                 }
             }
+<<<<<<< HEAD
         }
         addrman.Add(vAddr, pfrom->addr, 2 * 60 * 60);
         if (vAddr.size() < 1000)
             pfrom->fGetAddr = false;
+=======
+            // Do not store addresses outside our network
+            if (fReachable)
+                vAddrOk.push_back(addr);
+        }
+        addrman.Add(vAddrOk, pfrom->addr, 2 * 60 * 60);
+        if (vAddr.size() < 1000)
+            pfrom->fGetAddr = false;
+        if (pfrom->fOneShot)
+            pfrom->fDisconnect = true;
+>>>>>>> origin/Paycoin-master
     }
 
 
@@ -2907,7 +3656,11 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
                         // Bypass PushInventory, this must send even if redundant,
                         // and we want it right after the last block so they don't
                         // wait for other stuff first.
+<<<<<<< HEAD
                         // ppcoin: send latest proof-of-work block to allow the
+=======
+                        // paycoin: send latest proof-of-work block to allow the
+>>>>>>> origin/Paycoin-master
                         // download node to accept as orphan (proof-of-stake 
                         // block might be rejected by stake connection check)
                         vector<CInv> vInv;
@@ -2954,7 +3707,11 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             if (pindex->GetBlockHash() == hashStop)
             {
                 printf("  getblocks stopping at %d %s (%u bytes)\n", pindex->nHeight, pindex->GetBlockHash().ToString().substr(0,20).c_str(), nBytes);
+<<<<<<< HEAD
                 // ppcoin: tell downloading node about the latest block if it's
+=======
+                // paycoin: tell downloading node about the latest block if it's
+>>>>>>> origin/Paycoin-master
                 // without risk being rejected due to stake connection check
                 if (hashStop != hashBestChain && pindex->GetBlockTime() + nStakeMinAge > pindexBest->GetBlockTime())
                     pfrom->PushInventory(CInv(MSG_BLOCK, hashBestChain));
@@ -3386,11 +4143,19 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
                         pnode->setAddrKnown.clear();
 
                     // Rebroadcast our address
+<<<<<<< HEAD
                     if (!fNoListen && !fUseProxy && addrLocalHost.IsRoutable())
                     {
                         CAddress addr(addrLocalHost);
                         addr.nTime = GetAdjustedTime();
                         pnode->PushAddress(addr);
+=======
+                    if (!fNoListen && !fUseProxy)
+                    {
+                        CAddress addr = GetLocalAddress(&pnode->addr);
+                        if (addr.IsRoutable())
+                            pnode->PushAddress(addr);
+>>>>>>> origin/Paycoin-master
                     }
                 }
             }
@@ -3644,7 +4409,11 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
 
+<<<<<<< HEAD
     // ppcoin: if coinstake available add coinstake tx
+=======
+    // paycoin: if coinstake available add coinstake tx
+>>>>>>> origin/Paycoin-master
     static int64 nLastCoinStakeSearchTime = GetAdjustedTime();  // only initialized at startup
     CBlockIndex* pindexPrev = pindexBest;
 
@@ -3655,7 +4424,11 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
         int64 nSearchTime = txCoinStake.nTime; // search to current time
         if (nSearchTime > nLastCoinStakeSearchTime)
         {
+<<<<<<< HEAD
             if (pwallet->CreateCoinStake(*pwallet, pblock->nBits, nSearchTime-nLastCoinStakeSearchTime, txCoinStake))
+=======
+            if (pwallet->CreateCoinStake(*pwallet, pblock->nBits, nSearchTime-nLastCoinStakeSearchTime, txCoinStake, pindexPrev->nMoneySupply))
+>>>>>>> origin/Paycoin-master
             {
                 if (txCoinStake.nTime >= max(pindexPrev->GetMedianTimePast()+1, pindexPrev->GetBlockTime() - nMaxClockDrift))
                 {   // make sure coinstake would meet timestamp protocol
@@ -3761,7 +4534,11 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
             if (tx.nTime > GetAdjustedTime() || (pblock->IsProofOfStake() && tx.nTime > pblock->vtx[1].nTime))
                 continue;
 
+<<<<<<< HEAD
             // ppcoin: simplify transaction fee - allow free = false
+=======
+            // paycoin: simplify transaction fee - allow free = false
+>>>>>>> origin/Paycoin-master
             int64 nMinFee = tx.GetMinFee(nBlockSize, false, GMF_BLOCK);
 
             // Connecting shouldn't fail due to dependency on other memory pool transactions
@@ -3814,8 +4591,16 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
             printf("CreateNewBlock(): total size %lu\n", nBlockSize);
 
     }
+<<<<<<< HEAD
     if (pblock->IsProofOfWork())
         pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(pblock->nBits);
+=======
+
+    int nHeight = 0;
+    if(pindexBest != NULL){
+        nHeight = GetLastBlockIndex(pindexBest, false)->nHeight + 1;
+    }
+>>>>>>> origin/Paycoin-master
 
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
@@ -3827,6 +4612,11 @@ CBlock* CreateNewBlock(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfS
     if (pblock->IsProofOfWork())
         pblock->UpdateTime(pindexPrev);
     pblock->nNonce         = 0;
+<<<<<<< HEAD
+=======
+    if (pblock->IsProofOfWork())
+        pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(nHeight, pblock->nTime );
+>>>>>>> origin/Paycoin-master
 
     return pblock.release();
 }
@@ -3901,10 +4691,17 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
     if (hash > hashTarget && pblock->IsProofOfWork())
+<<<<<<< HEAD
         return error("BitcoinMiner : proof-of-work not meeting target");
 
     //// debug print
     printf("BitcoinMiner:\n");
+=======
+        return error("PeerMiner : proof-of-work not meeting target");
+
+    //// debug print
+    printf("PeerMiner:\n");
+>>>>>>> origin/Paycoin-master
     printf("new block found  \n  hash: %s  \ntarget: %s\n", hash.GetHex().c_str(), hashTarget.GetHex().c_str());
     pblock->print();
     printf("%s ", DateTimeStrFormat(GetTime()).c_str());
@@ -3914,7 +4711,11 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     {
         LOCK(cs_main);
         if (pblock->hashPrevBlock != hashBestChain)
+<<<<<<< HEAD
             return error("BitcoinMiner : generated block is stale");
+=======
+            return error("PeerMiner : generated block is stale");
+>>>>>>> origin/Paycoin-master
 
         // Remove key from key pool
         reservekey.KeepKey();
@@ -3939,6 +4740,18 @@ static bool fGenerateBitcoins = false;
 static bool fLimitProcessors = false;
 static int nLimitProcessors = -1;
 
+<<<<<<< HEAD
+=======
+void SetMintWarning(const string& strNewWarning)
+{
+    if (strMintWarning != strNewWarning)
+    {
+        strMintWarning = strNewWarning;
+        MainFrameRepaint();
+    }
+}
+
+>>>>>>> origin/Paycoin-master
 void BitcoinMiner(CWallet *pwallet, bool fProofOfStake)
 {
     printf("CPUMiner started for proof-of-%s\n", fProofOfStake? "stake" : "work");
@@ -3947,13 +4760,30 @@ void BitcoinMiner(CWallet *pwallet, bool fProofOfStake)
     // Each thread has its own key and counter
     CReserveKey reservekey(pwallet);
     unsigned int nExtraNonce = 0;
+<<<<<<< HEAD
+=======
+    int64_t nextAllowedBlock = 0;
+>>>>>>> origin/Paycoin-master
 
     while (fGenerateBitcoins || fProofOfStake)
     {
         if (fShutdown)
             return;
+<<<<<<< HEAD
         while (vNodes.empty() || IsInitialBlockDownload())
         {
+=======
+
+        if (fProofOfStake && (GetTime() < nextAllowedBlock || GetAdjustedTime() < STAKE_START_TIME)) {
+            nLastCoinStakeSearchInterval = 0;
+            Sleep(1000);
+            continue;
+        }
+
+        while (vNodes.empty() || IsInitialBlockDownload())
+        {
+            nLastCoinStakeSearchInterval = 0;
+>>>>>>> origin/Paycoin-master
             Sleep(1000);
             if (fShutdown)
                 return;
@@ -3963,6 +4793,10 @@ void BitcoinMiner(CWallet *pwallet, bool fProofOfStake)
 
         while (pwallet->IsLocked())
         {
+<<<<<<< HEAD
+=======
+            nLastCoinStakeSearchInterval = 0;
+>>>>>>> origin/Paycoin-master
             strMintWarning = strMintMessage;
             Sleep(1000);
         }
@@ -3982,25 +4816,45 @@ void BitcoinMiner(CWallet *pwallet, bool fProofOfStake)
 
         if (fProofOfStake)
         {
+<<<<<<< HEAD
             // ppcoin: if proof-of-stake block found then process block
+=======
+            // paycoin: if proof-of-stake block found then process block
+>>>>>>> origin/Paycoin-master
             if (pblock->IsProofOfStake())
             {
                 if (!pblock->SignBlock(*pwalletMain))
                 {
+<<<<<<< HEAD
                     strMintWarning = strMintMessage;
                     continue;
                 }
                 strMintWarning = "";
+=======
+                    SetMintWarning(strMintMessage);
+                    continue;
+                }
+                SetMintWarning("");
+>>>>>>> origin/Paycoin-master
                 printf("CPUMiner : proof-of-stake block found %s\n", pblock->GetHash().ToString().c_str()); 
                 SetThreadPriority(THREAD_PRIORITY_NORMAL);
                 CheckWork(pblock.get(), *pwalletMain, reservekey);
                 SetThreadPriority(THREAD_PRIORITY_LOWEST);
+<<<<<<< HEAD
+=======
+                nextAllowedBlock = GetTime() + 30 + GetRandInt(90);
+
+>>>>>>> origin/Paycoin-master
             }
             Sleep(500);
             continue;
         }
 
+<<<<<<< HEAD
         printf("Running BitcoinMiner with %d transactions in block\n", pblock->vtx.size());
+=======
+        printf("Running PeerMiner with %d transactions in block\n", pblock->vtx.size());
+>>>>>>> origin/Paycoin-master
 
 
         //
@@ -4045,10 +4899,17 @@ void BitcoinMiner(CWallet *pwallet, bool fProofOfStake)
                     assert(hash == pblock->GetHash());
                     if (!pblock->SignBlock(*pwalletMain))
                     {
+<<<<<<< HEAD
                         strMintWarning = strMintMessage;
                         break;
                     }
                     strMintWarning = "";
+=======
+                        SetMintWarning(strMintMessage);
+                        break;
+                    }
+                    SetMintWarning("");
+>>>>>>> origin/Paycoin-master
                     SetThreadPriority(THREAD_PRIORITY_NORMAL);
                     CheckWork(pblock.get(), *pwalletMain, reservekey);
                     SetThreadPriority(THREAD_PRIORITY_LOWEST);

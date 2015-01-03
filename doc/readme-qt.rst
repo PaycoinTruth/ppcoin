@@ -8,7 +8,11 @@ Debian
 -------
 
 First, make sure that the required packages for Qt4 development of your
+<<<<<<< HEAD
 distribution are installed, for Debian and Ubuntu these are:
+=======
+distribution are installed, for Debian these are:
+>>>>>>> origin/Paycoin-master
 
 ::
 
@@ -16,6 +20,18 @@ distribution are installed, for Debian and Ubuntu these are:
         libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev \
         libssl-dev libdb4.8++-dev
 
+<<<<<<< HEAD
+=======
+Ubuntu
+------
+
+::
+
+    apt-get install qt4-qmake libqt4-dev build-essential libboost-dev libboost-system-dev \
+        libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev \
+        libssl-dev libdb++-dev libminiupnpc-dev
+
+>>>>>>> origin/Paycoin-master
 then execute the following:
 
 ::
@@ -107,8 +123,13 @@ FreeDesktop notification interface through DBUS using the following qmake option
 Generation of QR codes
 -----------------------
 
+<<<<<<< HEAD
 libqrencode may be used to generate QRCode images for payment requests. 
 It can be downloaded from http://fukuchi.org/works/qrencode/index.html.en, or installed via your package manager. Pass the USE_QRCODE 
+=======
+libqrencode may be used to generate QRCode images for payment requests.
+It can be downloaded from http://fukuchi.org/works/qrencode/index.html.en, or installed via your package manager. Pass the USE_QRCODE
+>>>>>>> origin/Paycoin-master
 flag to qmake to control this:
 
 +--------------+--------------------------------------------------------------------------+

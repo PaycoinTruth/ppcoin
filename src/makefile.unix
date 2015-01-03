@@ -1,11 +1,19 @@
 # Copyright (c) 2009-2010 Satoshi Nakamoto
+<<<<<<< HEAD
 # Copyright (c) 2011-2012 The PPCoin developers
+=======
+# Copyright (c) 2011-2012 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 # Distributed under the MIT/X11 software license, see the accompanying
 # file license.txt or http://www.opensource.org/licenses/mit-license.php.
 
 USE_UPNP:=0
 
+<<<<<<< HEAD
 DEFS=-DBOOST_SPIRIT_THREADSAFE
+=======
+DEFS=-DBOOST_SPIRIT_THREADSAFE -DUSE_IPV6
+>>>>>>> origin/Paycoin-master
 
 DEFS += $(addprefix -I,$(CURDIR) $(CURDIR)/obj $(BOOST_INCLUDE_PATH) $(BDB_INCLUDE_PATH) $(OPENSSL_INCLUDE_PATH))
 LIBS = $(addprefix -L,$(BOOST_LIB_PATH) $(BDB_LIB_PATH) $(OPENSSL_LIB_PATH))
@@ -32,7 +40,12 @@ LIBS += \
    -l boost_thread$(BOOST_LIB_SUFFIX) \
    -l db_cxx$(BDB_LIB_SUFFIX) \
    -l ssl \
+<<<<<<< HEAD
    -l crypto
+=======
+   -l crypto \
+   -l rt
+>>>>>>> origin/Paycoin-master
 
 ifndef USE_UPNP
 	override USE_UPNP = -
@@ -101,6 +114,10 @@ OBJS= \
     obj/main.o \
     obj/net.o \
     obj/protocol.o \
+<<<<<<< HEAD
+=======
+    obj/kernelrecord.o \
+>>>>>>> origin/Paycoin-master
     obj/bitcoinrpc.o \
     obj/rpcdump.o \
     obj/script.o \
@@ -111,7 +128,11 @@ OBJS= \
     obj/kernel.o
 
 
+<<<<<<< HEAD
 all: ppcoind
+=======
+all: paycoind
+>>>>>>> origin/Paycoin-master
 
 # auto-generated dependencies:
 -include obj/*.P
@@ -129,7 +150,11 @@ obj/%.o: %.cpp
 	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
 	  rm -f $(@:%.o=%.d)
 
+<<<<<<< HEAD
 ppcoind: $(OBJS:obj/%=obj/%)
+=======
+paycoind: $(OBJS:obj/%=obj/%)
+>>>>>>> origin/Paycoin-master
 	$(CXX) $(xCXXFLAGS) -rdynamic -o $@ $^ $(LDFLAGS) $(LIBS)
 
 TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
@@ -141,11 +166,19 @@ obj-test/%.o: test/%.cpp
 	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
 	  rm -f $(@:%.o=%.d)
 
+<<<<<<< HEAD
 test_ppcoin: $(TESTOBJS) $(filter-out obj/init.o,$(OBJS:obj/%=obj/%))
 	$(CXX) $(xCXXFLAGS) -o $@ $(LIBPATHS) $^ -Wl,-B$(LMODE) -lboost_unit_test_framework $(LDFLAGS) $(LIBS)
 
 clean:
 	-rm -f ppcoind test_ppcoin
+=======
+test_paycoin: $(TESTOBJS) $(filter-out obj/init.o,$(OBJS:obj/%=obj/%))
+	$(CXX) $(xCXXFLAGS) -o $@ $(LIBPATHS) $^ -Wl,-B$(LMODE) -lboost_unit_test_framework $(LDFLAGS) $(LIBS)
+
+clean:
+	-rm -f paycoind test_paycoin
+>>>>>>> origin/Paycoin-master
 	-rm -f obj/*.o
 	-rm -f obj-test/*.o
 	-rm -f obj/*.P

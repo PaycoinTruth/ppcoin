@@ -6,8 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
+<<<<<<< HEAD
     <width>320</width>
     <height>404</height>
+=======
+    <width>379</width>
+    <height>441</height>
+>>>>>>> origin/Paycoin-master
    </rect>
   </property>
   <property name="windowTitle">
@@ -102,7 +107,11 @@
                </sizepolicy>
               </property>
               <property name="text">
+<<<<<<< HEAD
                <string>PPC</string>
+=======
+               <string>XPY</string>
+>>>>>>> origin/Paycoin-master
               </property>
               <property name="buddy">
                <cstring>lnReqAmount</cstring>

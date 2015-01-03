@@ -2,6 +2,10 @@
 #define ASKPASSPHRASEDIALOG_H
 
 #include <QDialog>
+<<<<<<< HEAD
+=======
+#include "virtualkeyboard.h"
+>>>>>>> origin/Paycoin-master
 
 namespace Ui {
     class AskPassphraseDialog;
@@ -35,6 +39,10 @@ private:
     Mode mode;
     WalletModel *model;
     bool fCapsLock;
+<<<<<<< HEAD
+=======
+    VirtualKeyboard *keyboard;
+>>>>>>> origin/Paycoin-master
 
 private slots:
     void textChanged();

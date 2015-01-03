@@ -15,10 +15,17 @@
 #include <string>
 #include "uint256.h"
 
+<<<<<<< HEAD
 #define PPCOIN_PORT  9901
 #define RPC_PORT     9902
 #define TESTNET_PORT 9903
 #define TESTNET_RPC_PORT 9904
+=======
+#define PAYCOIN_PORT  8998
+#define RPC_PORT     8999
+#define TESTNET_PORT 9000
+#define TESTNET_RPC_PORT 9001
+>>>>>>> origin/Paycoin-master
 
 extern bool fTestNet;
 
@@ -26,7 +33,11 @@ void GetMessageStart(unsigned char pchMessageStart[], bool fPersistent = false);
 
 static inline unsigned short GetDefaultPort(const bool testnet = fTestNet)
 {
+<<<<<<< HEAD
     return testnet ? TESTNET_PORT : PPCOIN_PORT;
+=======
+    return testnet ? TESTNET_PORT : PAYCOIN_PORT;
+>>>>>>> origin/Paycoin-master
 }
 
 

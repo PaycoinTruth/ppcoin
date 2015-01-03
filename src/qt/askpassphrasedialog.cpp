@@ -26,6 +26,12 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget *parent) :
     ui->passEdit3->installEventFilter(this);
     ui->capsLabel->clear();
 
+<<<<<<< HEAD
+=======
+    //Setup Keyboard
+    keyboard = new VirtualKeyboard(this);
+    ui->keyboardLayout->addWidget(keyboard);
+>>>>>>> origin/Paycoin-master
     switch(mode)
     {
         case Encrypt: // Ask passphrase x2
@@ -60,6 +66,11 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget *parent) :
     connect(ui->passEdit1, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
     connect(ui->passEdit2, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
     connect(ui->passEdit3, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
+<<<<<<< HEAD
+=======
+
+    connect(ui->keyboardToggle, SIGNAL(clicked()), keyboard, SLOT(toggleKeyboard()));
+>>>>>>> origin/Paycoin-master
 }
 
 AskPassphraseDialog::~AskPassphraseDialog()
@@ -99,7 +110,11 @@ void AskPassphraseDialog::accept()
             break;
         }
         QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm wallet encryption"),
+<<<<<<< HEAD
                  tr("WARNING: If you encrypt your wallet and lose your passphrase, you will <b>LOSE ALL OF YOUR PPCOINS</b>!\nAre you sure you wish to encrypt your wallet?"),
+=======
+                 tr("WARNING: If you encrypt your wallet and lose your passphrase, you will <b>LOSE ALL OF YOUR PAYCOINS</b>!\nAre you sure you wish to encrypt your wallet?"),
+>>>>>>> origin/Paycoin-master
                  QMessageBox::Yes|QMessageBox::Cancel,
                  QMessageBox::Cancel);
         if(retval == QMessageBox::Yes)
@@ -109,7 +124,11 @@ void AskPassphraseDialog::accept()
                 if(model->setWalletEncrypted(true, newpass1))
                 {
                     QMessageBox::warning(this, tr("Wallet encrypted"),
+<<<<<<< HEAD
                                          tr("PPCoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your ppcoins from being stolen by malware infecting your computer."));
+=======
+                                         tr("Paycoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your Paycoins from being stolen by malware infecting your computer."));
+>>>>>>> origin/Paycoin-master
                     QApplication::quit();
                 }
                 else
@@ -213,7 +232,11 @@ bool AskPassphraseDialog::event(QEvent *event)
     return QWidget::event(event);
 }
 
+<<<<<<< HEAD
 bool AskPassphraseDialog::eventFilter(QObject *, QEvent *event)
+=======
+bool AskPassphraseDialog::eventFilter(QObject *object, QEvent *event)
+>>>>>>> origin/Paycoin-master
 {
     /* Detect Caps Lock. 
      * There is no good OS-independent way to check a key state in Qt, but we
@@ -235,6 +258,13 @@ bool AskPassphraseDialog::eventFilter(QObject *, QEvent *event)
                 ui->capsLabel->clear();
             }
         }
+<<<<<<< HEAD
+=======
+    } else if (event->type() == QEvent::FocusIn) {
+        if (object->inherits("QLineEdit")) {
+            keyboard->setInput(object);
+        }
+>>>>>>> origin/Paycoin-master
     }
     return false;
 }

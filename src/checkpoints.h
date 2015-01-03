@@ -1,5 +1,10 @@
 // Copyright (c) 2009-2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2011-2013 The PPCoin developers
+=======
+// Copyright (c) 2011-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_CHECKPOINT_H
@@ -48,7 +53,11 @@ namespace Checkpoints
     bool IsSyncCheckpointTooOld(unsigned int nSeconds);
 }
 
+<<<<<<< HEAD
 // ppcoin: synchronized checkpoint
+=======
+// paycoin: synchronized checkpoint
+>>>>>>> origin/Paycoin-master
 class CUnsignedSyncCheckpoint
 {
 public:

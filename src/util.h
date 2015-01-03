@@ -1,6 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2012 The PPCoin developers
+=======
+// Copyright (c) 2012-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_UTIL_H
@@ -13,8 +18,15 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #else
+<<<<<<< HEAD
 typedef int pid_t; /* define for windows compatiblity */
 #endif
+=======
+#ifndef _WIN64
+typedef int pid_t; /* define for windows compatiblity */
+#endif
+#endif
+>>>>>>> origin/Paycoin-master
 #include <map>
 #include <vector>
 #include <string>
@@ -182,6 +194,10 @@ int64 GetAdjustedTime();
 std::string FormatFullVersion();
 std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments);
 void AddTimeData(const CNetAddr& ip, int64 nTime);
+<<<<<<< HEAD
+=======
+void runCommand(std::string strCommand);
+>>>>>>> origin/Paycoin-master
 
 
 
@@ -339,6 +355,63 @@ public:
 typedef boost::interprocess::interprocess_semaphore CSemaphore;
 #endif
 
+<<<<<<< HEAD
+=======
+/** RAII-style semaphore lock */
+class CSemaphoreGrant
+{
+private:
+    CSemaphore *sem;
+    bool fHaveGrant;
+
+public:
+    void Acquire() {
+        if (fHaveGrant)
+            return;
+        sem->wait();
+        fHaveGrant = true;
+    }
+
+    void Release() {
+        if (!fHaveGrant)
+            return;
+        sem->post();
+        fHaveGrant = false;
+    }
+
+    bool TryAcquire() {
+        if (!fHaveGrant && sem->try_wait())
+            fHaveGrant = true;
+        return fHaveGrant;
+    }
+
+    void MoveTo(CSemaphoreGrant &grant) {
+        grant.Release();
+        grant.sem = sem;
+        grant.fHaveGrant = fHaveGrant;
+        sem = NULL;
+        fHaveGrant = false;
+    }
+
+    CSemaphoreGrant() : sem(NULL), fHaveGrant(false) {}
+
+    CSemaphoreGrant(CSemaphore &sema, bool fTry = false) : sem(&sema), fHaveGrant(false) {
+        if (fTry)
+            TryAcquire();
+        else
+            Acquire();
+    }
+
+    ~CSemaphoreGrant() {
+        Release();
+    }
+
+    operator bool() {
+        return fHaveGrant;
+    }
+};
+
+>>>>>>> origin/Paycoin-master
 inline std::string i64tostr(int64 n)
 {
     return strprintf("%"PRI64d, n);
@@ -406,7 +479,12 @@ std::string HexStr(const T itbegin, const T itend, bool fSpaces=false)
     return std::string(rv.begin(), rv.end());
 }
 
+<<<<<<< HEAD
 inline std::string HexStr(const std::vector<unsigned char>& vch, bool fSpaces=false)
+=======
+template<typename T>
+inline std::string HexStr(const T& vch, bool fSpaces=false)
+>>>>>>> origin/Paycoin-master
 {
     return HexStr(vch.begin(), vch.end(), fSpaces);
 }

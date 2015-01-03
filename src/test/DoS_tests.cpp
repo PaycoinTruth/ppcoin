@@ -34,13 +34,21 @@ BOOST_AUTO_TEST_CASE(DoS_banning)
 {
     CNode::ClearBanned();
     CAddress addr1(ip(0xa0b0c001));
+<<<<<<< HEAD
     CNode dummyNode1(INVALID_SOCKET, addr1, true);
+=======
+    CNode dummyNode1(INVALID_SOCKET, addr1, "", true);
+>>>>>>> origin/Paycoin-master
     dummyNode1.Misbehaving(100); // Should get banned
     BOOST_CHECK(CNode::IsBanned(addr1));
     BOOST_CHECK(!CNode::IsBanned(ip(0xa0b0c001|0x0000ff00))); // Different ip, not banned
 
     CAddress addr2(ip(0xa0b0c002));
+<<<<<<< HEAD
     CNode dummyNode2(INVALID_SOCKET, addr2, true);
+=======
+    CNode dummyNode2(INVALID_SOCKET, addr2, "", true);
+>>>>>>> origin/Paycoin-master
     dummyNode2.Misbehaving(50);
     BOOST_CHECK(!CNode::IsBanned(addr2)); // 2 not banned yet...
     BOOST_CHECK(CNode::IsBanned(addr1));  // ... but 1 still should be
@@ -53,7 +61,11 @@ BOOST_AUTO_TEST_CASE(DoS_banscore)
     CNode::ClearBanned();
     mapArgs["-banscore"] = "111"; // because 11 is my favorite number
     CAddress addr1(ip(0xa0b0c001));
+<<<<<<< HEAD
     CNode dummyNode1(INVALID_SOCKET, addr1, true);
+=======
+    CNode dummyNode1(INVALID_SOCKET, addr1, "", true);
+>>>>>>> origin/Paycoin-master
     dummyNode1.Misbehaving(100);
     BOOST_CHECK(!CNode::IsBanned(addr1));
     dummyNode1.Misbehaving(10);
@@ -70,7 +82,11 @@ BOOST_AUTO_TEST_CASE(DoS_bantime)
     SetMockTime(nStartTime); // Overrides future calls to GetTime()
 
     CAddress addr(ip(0xa0b0c001));
+<<<<<<< HEAD
     CNode dummyNode(INVALID_SOCKET, addr, true);
+=======
+    CNode dummyNode(INVALID_SOCKET, addr, "", true);
+>>>>>>> origin/Paycoin-master
 
     dummyNode.Misbehaving(100);
     BOOST_CHECK(CNode::IsBanned(addr));
@@ -161,7 +177,11 @@ BOOST_AUTO_TEST_CASE(DoS_mapOrphans)
         tx.vin[0].scriptSig << OP_1;
         tx.vout.resize(1);
         tx.vout[0].nValue = 1*CENT;
+<<<<<<< HEAD
         tx.vout[0].scriptPubKey.SetBitcoinAddress(key.GetPubKey());
+=======
+        tx.vout[0].scriptPubKey.SetDestination(key.GetPubKey().GetID());
+>>>>>>> origin/Paycoin-master
 
         CDataStream ds(SER_DISK, CLIENT_VERSION);
         ds << tx;
@@ -179,7 +199,11 @@ BOOST_AUTO_TEST_CASE(DoS_mapOrphans)
         tx.vin[0].prevout.hash = txPrev.GetHash();
         tx.vout.resize(1);
         tx.vout[0].nValue = 1*CENT;
+<<<<<<< HEAD
         tx.vout[0].scriptPubKey.SetBitcoinAddress(key.GetPubKey());
+=======
+        tx.vout[0].scriptPubKey.SetDestination(key.GetPubKey().GetID());
+>>>>>>> origin/Paycoin-master
         SignSignature(keystore, txPrev, tx, 0);
 
         CDataStream ds(SER_DISK, CLIENT_VERSION);
@@ -195,7 +219,11 @@ BOOST_AUTO_TEST_CASE(DoS_mapOrphans)
         CTransaction tx;
         tx.vout.resize(1);
         tx.vout[0].nValue = 1*CENT;
+<<<<<<< HEAD
         tx.vout[0].scriptPubKey.SetBitcoinAddress(key.GetPubKey());
+=======
+        tx.vout[0].scriptPubKey.SetDestination(key.GetPubKey().GetID());
+>>>>>>> origin/Paycoin-master
         tx.vin.resize(500);
         for (int j = 0; j < tx.vin.size(); j++)
         {
@@ -244,7 +272,11 @@ BOOST_AUTO_TEST_CASE(DoS_checkSig)
         tx.vin[0].scriptSig << OP_1;
         tx.vout.resize(1);
         tx.vout[0].nValue = 1*CENT;
+<<<<<<< HEAD
         tx.vout[0].scriptPubKey.SetBitcoinAddress(key.GetPubKey());
+=======
+        tx.vout[0].scriptPubKey.SetDestination(key.GetPubKey().GetID());
+>>>>>>> origin/Paycoin-master
 
         CDataStream ds(SER_DISK, CLIENT_VERSION);
         ds << tx;
@@ -255,7 +287,11 @@ BOOST_AUTO_TEST_CASE(DoS_checkSig)
     CTransaction tx;
     tx.vout.resize(1);
     tx.vout[0].nValue = 1*CENT;
+<<<<<<< HEAD
     tx.vout[0].scriptPubKey.SetBitcoinAddress(key.GetPubKey());
+=======
+    tx.vout[0].scriptPubKey.SetDestination(key.GetPubKey().GetID());
+>>>>>>> origin/Paycoin-master
     tx.vin.resize(NPREV);
     for (int j = 0; j < tx.vin.size(); j++)
     {

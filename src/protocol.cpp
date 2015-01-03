@@ -15,6 +15,7 @@
 // The characters are rarely used upper ascii, not valid as UTF-8, and produce
 // a large 4-byte int at any alignment.
 
+<<<<<<< HEAD
 // Public testnet message start
 // unsigned char pchMessageStartTestBitcoin[4] = { 0xfa, 0xbf, 0xb5, 0xda };
 static unsigned char pchMessageStartTestOld[4] = { 0xdb, 0xe1, 0xf2, 0xf6 };
@@ -25,15 +26,30 @@ static unsigned int nMessageStartTestSwitchTime = 1346200000;
 static unsigned char pchMessageStartBitcoin[4] = { 0xf9, 0xbe, 0xb4, 0xd9 };
 static unsigned char pchMessageStartPPCoin[4] = { 0xe6, 0xe8, 0xe9, 0xe5 };
 static unsigned int nMessageStartSwitchTime = 1347300000;
+=======
+// Public message start
+static unsigned char pchMessageStartMain[4] = { 0xaa, 0xaa, 0xaa, 0xaa };
+// Public testnet message start
+static unsigned char pchMessageStartTest[4] = { 0xbb, 0xbb, 0xbb, 0xbb };
+>>>>>>> origin/Paycoin-master
 
 void GetMessageStart(unsigned char pchMessageStart[], bool fPersistent)
 {
     if (fTestNet)
+<<<<<<< HEAD
         memcpy(pchMessageStart, (fPersistent || GetAdjustedTime() > nMessageStartTestSwitchTime)? pchMessageStartTestNew : pchMessageStartTestOld, sizeof(pchMessageStartTestNew));
     else
         memcpy(pchMessageStart, (fPersistent || GetAdjustedTime() > nMessageStartSwitchTime)? pchMessageStartPPCoin : pchMessageStartBitcoin, sizeof(pchMessageStartPPCoin));
 }
 
+=======
+        memcpy(pchMessageStart, pchMessageStartTest, sizeof(pchMessageStartTest));
+    else
+        memcpy(pchMessageStart, pchMessageStartMain, sizeof(pchMessageStartMain));
+}
+
+
+>>>>>>> origin/Paycoin-master
 static const char* ppszTypeName[] =
 {
     "ERROR",

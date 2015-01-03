@@ -240,6 +240,7 @@ CPrivKey CKey::GetPrivKey() const
     return vchPrivKey;
 }
 
+<<<<<<< HEAD
 bool CKey::SetPubKey(const std::vector<unsigned char>& vchPubKey)
 {
     const unsigned char* pbegin = &vchPubKey[0];
@@ -247,11 +248,24 @@ bool CKey::SetPubKey(const std::vector<unsigned char>& vchPubKey)
         return false;
     fSet = true;
     if (vchPubKey.size() == 33)
+=======
+bool CKey::SetPubKey(const CPubKey& vchPubKey)
+{
+    const unsigned char* pbegin = &vchPubKey.vchPubKey[0];
+    if (!o2i_ECPublicKey(&pkey, &pbegin, vchPubKey.vchPubKey.size()))
+        return false;
+    fSet = true;
+    if (vchPubKey.vchPubKey.size() == 33)
+>>>>>>> origin/Paycoin-master
         SetCompressedPubKey();
     return true;
 }
 
+<<<<<<< HEAD
 std::vector<unsigned char> CKey::GetPubKey() const
+=======
+CPubKey CKey::GetPubKey() const
+>>>>>>> origin/Paycoin-master
 {
     int nSize = i2o_ECPublicKey(pkey, NULL);
     if (!nSize)
@@ -260,7 +274,11 @@ std::vector<unsigned char> CKey::GetPubKey() const
     unsigned char* pbegin = &vchPubKey[0];
     if (i2o_ECPublicKey(pkey, &pbegin) != nSize)
         throw key_error("CKey::GetPubKey() : i2o_ECPublicKey returned unexpected size");
+<<<<<<< HEAD
     return vchPubKey;
+=======
+    return CPubKey(vchPubKey);
+>>>>>>> origin/Paycoin-master
 }
 
 bool CKey::Sign(uint256 hash, std::vector<unsigned char>& vchSig)
@@ -308,7 +326,14 @@ bool CKey::SignCompact(uint256 hash, std::vector<unsigned char>& vchSig)
         }
 
         if (nRecId == -1)
+<<<<<<< HEAD
             throw key_error("CKey::SignCompact() : unable to construct recoverable key");
+=======
+        {
+            ECDSA_SIG_free(sig);
+            throw key_error("CKey::SignCompact() : unable to construct recoverable key");
+        }
+>>>>>>> origin/Paycoin-master
 
         vchSig[0] = nRecId+27+(fCompressedPubKey ? 4 : 0);
         BN_bn2bin(sig->r,&vchSig[33-(nBitsR+7)/8]);
@@ -347,6 +372,10 @@ bool CKey::SetCompactSignature(uint256 hash, const std::vector<unsigned char>& v
         ECDSA_SIG_free(sig);
         return true;
     }
+<<<<<<< HEAD
+=======
+    ECDSA_SIG_free(sig);
+>>>>>>> origin/Paycoin-master
     return false;
 }
 
@@ -381,3 +410,25 @@ bool CKey::IsValid()
     key2.SetSecret(secret, fCompr);
     return GetPubKey() == key2.GetPubKey();
 }
+<<<<<<< HEAD
+=======
+
+bool CPubKey::RecoverCompact(const uint256 &hash, const std::vector<unsigned char>& vchSig) {
+    if (vchSig.size() != 65)
+        return false;
+    CKey key;
+    if (!key.SetCompactSignature(hash, vchSig))
+        return false;
+    vchPubKey = key.GetPubKey().Raw();
+    return true;
+}
+
+bool CPubKey::IsFullyValid() const {
+    if (!IsValid())
+        return false;
+    CKey key;
+    if (!key.SetPubKey(*this))
+        return false;
+    return true;
+}
+>>>>>>> origin/Paycoin-master

@@ -8,10 +8,19 @@ class TransactionTableModel;
 class ClientModel;
 class WalletModel;
 class TransactionView;
+<<<<<<< HEAD
 class OverviewPage;
 class AddressBookPage;
 class SendCoinsDialog;
 class MessagePage;
+=======
+class MintingView;
+class OverviewPage;
+class AddressBookPage;
+class SendCoinsDialog;
+class SignVerifyMessageDialog;
+class MultisigDialog;
+>>>>>>> origin/Paycoin-master
 class Notificator;
 class RPCConsole;
 
@@ -61,10 +70,19 @@ private:
 
     OverviewPage *overviewPage;
     QWidget *transactionsPage;
+<<<<<<< HEAD
     AddressBookPage *addressBookPage;
     AddressBookPage *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     MessagePage *messagePage;
+=======
+    QWidget *mintingPage;
+    AddressBookPage *addressBookPage;
+    AddressBookPage *receiveCoinsPage;
+    SendCoinsDialog *sendCoinsPage;
+    SignVerifyMessageDialog *messagePage;
+    MultisigDialog *multisigPage;
+>>>>>>> origin/Paycoin-master
 
     QLabel *labelEncryptionIcon;
     QLabel *labelConnectionsIcon;
@@ -75,16 +93,28 @@ private:
     QMenuBar *appMenuBar;
     QAction *overviewAction;
     QAction *historyAction;
+<<<<<<< HEAD
+=======
+    QAction *mintingAction;
+>>>>>>> origin/Paycoin-master
     QAction *quitAction;
     QAction *sendCoinsAction;
     QAction *addressBookAction;
     QAction *messageAction;
+<<<<<<< HEAD
+=======
+    QAction *multisigAction;
+>>>>>>> origin/Paycoin-master
     QAction *aboutAction;
     QAction *receiveCoinsAction;
     QAction *optionsAction;
     QAction *toggleHideAction;
     QAction *exportAction;
     QAction *encryptWalletAction;
+<<<<<<< HEAD
+=======
+    QAction *unlockForMintingAction;
+>>>>>>> origin/Paycoin-master
     QAction *backupWalletAction;
     QAction *changePassphraseAction;
     QAction *aboutQtAction;
@@ -93,6 +123,10 @@ private:
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
     TransactionView *transactionView;
+<<<<<<< HEAD
+=======
+    MintingView *mintingView;
+>>>>>>> origin/Paycoin-master
     RPCConsole *rpcConsole;
 
     QMovie *syncIconMovie;
@@ -131,13 +165,22 @@ public slots:
     void handleURI(QString strURI);
 
     void gotoMessagePage();
+<<<<<<< HEAD
     void gotoMessagePage(QString);
+=======
+    void gotoMultisigPage();
+>>>>>>> origin/Paycoin-master
 
 private slots:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
+<<<<<<< HEAD
+=======
+    /** Switch to minting page */
+    void gotoMintingPage();
+>>>>>>> origin/Paycoin-master
     /** Switch to address book page */
     void gotoAddressBookPage();
     /** Switch to receive coins page */
@@ -160,6 +203,11 @@ private slots:
     void incomingTransaction(const QModelIndex & parent, int start, int end);
     /** Encrypt the wallet */
     void encryptWallet(bool status);
+<<<<<<< HEAD
+=======
+    /** Decrypt wallet for minting only */
+    void unlockForMinting(bool status);
+>>>>>>> origin/Paycoin-master
     /** Backup the wallet */
     void backupWallet();
     /** Change encrypted wallet passphrase */

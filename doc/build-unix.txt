@@ -43,6 +43,12 @@ your package manager. Set USE_QRCODE to control this:
  USE_QRCODE=0   (the default) No QRCode support - libqrcode not required
  USE_QRCODE=1   QRCode support enabled
 
+<<<<<<< HEAD
+=======
+IPv6 support may be enabled by setting
+ USE_IPV6=1    Enable IPv6 support
+
+>>>>>>> origin/Paycoin-master
 Licenses of statically linked libraries:
  Berkeley DB   New BSD license with additional requirement that linked
                software must be free open source
@@ -72,21 +78,35 @@ If using Boost 1.37, append -mt to the boost libraries in the makefile.
 Dependency Build Instructions: Gentoo
 -------------------------------------
 
+<<<<<<< HEAD
 Note: Currently, there is no ppcoin ebuild available in overlay 
+=======
+Note: Currently, there is no paycoin ebuild available in overlay 
+>>>>>>> origin/Paycoin-master
 
 emerge -av1 --noreplace dev-libs/boost dev-libs/glib dev-libs/openssl sys-libs/db:4.8
 
 Note: If you like to have UPnP support, you need to install net-libs/miniupnpc.
  
 Take the following steps to build (no UPnP support):
+<<<<<<< HEAD
  cd ppcoin/src
  make -f makefile.unix USE_UPNP= BDB_INCLUDE_PATH='/usr/include/db4.8'
  strip ppcoind
+=======
+ cd paycoin/src
+ make -f makefile.unix USE_UPNP= BDB_INCLUDE_PATH='/usr/include/db4.8'
+ strip paycoind
+>>>>>>> origin/Paycoin-master
 
 
 Notes
 -----
+<<<<<<< HEAD
 The release is built with GCC and then "strip ppcoind" to strip the debug
+=======
+The release is built with GCC and then "strip paycoind" to strip the debug
+>>>>>>> origin/Paycoin-master
 symbols, which reduces the executable size by about 90%.
 
 

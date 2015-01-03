@@ -39,6 +39,10 @@ public slots:
 
 signals:
     void removeEntry(SendCoinsEntry *entry);
+<<<<<<< HEAD
+=======
+    void payAmountChanged(); 
+>>>>>>> origin/Paycoin-master
 
 private slots:
     void on_deleteButton_clicked();

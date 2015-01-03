@@ -6,6 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
+<<<<<<< HEAD
     <width>593</width>
     <height>319</height>
    </rect>
@@ -30,6 +31,25 @@
      </property>
     </widget>
    </item>
+=======
+    <width>544</width>
+    <height>488</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>About Paycoin</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="leftMargin">
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+>>>>>>> origin/Paycoin-master
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
@@ -46,11 +66,47 @@
       </spacer>
      </item>
      <item>
+<<<<<<< HEAD
+=======
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../bitcoin.qrc">:/icons/res/icons/horizontal_trans-no-shadow.png</pixmap>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="indent">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+>>>>>>> origin/Paycoin-master
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
+<<<<<<< HEAD
           <string>&lt;b&gt;PPCoin&lt;/b&gt; version</string>
+=======
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Paycoin&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+>>>>>>> origin/Paycoin-master
          </property>
          <property name="textInteractionFlags">
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -60,7 +116,11 @@
        <item>
         <widget class="QLabel" name="versionLabel">
          <property name="text">
+<<<<<<< HEAD
           <string notr="true">0.3.666-beta</string>
+=======
+          <string notr="true">v0.1.0</string>
+>>>>>>> origin/Paycoin-master
          </property>
          <property name="textFormat">
           <enum>Qt::RichText</enum>
@@ -86,9 +146,22 @@
       </layout>
      </item>
      <item>
+<<<<<<< HEAD
       <widget class="QLabel" name="label_ppcoin_copyright">
        <property name="text">
         <string>Copyright © 2011-2014 PPCoin Developers</string>
+=======
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Copyright © 2014 Paycoin Developers</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_paycoin_copyright">
+       <property name="text">
+        <string>Copyright © 2011-2014 Peercoin Developers</string>
+>>>>>>> origin/Paycoin-master
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -101,7 +174,11 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
+<<<<<<< HEAD
         <string>Copyright © 2009-2012 Bitcoin Developers
+=======
+        <string>Copyright © 2009-2014 Bitcoin Developers
+>>>>>>> origin/Paycoin-master
 
 This is experimental software.
 

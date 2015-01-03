@@ -59,6 +59,10 @@ public:
 private:
     QValueComboBox *unit;
     QCheckBox *display_addresses;
+<<<<<<< HEAD
+=======
+    QCheckBox *coin_control_features;
+>>>>>>> origin/Paycoin-master
 signals:
 
 public slots:
@@ -168,8 +172,13 @@ MainOptionsPage::MainOptionsPage(QWidget *parent):
 {
     QVBoxLayout *layout = new QVBoxLayout();
 
+<<<<<<< HEAD
     bitcoin_at_startup = new QCheckBox(tr("&Start PPCoin on window system startup"));
     bitcoin_at_startup->setToolTip(tr("Automatically start PPCoin after the computer is turned on"));
+=======
+    bitcoin_at_startup = new QCheckBox(tr("&Start Paycoin on window system startup"));
+    bitcoin_at_startup->setToolTip(tr("Automatically start Paycoin after the computer is turned on"));
+>>>>>>> origin/Paycoin-master
     layout->addWidget(bitcoin_at_startup);
 
 #ifndef Q_WS_MAC
@@ -183,7 +192,11 @@ MainOptionsPage::MainOptionsPage(QWidget *parent):
 #endif
 
     map_port_upnp = new QCheckBox(tr("Map port using &UPnP"));
+<<<<<<< HEAD
     map_port_upnp->setToolTip(tr("Automatically open the PPCoin client port on the router. This only works when your router supports UPnP and it is enabled."));
+=======
+    map_port_upnp->setToolTip(tr("Automatically open the Paycoin client port on the router. This only works when your router supports UPnP and it is enabled."));
+>>>>>>> origin/Paycoin-master
     layout->addWidget(map_port_upnp);
 
     connect_socks4 = new QCheckBox(tr("&Connect through SOCKS4 proxy:"));
@@ -213,15 +226,26 @@ MainOptionsPage::MainOptionsPage(QWidget *parent):
     proxy_hbox->addStretch(1);
 
     layout->addLayout(proxy_hbox);
+<<<<<<< HEAD
     QLabel *fee_help = new QLabel(tr("Optional transaction fee per kB that helps make sure your transactions are processed quickly. Most transactions are 1 kB. Fee 0.01 recommended."));
+=======
+    QLabel *fee_help = new QLabel(tr("Mandatory network transaction fee per kB transferred. Most transactions are 1 kB and incur a 0.01 XPY fee. Note: transfer size may increase depending on the number of input transactions required to be added together to fund the payment."));
+>>>>>>> origin/Paycoin-master
     fee_help->setWordWrap(true);
     layout->addWidget(fee_help);
 
     QHBoxLayout *fee_hbox = new QHBoxLayout();
     fee_hbox->addSpacing(18);
+<<<<<<< HEAD
     QLabel *fee_label = new QLabel(tr("Pay transaction &fee"));
     fee_hbox->addWidget(fee_label);
     fee_edit = new BitcoinAmountField();
+=======
+    QLabel *fee_label = new QLabel(tr("Additional network &fee:"));
+    fee_hbox->addWidget(fee_label);
+    fee_edit = new BitcoinAmountField();
+    fee_edit->setDisabled(true);
+>>>>>>> origin/Paycoin-master
 
     fee_label->setBuddy(fee_edit);
     fee_hbox->addWidget(fee_edit);
@@ -282,9 +306,19 @@ DisplayOptionsPage::DisplayOptionsPage(QWidget *parent):
     layout->addLayout(unit_hbox);
 
     display_addresses = new QCheckBox(tr("&Display addresses in transaction list"), this);
+<<<<<<< HEAD
     display_addresses->setToolTip(tr("Whether to show PPCoin addresses in the transaction list"));
     layout->addWidget(display_addresses);
 
+=======
+    display_addresses->setToolTip(tr("Whether to show Paycoin addresses in the transaction list"));
+    layout->addWidget(display_addresses);
+
+    coin_control_features = new QCheckBox(tr("Display coin control features (experts only!)"), this);
+    coin_control_features->setToolTip(tr("Whether to show coin control features or not"));
+    layout->addWidget(coin_control_features);
+
+>>>>>>> origin/Paycoin-master
     layout->addStretch();
 
     setLayout(layout);
@@ -294,4 +328,8 @@ void DisplayOptionsPage::setMapper(MonitoredDataMapper *mapper)
 {
     mapper->addMapping(unit, OptionsModel::DisplayUnit);
     mapper->addMapping(display_addresses, OptionsModel::DisplayAddresses);
+<<<<<<< HEAD
+=======
+    mapper->addMapping(coin_control_features, OptionsModel::CoinControlFeatures);
+>>>>>>> origin/Paycoin-master
 }

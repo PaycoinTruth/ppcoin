@@ -6,7 +6,11 @@
 #include "keystore.h"
 #include "script.h"
 
+<<<<<<< HEAD
 bool CKeyStore::GetPubKey(const CBitcoinAddress &address, std::vector<unsigned char> &vchPubKeyOut) const
+=======
+bool CKeyStore::GetPubKey(const CKeyID &address, CPubKey &vchPubKeyOut) const
+>>>>>>> origin/Paycoin-master
 {
     CKey key;
     if (!GetKey(address, key))
@@ -21,7 +25,11 @@ bool CBasicKeyStore::AddKey(const CKey& key)
     CSecret secret = key.GetSecret(fCompressed);
     {
         LOCK(cs_KeyStore);
+<<<<<<< HEAD
         mapKeys[CBitcoinAddress(key.GetPubKey())] = make_pair(secret, fCompressed);
+=======
+        mapKeys[key.GetPubKey().GetID()] = make_pair(secret, fCompressed);
+>>>>>>> origin/Paycoin-master
     }
     return true;
 }
@@ -30,12 +38,20 @@ bool CBasicKeyStore::AddCScript(const CScript& redeemScript)
 {
     {
         LOCK(cs_KeyStore);
+<<<<<<< HEAD
         mapScripts[Hash160(redeemScript)] = redeemScript;
+=======
+        mapScripts[redeemScript.GetID()] = redeemScript;
+>>>>>>> origin/Paycoin-master
     }
     return true;
 }
 
+<<<<<<< HEAD
 bool CBasicKeyStore::HaveCScript(const uint160& hash) const
+=======
+bool CBasicKeyStore::HaveCScript(const CScriptID& hash) const
+>>>>>>> origin/Paycoin-master
 {
     bool result;
     {
@@ -46,7 +62,11 @@ bool CBasicKeyStore::HaveCScript(const uint160& hash) const
 }
 
 
+<<<<<<< HEAD
 bool CBasicKeyStore::GetCScript(const uint160 &hash, CScript& redeemScriptOut) const
+=======
+bool CBasicKeyStore::GetCScript(const CScriptID &hash, CScript& redeemScriptOut) const
+>>>>>>> origin/Paycoin-master
 {
     {
         LOCK(cs_KeyStore);
@@ -83,10 +103,17 @@ bool CCryptoKeyStore::Unlock(const CKeyingMaterial& vMasterKeyIn)
         CryptedKeyMap::const_iterator mi = mapCryptedKeys.begin();
         for (; mi != mapCryptedKeys.end(); ++mi)
         {
+<<<<<<< HEAD
             const std::vector<unsigned char> &vchPubKey = (*mi).second.first;
             const std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
             CSecret vchSecret;
             if(!DecryptSecret(vMasterKeyIn, vchCryptedSecret, Hash(vchPubKey.begin(), vchPubKey.end()), vchSecret))
+=======
+            const CPubKey &vchPubKey = (*mi).second.first;
+            const std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
+            CSecret vchSecret;
+            if(!DecryptSecret(vMasterKeyIn, vchCryptedSecret, vchPubKey.GetHash(), vchSecret))
+>>>>>>> origin/Paycoin-master
                 return false;
             if (vchSecret.size() != 32)
                 return false;
@@ -113,9 +140,15 @@ bool CCryptoKeyStore::AddKey(const CKey& key)
             return false;
 
         std::vector<unsigned char> vchCryptedSecret;
+<<<<<<< HEAD
         std::vector<unsigned char> vchPubKey = key.GetPubKey();
         bool fCompressed;
         if (!EncryptSecret(vMasterKey, key.GetSecret(fCompressed), Hash(vchPubKey.begin(), vchPubKey.end()), vchCryptedSecret))
+=======
+        CPubKey vchPubKey = key.GetPubKey();
+        bool fCompressed;
+        if (!EncryptSecret(vMasterKey, key.GetSecret(fCompressed), vchPubKey.GetHash(), vchCryptedSecret))
+>>>>>>> origin/Paycoin-master
             return false;
 
         if (!AddCryptedKey(key.GetPubKey(), vchCryptedSecret))
@@ -125,19 +158,31 @@ bool CCryptoKeyStore::AddKey(const CKey& key)
 }
 
 
+<<<<<<< HEAD
 bool CCryptoKeyStore::AddCryptedKey(const std::vector<unsigned char> &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret)
+=======
+bool CCryptoKeyStore::AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret)
+>>>>>>> origin/Paycoin-master
 {
     {
         LOCK(cs_KeyStore);
         if (!SetCrypted())
             return false;
 
+<<<<<<< HEAD
         mapCryptedKeys[CBitcoinAddress(vchPubKey)] = make_pair(vchPubKey, vchCryptedSecret);
+=======
+        mapCryptedKeys[vchPubKey.GetID()] = make_pair(vchPubKey, vchCryptedSecret);
+>>>>>>> origin/Paycoin-master
     }
     return true;
 }
 
+<<<<<<< HEAD
 bool CCryptoKeyStore::GetKey(const CBitcoinAddress &address, CKey& keyOut) const
+=======
+bool CCryptoKeyStore::GetKey(const CKeyID &address, CKey& keyOut) const
+>>>>>>> origin/Paycoin-master
 {
     {
         LOCK(cs_KeyStore);
@@ -147,10 +192,17 @@ bool CCryptoKeyStore::GetKey(const CBitcoinAddress &address, CKey& keyOut) const
         CryptedKeyMap::const_iterator mi = mapCryptedKeys.find(address);
         if (mi != mapCryptedKeys.end())
         {
+<<<<<<< HEAD
             const std::vector<unsigned char> &vchPubKey = (*mi).second.first;
             const std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
             CSecret vchSecret;
             if (!DecryptSecret(vMasterKey, vchCryptedSecret, Hash(vchPubKey.begin(), vchPubKey.end()), vchSecret))
+=======
+            const CPubKey &vchPubKey = (*mi).second.first;
+            const std::vector<unsigned char> &vchCryptedSecret = (*mi).second.second;
+            CSecret vchSecret;
+            if (!DecryptSecret(vMasterKey, vchCryptedSecret, vchPubKey.GetHash(), vchSecret))
+>>>>>>> origin/Paycoin-master
                 return false;
             if (vchSecret.size() != 32)
                 return false;
@@ -162,7 +214,11 @@ bool CCryptoKeyStore::GetKey(const CBitcoinAddress &address, CKey& keyOut) const
     return false;
 }
 
+<<<<<<< HEAD
 bool CCryptoKeyStore::GetPubKey(const CBitcoinAddress &address, std::vector<unsigned char>& vchPubKeyOut) const
+=======
+bool CCryptoKeyStore::GetPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const
+>>>>>>> origin/Paycoin-master
 {
     {
         LOCK(cs_KeyStore);
@@ -192,10 +248,17 @@ bool CCryptoKeyStore::EncryptKeys(CKeyingMaterial& vMasterKeyIn)
             CKey key;
             if (!key.SetSecret(mKey.second.first, mKey.second.second))
                 return false;
+<<<<<<< HEAD
             const std::vector<unsigned char> vchPubKey = key.GetPubKey();
             std::vector<unsigned char> vchCryptedSecret;
             bool fCompressed;
             if (!EncryptSecret(vMasterKeyIn, key.GetSecret(fCompressed), Hash(vchPubKey.begin(), vchPubKey.end()), vchCryptedSecret))
+=======
+            const CPubKey vchPubKey = key.GetPubKey();
+            std::vector<unsigned char> vchCryptedSecret;
+            bool fCompressed;
+            if (!EncryptSecret(vMasterKeyIn, key.GetSecret(fCompressed), vchPubKey.GetHash(), vchCryptedSecret))
+>>>>>>> origin/Paycoin-master
                 return false;
             if (!AddCryptedKey(vchPubKey, vchCryptedSecret))
                 return false;

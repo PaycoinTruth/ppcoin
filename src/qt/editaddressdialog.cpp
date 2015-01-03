@@ -93,7 +93,11 @@ void EditAddressDialog::accept()
             break;
         case AddressTableModel::INVALID_ADDRESS:
             QMessageBox::warning(this, windowTitle(),
+<<<<<<< HEAD
                 tr("The entered address \"%1\" is not a valid bitcoin address.").arg(ui->addressEdit->text()),
+=======
+                tr("The entered address \"%1\" is not a valid Paycoin address.").arg(ui->addressEdit->text()),
+>>>>>>> origin/Paycoin-master
                 QMessageBox::Ok, QMessageBox::Ok);
             return;
         case AddressTableModel::WALLET_UNLOCK_FAILURE:

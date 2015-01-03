@@ -1,6 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin Developers
+<<<<<<< HEAD
 // Copyright (c) 2011-2012 The PPCoin developers
+=======
+// Copyright (c) 2011-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -20,6 +25,10 @@
 #include <vector>
 #include "bignum.h"
 #include "key.h"
+<<<<<<< HEAD
+=======
+#include "script.h"
+>>>>>>> origin/Paycoin-master
 
 static const char* pszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
@@ -190,7 +199,11 @@ protected:
     {
         // zero the memory, as it may contain sensitive data
         if (!vchData.empty())
+<<<<<<< HEAD
             memset(&vchData[0], 0, vchData.size());
+=======
+            OPENSSL_cleanse(&vchData[0], vchData.size());
+>>>>>>> origin/Paycoin-master
     }
 
     void SetData(int nVersionIn, const void* pdata, size_t nSize)
@@ -221,7 +234,11 @@ public:
         vchData.resize(vchTemp.size() - 1);
         if (!vchData.empty())
             memcpy(&vchData[0], &vchTemp[1], vchData.size());
+<<<<<<< HEAD
         memset(&vchTemp[0], 0, vchTemp.size());
+=======
+        OPENSSL_cleanse(&vchTemp[0], vchData.size());
+>>>>>>> origin/Paycoin-master
         return true;
     }
 
@@ -259,17 +276,38 @@ public:
  * Script-hash-addresses have version 117 (or 196 testnet).
  * The data vector contains RIPEMD160(SHA256(cscript)), where cscript is the serialized redemption script.
  */
+<<<<<<< HEAD
+=======
+class CBitcoinAddress;
+class CBitcoinAddressVisitor : public boost::static_visitor<bool>
+{
+private:
+    CBitcoinAddress *addr;
+public:
+    CBitcoinAddressVisitor(CBitcoinAddress *addrIn) : addr(addrIn) { }
+    bool operator()(const CKeyID &id) const;
+    bool operator()(const CScriptID &id) const;
+    bool operator()(const CNoDestination &no) const;
+};
+
+>>>>>>> origin/Paycoin-master
 class CBitcoinAddress : public CBase58Data
 {
 public:
     enum
     {
+<<<<<<< HEAD
         PUBKEY_ADDRESS = 55,  // ppcoin: addresses begin with 'P'
         SCRIPT_ADDRESS = 117, // ppcoin: addresses begin with 'p'
+=======
+        PUBKEY_ADDRESS = 55,  // paycoin: addresses begin with 'P'
+        SCRIPT_ADDRESS = 117, // paycoin: addresses begin with 'p'
+>>>>>>> origin/Paycoin-master
         PUBKEY_ADDRESS_TEST = 111,
         SCRIPT_ADDRESS_TEST = 196,
     };
 
+<<<<<<< HEAD
     bool SetHash160(const uint160& hash160)
     {
         SetData(fTestNet ? PUBKEY_ADDRESS_TEST : PUBKEY_ADDRESS, &hash160, 20);
@@ -285,6 +323,21 @@ public:
     {
         SetData(fTestNet ? SCRIPT_ADDRESS_TEST : SCRIPT_ADDRESS, &hash160, 20);
         return true;
+=======
+    bool Set(const CKeyID &id) {
+        SetData(fTestNet ? PUBKEY_ADDRESS_TEST : PUBKEY_ADDRESS, &id, 20);
+        return true;
+    }
+
+    bool Set(const CScriptID &id) {
+        SetData(fTestNet ? SCRIPT_ADDRESS_TEST : SCRIPT_ADDRESS, &id, 20);
+        return true;
+    }
+
+    bool Set(const CTxDestination &dest)
+    {
+        return boost::apply_visitor(CBitcoinAddressVisitor(this), dest);
+>>>>>>> origin/Paycoin-master
     }
 
     bool IsValid() const
@@ -316,6 +369,7 @@ public:
         }
         return fExpectTestNet == fTestNet && vchData.size() == nExpectedSize;
     }
+<<<<<<< HEAD
     bool IsScript() const
     {
         if (!IsValid())
@@ -324,11 +378,14 @@ public:
             return nVersion == SCRIPT_ADDRESS_TEST;
         return nVersion == SCRIPT_ADDRESS;
     }
+=======
+>>>>>>> origin/Paycoin-master
 
     CBitcoinAddress()
     {
     }
 
+<<<<<<< HEAD
     CBitcoinAddress(uint160 hash160In)
     {
         SetHash160(hash160In);
@@ -337,6 +394,11 @@ public:
     CBitcoinAddress(const std::vector<unsigned char>& vchPubKey)
     {
         SetPubKey(vchPubKey);
+=======
+    CBitcoinAddress(const CTxDestination &dest)
+    {
+        Set(dest);
+>>>>>>> origin/Paycoin-master
     }
 
     CBitcoinAddress(const std::string& strAddress)
@@ -349,6 +411,7 @@ public:
         SetString(pszAddress);
     }
 
+<<<<<<< HEAD
     uint160 GetHash160() const
     {
         assert(vchData.size() == 20);
@@ -358,6 +421,60 @@ public:
     }
 };
 
+=======
+    CTxDestination Get() const {
+        if (!IsValid())
+            return CNoDestination();
+        switch (nVersion) {
+        case PUBKEY_ADDRESS:
+        case PUBKEY_ADDRESS_TEST: {
+            uint160 id;
+            memcpy(&id, &vchData[0], 20);
+            return CKeyID(id);
+        }
+        case SCRIPT_ADDRESS:
+        case SCRIPT_ADDRESS_TEST: {
+            uint160 id;
+            memcpy(&id, &vchData[0], 20);
+            return CScriptID(id);
+        }
+        }
+        return CNoDestination();
+    }
+
+    bool GetKeyID(CKeyID &keyID) const {
+        if (!IsValid())
+            return false;
+        switch (nVersion) {
+        case PUBKEY_ADDRESS:
+        case PUBKEY_ADDRESS_TEST: {
+            uint160 id;
+            memcpy(&id, &vchData[0], 20);
+            keyID = CKeyID(id);
+            return true;
+        }
+        default: return false;
+        }
+    }
+
+    bool IsScript() const {
+        if (!IsValid())
+            return false;
+        switch (nVersion) {
+        case SCRIPT_ADDRESS:
+        case SCRIPT_ADDRESS_TEST: {
+            return true;
+        }
+        default: return false;
+        }
+    }
+};
+
+bool inline CBitcoinAddressVisitor::operator()(const CKeyID &id) const         { return addr->Set(id); }
+bool inline CBitcoinAddressVisitor::operator()(const CScriptID &id) const      { return addr->Set(id); }
+bool inline CBitcoinAddressVisitor::operator()(const CNoDestination &id) const { return false; }
+
+>>>>>>> origin/Paycoin-master
 /** A base58-encoded secret key */
 class CBitcoinSecret : public CBase58Data
 {

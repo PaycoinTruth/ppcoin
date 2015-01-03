@@ -1,6 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2011-2013 The PPCoin developers
+=======
+// Copyright (c) 2011-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include "db.h"
@@ -75,7 +80,11 @@ void Shutdown(void* parg)
         delete pwalletMain;
         CreateThread(ExitTimeout, NULL);
         Sleep(50);
+<<<<<<< HEAD
         printf("PPCoin exiting\n\n");
+=======
+        printf("Paycoin exiting\n\n");
+>>>>>>> origin/Paycoin-master
         fExit = true;
 #ifndef QT_GUI
         // ensure non UI client get's exited here, but let Bitcoin-Qt reach return 0; in bitcoin.cpp
@@ -135,6 +144,21 @@ bool AppInit(int argc, char* argv[])
     return fRet;
 }
 
+<<<<<<< HEAD
+=======
+bool static Bind(const CService &addr) {
+    if (IsLimited(addr))
+        return false;
+    std::string strError;
+    if (!BindListenPort(addr, strError))
+    {
+        ThreadSafeMessageBox(strError, _("Paycoin"), wxOK | wxMODAL);
+        return false;
+    }
+    return true;
+}
+
+>>>>>>> origin/Paycoin-master
 bool AppInit2(int argc, char* argv[])
 {
 #ifdef _MSC_VER
@@ -177,6 +201,7 @@ bool AppInit2(int argc, char* argv[])
     if (mapArgs.count("-?") || mapArgs.count("--help"))
     {
         string strUsage = string() +
+<<<<<<< HEAD
           _("PPCoin version") + " " + FormatFullVersion() + "\n\n" +
           _("Usage:") + "\t\t\t\t\t\t\t\t\t\t\n" +
             "  ppcoind [options]                   \t  " + "\n" +
@@ -186,6 +211,17 @@ bool AppInit2(int argc, char* argv[])
           _("Options:") + "\n" +
             "  -conf=<file>     \t\t  " + _("Specify configuration file (default: ppcoin.conf)") + "\n" +
             "  -pid=<file>      \t\t  " + _("Specify pid file (default: ppcoind.pid)") + "\n" +
+=======
+          _("Paycoin version") + " " + FormatFullVersion() + "\n\n" +
+          _("Usage:") + "\t\t\t\t\t\t\t\t\t\t\n" +
+            "  paycoind [options]                   \t  " + "\n" +
+            "  paycoind [options] <command> [params]\t  " + _("Send command to -server or paycoind") + "\n" +
+            "  paycoind [options] help              \t\t  " + _("List commands") + "\n" +
+            "  paycoind [options] help <command>    \t\t  " + _("Get help for a command") + "\n" +
+          _("Options:") + "\n" +
+            "  -conf=<file>     \t\t  " + _("Specify configuration file (default: paycoin.conf)") + "\n" +
+            "  -pid=<file>      \t\t  " + _("Specify pid file (default: paycoind.pid)") + "\n" +
+>>>>>>> origin/Paycoin-master
             "  -gen             \t\t  " + _("Generate coins") + "\n" +
             "  -gen=0           \t\t  " + _("Don't generate coins") + "\n" +
             "  -min             \t\t  " + _("Start minimized") + "\n" +
@@ -194,6 +230,7 @@ bool AppInit2(int argc, char* argv[])
             "  -dbcache=<n>     \t\t  " + _("Set database cache size in megabytes (default: 25)") + "\n" +
             "  -dblogsize=<n>   \t\t  " + _("Set database disk log size in megabytes (default: 100)") + "\n" +
             "  -timeout=<n>     \t  "   + _("Specify connection timeout (in milliseconds)") + "\n" +
+<<<<<<< HEAD
             "  -proxy=<ip:port> \t  "   + _("Connect through socks4 proxy") + "\n" +
             "  -dns             \t  "   + _("Allow DNS lookups for addnode and connect") + "\n" +
             "  -port=<port>     \t\t  " + _("Listen for connections on <port> (default: 9901 or testnet: 9903)") + "\n" +
@@ -201,6 +238,23 @@ bool AppInit2(int argc, char* argv[])
             "  -addnode=<ip>    \t  "   + _("Add a node to connect to and attempt to keep the connection open") + "\n" +
             "  -connect=<ip>    \t\t  " + _("Connect only to the specified node") + "\n" +
             "  -listen          \t  "   + _("Accept connections from outside (default: 1)") + "\n" +
+=======
+            "  -proxy=<ip:port> \t  "   + _("Connect through socks proxy") + "\n" +
+            "  -socks=<n>       \t  "   + _("Select the version of socks proxy to use (4 or 5, 5 is default)") + "\n" +
+            "  -noproxy=<net>   \t  "   + _("Do not use proxy for connections to network net (ipv4 or ipv6)") + "\n" +
+            "  -dns             \t  "   + _("Allow DNS lookups for -addnode, -seednode and -connect") + "\n" +
+            "  -proxydns        \t  "   + _("Pass DNS requests to (SOCKS5) proxy") + "\n" +
+            "  -port=<port>     \t\t  " + _("Listen for connections on <port> (default: 8998 or testnet: 9000)") + "\n" +
+            "  -maxconnections=<n>\t  " + _("Maintain at most <n> connections to peers (default: 125)") + "\n" +
+            "  -addnode=<ip>    \t  "   + _("Add a node to connect to and attempt to keep the connection open") + "\n" +
+            "  -connect=<ip>    \t\t  " + _("Connect only to the specified node") + "\n" +
+            "  -seednode=<ip>   \t\t  " + _("Connect to a node to retrieve peer addresses, and disconnect") + "\n" +
+            "  -externalip=<ip> \t  "   + _("Specify your own public address") + "\n" +
+            "  -onlynet=<net>   \t  "   + _("Only connect to nodes in network <net> (IPv4 or IPv6)") + "\n" +
+            "  -discover        \t  "   + _("Try to discover public IP address (default: 1)") + "\n" +
+            "  -listen          \t  "   + _("Accept connections from outside (default: 1)") + "\n" +
+            "  -bind=<addr>     \t  "   + _("Bind to given address. Use [host]:port notation for IPv6") + "\n" +
+>>>>>>> origin/Paycoin-master
 #ifdef QT_GUI
             "  -lang=<lang>     \t\t  " + _("Set language, for example \"de_DE\" (default: system locale)") + "\n" +
 #endif
@@ -233,10 +287,18 @@ bool AppInit2(int argc, char* argv[])
 #endif
             "  -rpcuser=<user>  \t  "   + _("Username for JSON-RPC connections") + "\n" +
             "  -rpcpassword=<pw>\t  "   + _("Password for JSON-RPC connections") + "\n" +
+<<<<<<< HEAD
             "  -rpcport=<port>  \t\t  " + _("Listen for JSON-RPC connections on <port> (default: 9902)") + "\n" +
             "  -rpcallowip=<ip> \t\t  " + _("Allow JSON-RPC connections from specified IP address") + "\n" +
             "  -rpcconnect=<ip> \t  "   + _("Send commands to node running on <ip> (default: 127.0.0.1)") + "\n" +
             "  -blocknotify=<cmd> "     + _("Execute command when the best block changes (%s in cmd is replaced by block hash)") + "\n" +
+=======
+            "  -rpcport=<port>  \t\t  " + _("Listen for JSON-RPC connections on <port> (default: 8999)") + "\n" +
+            "  -rpcallowip=<ip> \t\t  " + _("Allow JSON-RPC connections from specified IP address") + "\n" +
+            "  -rpcconnect=<ip> \t  "   + _("Send commands to node running on <ip> (default: 127.0.0.1)") + "\n" +
+            "  -blocknotify=<cmd> "     + _("Execute command when the best block changes (%s in cmd is replaced by block hash)") + "\n" +
+            "  -walletnotify=<cmd> "    + _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)") + "\n" +
+>>>>>>> origin/Paycoin-master
             "  -upgradewallet   \t  "   + _("Upgrade wallet to latest format") + "\n" +
             "  -keypool=<n>     \t  "   + _("Set key pool size to <n> (default: 100)") + "\n" +
             "  -rescan          \t  "   + _("Rescan the block chain for missing wallet transactions") + "\n" +
@@ -244,7 +306,11 @@ bool AppInit2(int argc, char* argv[])
             "  -checklevel=<n>  \t\t  " + _("How thorough the block verification is (0-6, default: 1)") + "\n";
 
         strUsage += string() +
+<<<<<<< HEAD
             _("\nSSL options: (see the Bitcoin Wiki for SSL setup instructions)") + "\n" +
+=======
+            _("\nSSL options: (see the Paycoin Wiki for SSL setup instructions)") + "\n" +
+>>>>>>> origin/Paycoin-master
             "  -rpcssl                                \t  " + _("Use OpenSSL (https) for JSON-RPC connections") + "\n" +
             "  -rpcsslcertificatechainfile=<file.cert>\t  " + _("Server certificate file (default: server.cert)") + "\n" +
             "  -rpcsslprivatekeyfile=<file.pem>       \t  " + _("Server private key (default: server.pem)") + "\n" +
@@ -294,7 +360,11 @@ bool AppInit2(int argc, char* argv[])
 
 #ifndef QT_GUI
     for (int i = 1; i < argc; i++)
+<<<<<<< HEAD
         if (!IsSwitchChar(argv[i][0]) && !(strlen(argv[i]) >= 7 && strncasecmp(argv[i], "ppcoin:", 7) == 0))
+=======
+        if (!IsSwitchChar(argv[i][0]) && !(strlen(argv[i]) >= 7 && strncasecmp(argv[i], "paycoin:", 7) == 0))
+>>>>>>> origin/Paycoin-master
             fCommandLine = true;
 
     if (fCommandLine)
@@ -329,7 +399,11 @@ bool AppInit2(int argc, char* argv[])
     if (!fDebug)
         ShrinkDebugFile();
     printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+<<<<<<< HEAD
     printf("PPCoin version %s (%s)\n", FormatFullVersion().c_str(), CLIENT_DATE.c_str());
+=======
+    printf("Paycoin version %s (%s)\n", FormatFullVersion().c_str(), CLIENT_DATE.c_str());
+>>>>>>> origin/Paycoin-master
     printf("Default data directory %s\n", GetDefaultDataDir().string().c_str());
 
     if (GetBoolArg("-loadblockindextest"))
@@ -347,7 +421,11 @@ bool AppInit2(int argc, char* argv[])
     static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
     if (!lock.try_lock())
     {
+<<<<<<< HEAD
         ThreadSafeMessageBox(strprintf(_("Cannot obtain a lock on data directory %s.  PPCoin is probably already running."), GetDataDir().string().c_str()), _("PPCoin"), wxOK|wxMODAL);
+=======
+        ThreadSafeMessageBox(strprintf(_("Cannot obtain a lock on data directory %s.  Paycoin is probably already running."), GetDataDir().string().c_str()), _("Paycoin"), wxOK|wxMODAL);
+>>>>>>> origin/Paycoin-master
         return false;
     }
 
@@ -356,7 +434,11 @@ bool AppInit2(int argc, char* argv[])
     // Load data files
     //
     if (fDaemon)
+<<<<<<< HEAD
         fprintf(stdout, "ppcoin server starting\n");
+=======
+        fprintf(stdout, "Paycoin server starting\n");
+>>>>>>> origin/Paycoin-master
     int64 nStart;
 
     InitMessage(_("Loading addresses..."));
@@ -393,12 +475,21 @@ bool AppInit2(int argc, char* argv[])
         if (nLoadWalletRet == DB_CORRUPT)
             strErrors << _("Error loading wallet.dat: Wallet corrupted") << "\n";
         else if (nLoadWalletRet == DB_TOO_NEW)
+<<<<<<< HEAD
             strErrors << _("Error loading wallet.dat: Wallet requires newer version of PPCoin") << "\n";
         else if (nLoadWalletRet == DB_NEED_REWRITE)
         {
             strErrors << _("Wallet needed to be rewritten: restart PPCoin to complete") << "\n";
             printf("%s", strErrors.str().c_str());
             ThreadSafeMessageBox(strErrors.str(), _("PPCoin"), wxOK | wxICON_ERROR | wxMODAL);
+=======
+            strErrors << _("Error loading wallet.dat: Wallet requires newer version of Paycoin") << "\n";
+        else if (nLoadWalletRet == DB_NEED_REWRITE)
+        {
+            strErrors << _("Wallet needed to be rewritten: restart Paycoin to complete") << "\n";
+            printf("%s", strErrors.str().c_str());
+            ThreadSafeMessageBox(strErrors.str(), _("Paycoin"), wxOK | wxICON_ERROR | wxMODAL);
+>>>>>>> origin/Paycoin-master
             return false;
         }
         else
@@ -426,11 +517,19 @@ bool AppInit2(int argc, char* argv[])
         // Create new keyUser and set as default key
         RandAddSeedPerfmon();
 
+<<<<<<< HEAD
         std::vector<unsigned char> newDefaultKey;
         if (!pwalletMain->GetKeyFromPool(newDefaultKey, false))
             strErrors << _("Cannot initialize keypool") << "\n";
         pwalletMain->SetDefaultKey(newDefaultKey);
         if (!pwalletMain->SetAddressBookName(CBitcoinAddress(pwalletMain->vchDefaultKey), ""))
+=======
+        CPubKey newDefaultKey;
+        if (!pwalletMain->GetKeyFromPool(newDefaultKey, false))
+            strErrors << _("Cannot initialize keypool") << "\n";
+        pwalletMain->SetDefaultKey(newDefaultKey);
+        if (!pwalletMain->SetAddressBookName(pwalletMain->vchDefaultKey.GetID(), ""))
+>>>>>>> origin/Paycoin-master
             strErrors << _("Cannot write default address") << "\n";
     }
 
@@ -470,7 +569,11 @@ bool AppInit2(int argc, char* argv[])
 
     if (!strErrors.str().empty())
     {
+<<<<<<< HEAD
         ThreadSafeMessageBox(strErrors.str(), _("PPCoin"), wxOK | wxICON_ERROR | wxMODAL);
+=======
+        ThreadSafeMessageBox(strErrors.str(), _("Paycoin"), wxOK | wxICON_ERROR | wxMODAL);
+>>>>>>> origin/Paycoin-master
         return false;
     }
 
@@ -526,11 +629,39 @@ bool AppInit2(int argc, char* argv[])
         addrProxy = CService(mapArgs["-proxy"], 9050);
         if (!addrProxy.IsValid())
         {
+<<<<<<< HEAD
             ThreadSafeMessageBox(_("Invalid -proxy address"), _("PPCcoin"), wxOK | wxMODAL);
+=======
+            ThreadSafeMessageBox(_("Invalid -proxy address"), _("Paycoin"), wxOK | wxMODAL);
+>>>>>>> origin/Paycoin-master
             return false;
         }
     }
 
+<<<<<<< HEAD
+=======
+    if (mapArgs.count("-noproxy"))
+    {
+        BOOST_FOREACH(std::string snet, mapMultiArgs["-noproxy"]) {
+            enum Network net = ParseNetwork(snet);
+            if (net == NET_UNROUTABLE) {
+                ThreadSafeMessageBox(_("Unknown network specified in -noproxy"), _("Paycoin"), wxOK | wxMODAL);
+                return false;
+            }
+            SetNoProxy(net);
+        }
+    }
+
+    if (mapArgs.count("-connect") && mapMultiArgs["-connect"].size() > 0) {
+        SoftSetBoolArg("-dnsseed", false);
+        SoftSetBoolArg("-listen", false);
+    }
+
+    // even in Tor mode, if -bind is specified, you really want -listen
+    if (mapArgs.count("-bind"))
+        SoftSetBoolArg("-listen", true);
+
+>>>>>>> origin/Paycoin-master
     bool fTor = (fUseProxy && addrProxy.GetPort() == 9050);
     if (fTor)
     {
@@ -538,6 +669,7 @@ bool AppInit2(int argc, char* argv[])
         // Note: the GetBoolArg() calls for all of these must happen later.
         SoftSetBoolArg("-listen", false);
         SoftSetBoolArg("-irc", false);
+<<<<<<< HEAD
         SoftSetBoolArg("-dnsseed", false);
         SoftSetBoolArg("-upnp", false);
         SoftSetBoolArg("-dns", false);
@@ -545,6 +677,39 @@ bool AppInit2(int argc, char* argv[])
 
     fAllowDNS = GetBoolArg("-dns");
     fNoListen = !GetBoolArg("-listen", true);
+=======
+        SoftSetBoolArg("-proxydns", true);
+        SoftSetBoolArg("-upnp", false);
+        SoftSetBoolArg("-discover", false);
+    }
+
+    if (mapArgs.count("-onlynet")) {
+        std::set<enum Network> nets;
+        BOOST_FOREACH(std::string snet, mapMultiArgs["-onlynet"]) {
+            enum Network net = ParseNetwork(snet);
+            if (net == NET_UNROUTABLE) {
+                ThreadSafeMessageBox(_("Unknown network specified in -onlynet"), _("Paycoin"), wxOK | wxMODAL);
+                return false;
+            }
+            nets.insert(net);
+        }
+        for (int n = 0; n < NET_MAX; n++) {
+            enum Network net = (enum Network)n;
+            if (!nets.count(net))
+                SetLimited(net);
+        }
+    }
+
+    fNameLookup = GetBoolArg("-dns");
+    fProxyNameLookup = GetBoolArg("-proxydns");
+    if (fProxyNameLookup)
+        fNameLookup = true;
+    fNoListen = !GetBoolArg("-listen", true);
+    nSocksVersion = GetArg("-socks", 5);
+
+    BOOST_FOREACH(string strDest, mapMultiArgs["-seednode"])
+        AddOneShot(strDest);
+>>>>>>> origin/Paycoin-master
 
     // Continue to put "/P2SH/" in the coinbase to monitor
     // BIP16 support.
@@ -552,6 +717,7 @@ bool AppInit2(int argc, char* argv[])
     const char* pszP2SH = "/P2SH/";
     COINBASE_FLAGS << std::vector<unsigned char>(pszP2SH, pszP2SH+strlen(pszP2SH));
 
+<<<<<<< HEAD
     if (!fNoListen)
     {
         std::string strError;
@@ -571,12 +737,39 @@ bool AppInit2(int argc, char* argv[])
             if (addr.IsValid())
                 addrman.Add(addr, CNetAddr("127.0.0.1"));
         }
+=======
+    bool fBound = false;
+    if (!fNoListen)
+    {
+        std::string strError;
+        if (mapArgs.count("-bind")) {
+            BOOST_FOREACH(std::string strBind, mapMultiArgs["-bind"]) {
+                fBound |= Bind(CService(strBind, GetDefaultPort(), false));
+            }
+        } else {
+            struct in_addr inaddr_any;
+            inaddr_any.s_addr = INADDR_ANY;
+            fBound |= Bind(CService(inaddr_any, GetDefaultPort()));
+#ifdef USE_IPV6
+            fBound |= Bind(CService(in6addr_any, GetDefaultPort()));
+#endif
+        }
+        if (!fBound)
+            return false;
+    }
+
+    if (mapArgs.count("-externalip"))
+    {
+        BOOST_FOREACH(string strAddr, mapMultiArgs["-externalip"])
+            AddLocal(CNetAddr(strAddr, fNameLookup), LOCAL_MANUAL);
+>>>>>>> origin/Paycoin-master
     }
 
     if (mapArgs.count("-paytxfee"))
     {
         if (!ParseMoney(mapArgs["-paytxfee"], nTransactionFee) || nTransactionFee < MIN_TX_FEE)
         {
+<<<<<<< HEAD
             ThreadSafeMessageBox(_("Invalid amount for -paytxfee=<amount>"), _("PPCoin"), wxOK | wxMODAL);
             return false;
         }
@@ -585,19 +778,40 @@ bool AppInit2(int argc, char* argv[])
     }
 
     if (mapArgs.count("-reservebalance")) // ppcoin: reserve balance amount
+=======
+            ThreadSafeMessageBox(_("Invalid amount for -paytxfee=<amount>"), _("Paycoin"), wxOK | wxMODAL);
+            return false;
+        }
+        if (nTransactionFee > 0.25 * COIN)
+            ThreadSafeMessageBox(_("Warning: -paytxfee is set very high.  This is the transaction fee you will pay if you send a transaction."), _("Paycoin"), wxOK | wxICON_EXCLAMATION | wxMODAL);
+    }
+
+    if (mapArgs.count("-reservebalance")) // paycoin: reserve balance amount
+>>>>>>> origin/Paycoin-master
     {
         int64 nReserveBalance = 0;
         if (!ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
         {
+<<<<<<< HEAD
             ThreadSafeMessageBox(_("Invalid amount for -reservebalance=<amount>"), _("PPCoin"), wxOK | wxMODAL);
+=======
+            ThreadSafeMessageBox(_("Invalid amount for -reservebalance=<amount>"), _("Paycoin"), wxOK | wxMODAL);
+>>>>>>> origin/Paycoin-master
             return false;
         }
     }
 
+<<<<<<< HEAD
     if (mapArgs.count("-checkpointkey")) // ppcoin: checkpoint master priv key
     {
         if (!Checkpoints::SetCheckpointPrivKey(GetArg("-checkpointkey", "")))
             ThreadSafeMessageBox(_("Unable to sign checkpoint, wrong checkpointkey?\n"), _("PPCoin"), wxOK | wxMODAL);
+=======
+    if (mapArgs.count("-checkpointkey")) // paycoin: checkpoint master priv key
+    {
+        if (!Checkpoints::SetCheckpointPrivKey(GetArg("-checkpointkey", "")))
+            ThreadSafeMessageBox(_("Unable to sign checkpoint, wrong checkpointkey?\n"), _("Paycoin"), wxOK | wxMODAL);
+>>>>>>> origin/Paycoin-master
     }
 
     //
@@ -609,7 +823,11 @@ bool AppInit2(int argc, char* argv[])
     RandAddSeedPerfmon();
 
     if (!CreateThread(StartNode, NULL))
+<<<<<<< HEAD
         ThreadSafeMessageBox(_("Error: CreateThread(StartNode) failed"), _("PPCoin"), wxOK | wxMODAL);
+=======
+        ThreadSafeMessageBox(_("Error: CreateThread(StartNode) failed"), _("Paycoin"), wxOK | wxMODAL);
+>>>>>>> origin/Paycoin-master
 
     if (fServer)
         CreateThread(ThreadRPCServer, NULL);

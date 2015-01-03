@@ -1,6 +1,10 @@
 /*
  * W.J. van der Laan 2011-2012
+<<<<<<< HEAD
  * The PPCoin Developers 2013
+=======
+ * The Paycoin Developers 2013
+>>>>>>> origin/Paycoin-master
  */
 #include "bitcoingui.h"
 #include "clientmodel.h"
@@ -102,7 +106,11 @@ void InitMessage(const std::string &message)
 {
     if(splashref)
     {
+<<<<<<< HEAD
         splashref->showMessage(QString::fromStdString(message), Qt::AlignBottom|Qt::AlignHCenter, QColor(255,255,200));
+=======
+        splashref->showMessage(QString::fromStdString(message), Qt::AlignBottom|Qt::AlignHCenter, QColor(255,255,255));
+>>>>>>> origin/Paycoin-master
         QApplication::instance()->processEvents();
     }
 }
@@ -125,7 +133,11 @@ std::string _(const char* psz)
 static void handleRunawayException(std::exception *e)
 {
     PrintExceptionContinue(e, "Runaway exception");
+<<<<<<< HEAD
     QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occured. PPCoin can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
+=======
+    QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occured. Paycoin can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
+>>>>>>> origin/Paycoin-master
     exit(1);
 }
 
@@ -141,7 +153,11 @@ int main(int argc, char *argv[])
     // Do this early as we don't want to bother initializing if we are just calling IPC
     for (int i = 1; i < argc; i++)
     {
+<<<<<<< HEAD
         if (strlen(argv[i]) >= 7 && strncasecmp(argv[i], "ppcoin:", 7) == 0)
+=======
+        if (strlen(argv[i]) >= 7 && strncasecmp(argv[i], "paycoin:", 7) == 0)
+>>>>>>> origin/Paycoin-master
         {
             const char *strURI = argv[i];
             try {
@@ -178,12 +194,21 @@ int main(int argc, char *argv[])
 
     // Application identification (must be set before OptionsModel is initialized,
     // as it is used to locate QSettings)
+<<<<<<< HEAD
     app.setOrganizationName("PPCoin");
     app.setOrganizationDomain("ppcoin.org");
     if(GetBoolArg("-testnet")) // Separate UI settings for testnet
         app.setApplicationName("PPCoin-Qt-testnet");
     else
         app.setApplicationName("PPCoin-Qt");
+=======
+    app.setOrganizationName("Paycoin");
+    app.setOrganizationDomain("paycoin.org");
+    if(GetBoolArg("-testnet")) // Separate UI settings for testnet
+        app.setApplicationName("Paycoin-Qt-testnet");
+    else
+        app.setApplicationName("Paycoin-Qt");
+>>>>>>> origin/Paycoin-master
 
     // ... then GUI settings:
     OptionsModel optionsModel;
@@ -268,7 +293,11 @@ int main(int argc, char *argv[])
                 // Check for URI in argv
                 for (int i = 1; i < argc; i++)
                 {
+<<<<<<< HEAD
                     if (strlen(argv[i]) >= 7 && strncasecmp(argv[i], "ppcoin:", 7) == 0)
+=======
+                    if (strlen(argv[i]) >= 7 && strncasecmp(argv[i], "paycoin:", 7) == 0)
+>>>>>>> origin/Paycoin-master
                     {
                         const char *strURI = argv[i];
                         try {

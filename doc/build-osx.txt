@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 Copyright (c) 2012-2013 PPCoin Developers
+=======
+Copyright (c) 2012-2013 Paycoin Developers
+>>>>>>> origin/Paycoin-master
 Copyright (c) 2009-2012 Bitcoin Developers
 Distributed under the MIT/X11 software license, see the accompanying file
 license.txt or http://www.opensource.org/licenses/mit-license.php.  This
@@ -12,10 +16,18 @@ Mac OS X bitcoind build instructions
 Laszlo Hanyecz <solar@heliacal.net>
 Douglas Huff <dhuff@jrbobdobbs.org>
 
+<<<<<<< HEAD
 Modified for PPCoin by Jeff Larkin <jefflarkin@gmail.com>
 
 
 See readme-qt.rst for instructions on building PPCoin QT, the
+=======
+Modified for Paycoin by Jeff Larkin <jefflarkin@gmail.com>
+Modified for Paycoin by Ben Rossi <ben@rossinet.com>
+
+
+See readme-qt.rst for instructions on building the Paycoin community version of Paycoin QT, the
+>>>>>>> origin/Paycoin-master
 graphical user interface.
 
 Tested on 10.5 and 10.6 intel.  PPC is not supported because it's big-endian.
@@ -30,7 +42,11 @@ but you can get the current version from http://developer.apple.com
 
 1.  Clone the github tree to get the source code:
 
+<<<<<<< HEAD
 git clone git@github.com:ppcoin/ppcoin.git ppcoin
+=======
+git clone git@github.com/GAWMiners/paycoin.git paycoin
+>>>>>>> origin/Paycoin-master
 
 2.  Download and install MacPorts from http://www.macports.org/
 
@@ -46,14 +62,26 @@ sudo port install qrencode
 
 4.  Now you should be able to build bitcoind:
 
+<<<<<<< HEAD
 cd ppcoin/src
+=======
+cd paycoin/src
+>>>>>>> origin/Paycoin-master
 make -f makefile.osx
 # To build 64-bit binaies:
 make -f makefile.osx RELEASE=true 64BIT=true
 
 Run:
+<<<<<<< HEAD
   ./ppcoind --help  # for a list of command-line options.
 Run
   ./ppcoind -daemon # to start the bitcoin daemon.
 Run
   ./ppcoind help # When the daemon is running, to get a list of RPC commands
+=======
+  ./paycoind --help  # for a list of command-line options.
+Run
+  ./paycoind -daemon # to start the bitcoin daemon.
+Run
+  ./paycoind help # When the daemon is running, to get a list of RPC commands
+>>>>>>> origin/Paycoin-master

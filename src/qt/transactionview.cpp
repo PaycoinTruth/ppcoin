@@ -11,6 +11,10 @@
 #include "editaddressdialog.h"
 #include "optionsmodel.h"
 #include "guiutil.h"
+<<<<<<< HEAD
+=======
+#include "wallet.h"
+>>>>>>> origin/Paycoin-master
 
 #include <QScrollBar>
 #include <QComboBox>
@@ -24,7 +28,10 @@
 #include <QMessageBox>
 #include <QPoint>
 #include <QMenu>
+<<<<<<< HEAD
 #include <QApplication>
+=======
+>>>>>>> origin/Paycoin-master
 #include <QClipboard>
 #include <QLabel>
 #include <QDateTimeEdit>
@@ -125,15 +132,30 @@ TransactionView::TransactionView(QWidget *parent) :
     QAction *copyAddressAction = new QAction(tr("Copy address"), this);
     QAction *copyLabelAction = new QAction(tr("Copy label"), this);
     QAction *copyAmountAction = new QAction(tr("Copy amount"), this);
+<<<<<<< HEAD
     QAction *editLabelAction = new QAction(tr("Edit label"), this);
     QAction *showDetailsAction = new QAction(tr("Show details..."), this);
+=======
+    QAction *copyTransactionIdAction = new QAction(tr("Copy transaction id"), this);
+    QAction *editLabelAction = new QAction(tr("Edit label"), this);
+    QAction *showDetailsAction = new QAction(tr("Show details..."), this);
+    QAction *clearOrphansAction = new QAction(tr("Clear orphans"), this);
+>>>>>>> origin/Paycoin-master
 
     contextMenu = new QMenu();
     contextMenu->addAction(copyAddressAction);
     contextMenu->addAction(copyLabelAction);
     contextMenu->addAction(copyAmountAction);
+<<<<<<< HEAD
     contextMenu->addAction(editLabelAction);
     contextMenu->addAction(showDetailsAction);
+=======
+    contextMenu->addAction(copyTransactionIdAction);
+    contextMenu->addAction(editLabelAction);
+    contextMenu->addAction(showDetailsAction);
+    contextMenu->addSeparator();
+    contextMenu->addAction(clearOrphansAction);
+>>>>>>> origin/Paycoin-master
 
     // Connect actions
     connect(dateWidget, SIGNAL(activated(int)), this, SLOT(chooseDate(int)));
@@ -147,8 +169,15 @@ TransactionView::TransactionView(QWidget *parent) :
     connect(copyAddressAction, SIGNAL(triggered()), this, SLOT(copyAddress()));
     connect(copyLabelAction, SIGNAL(triggered()), this, SLOT(copyLabel()));
     connect(copyAmountAction, SIGNAL(triggered()), this, SLOT(copyAmount()));
+<<<<<<< HEAD
     connect(editLabelAction, SIGNAL(triggered()), this, SLOT(editLabel()));
     connect(showDetailsAction, SIGNAL(triggered()), this, SLOT(showDetails()));
+=======
+    connect(copyTransactionIdAction, SIGNAL(triggered()), this, SLOT(copyTransactionId()));
+    connect(editLabelAction, SIGNAL(triggered()), this, SLOT(editLabel()));
+    connect(showDetailsAction, SIGNAL(triggered()), this, SLOT(showDetails()));
+    connect(clearOrphansAction, SIGNAL(triggered()), this, SLOT(clearOrphans()));
+>>>>>>> origin/Paycoin-master
 }
 
 void TransactionView::setModel(WalletModel *model)
@@ -314,6 +343,14 @@ void TransactionView::copyAmount()
     GUIUtil::copyEntryData(transactionView, 0, TransactionTableModel::FormattedAmountRole);
 }
 
+<<<<<<< HEAD
+=======
+void TransactionView::copyTransactionId()
+{
+    GUIUtil::copyEntryData(transactionView, 0, TransactionTableModel::TxIDRole);
+}
+
+>>>>>>> origin/Paycoin-master
 void TransactionView::editLabel()
 {
     if(!transactionView->selectionModel() ||!model)
@@ -372,6 +409,22 @@ void TransactionView::showDetails()
     }
 }
 
+<<<<<<< HEAD
+=======
+void TransactionView::clearOrphans()
+{
+    if(!model)
+        return;
+
+    model->clearOrphans();
+    model->getTransactionTableModel()->refresh();
+    delete transactionProxyModel;
+    setModel(model);
+    transactionView->sortByColumn(TransactionTableModel::Status, Qt::DescendingOrder);
+    transactionView->sortByColumn(TransactionTableModel::Date, Qt::DescendingOrder);
+}
+
+>>>>>>> origin/Paycoin-master
 QWidget *TransactionView::createDateRangeWidget()
 {
     dateRangeWidget = new QFrame();

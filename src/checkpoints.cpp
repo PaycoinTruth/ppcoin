@@ -1,5 +1,10 @@
 // Copyright (c) 2009-2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2011-2013 The PPCoin developers
+=======
+// Copyright (c) 2011-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -26,9 +31,24 @@ namespace Checkpoints
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
         ( 0, hashGenesisBlockOfficial )
+<<<<<<< HEAD
         ( 19080, uint256("0x000000000000bca54d9ac17881f94193fd6a270c1bb21c3bf0b37f588a40dbd7"))
         ( 30583, uint256("0xd39d1481a7eecba48932ea5913be58ad3894c7ee6d5a8ba8abeb772c66a6696e"))
         ( 99999, uint256("0x27fd5e1de16a4270eb8c68dee2754a64da6312c7c3a0e99a7e6776246be1ee3f"))
+=======
+        ( 276, uint256("0x0000000000000073a6b02412fc261414fde6304366ca7d90cc0c175516d52272"))
+        ( 6888, uint256("0x00000000000000077ae1fcd6f73b21cb62e1410db57f4a5decb2728cdfc2df84"))
+        ( 7880, uint256("0x0000000000001017d14badb06d831f101d94c823715113b7b6b11b7649250ce6"))
+        ( 8047, uint256("0x94e1cf0e8ced93a0f4b34d4845493d07b7c2fb1b92d1e9d2681464bdc2547728"))
+        ( 8048, uint256("0x0a909aca8cf1c12b412d286c88f1e41ceab5336a231772b8da05022c5f4c544c"))
+        ( 8049, uint256("0x28a3efae5e2295ff571943e6b7906f4ac0e7b9c17cad90715d13de2613a71b29"))
+        ( 8050, uint256("0x56e81e95c989a4c18151c19a0e53d3cbc39314f933eea6f16e0eaa1b2529d027"))
+        ( 8051, uint256("0xdc26f8766497644ba86ff8bb8bb13b8be3912299af1046f0e9e0488b393172d0"))
+        ( 8052, uint256("0x0fc44b803dc4d8572980e3c3437bc9b8f0a00d2583ad8792ac76fcd1299793af"))
+        ( 8053, uint256("0xb543bb95ad48dbc1bcf76c100ab5f7fcdc68b4f57e15bfcad6091680446c51bc"))
+        ( 8054, uint256("0xe40395afad71babe79627563f0f1401ca1f4d082eebc6e7576d7fe8445ac7606"))
+        ( 8055, uint256("0x24046864d432565d46481b469611d0f97b9ac0fd3dff0a8f71fb7d8e3a983994"))
+>>>>>>> origin/Paycoin-master
         ;
 
     bool CheckHardened(int nHeight, const uint256& hash)
@@ -66,7 +86,11 @@ namespace Checkpoints
         return NULL;
     }
 
+<<<<<<< HEAD
     // ppcoin: synchronized checkpoint (centrally broadcasted)
+=======
+    // paycoin: synchronized checkpoint (centrally broadcasted)
+>>>>>>> origin/Paycoin-master
     uint256 hashSyncCheckpoint = 0;
     uint256 hashPendingCheckpoint = 0;
     CSyncCheckpoint checkpointMessage;
@@ -74,7 +98,11 @@ namespace Checkpoints
     uint256 hashInvalidCheckpoint = 0;
     CCriticalSection cs_hashSyncCheckpoint;
 
+<<<<<<< HEAD
     // ppcoin: get last synchronized checkpoint
+=======
+    // paycoin: get last synchronized checkpoint
+>>>>>>> origin/Paycoin-master
     CBlockIndex* GetLastSyncCheckpoint()
     {
         LOCK(cs_hashSyncCheckpoint);
@@ -85,7 +113,11 @@ namespace Checkpoints
         return NULL;
     }
 
+<<<<<<< HEAD
     // ppcoin: only descendant of current sync-checkpoint is allowed
+=======
+    // paycoin: only descendant of current sync-checkpoint is allowed
+>>>>>>> origin/Paycoin-master
     bool ValidateSyncCheckpoint(uint256 hashCheckpoint)
     {
         if (!mapBlockIndex.count(hashSyncCheckpoint))
@@ -244,7 +276,11 @@ namespace Checkpoints
         return false;
     }
 
+<<<<<<< HEAD
     // ppcoin: reset synchronized checkpoint to last hardened checkpoint
+=======
+    // paycoin: reset synchronized checkpoint to last hardened checkpoint
+>>>>>>> origin/Paycoin-master
     bool ResetSyncCheckpoint()
     {
         LOCK(cs_hashSyncCheckpoint);
@@ -366,12 +402,21 @@ namespace Checkpoints
     }
 }
 
+<<<<<<< HEAD
 // ppcoin: sync-checkpoint master key
 const std::string CSyncCheckpoint::strMasterPubKey = "04c0c707c28533fd5c9f79d2d3a2d80dff259ad8f915241cd14608fb9bc07c74830efe8438f2b272a866b4af5e0c2cc2a9909972aefbd976937e39f46bb38c277c";
 
 std::string CSyncCheckpoint::strMasterPrivKey = "";
 
 // ppcoin: verify signature of sync-checkpoint message
+=======
+// paycoin: sync-checkpoint master key
+const std::string CSyncCheckpoint::strMasterPubKey = "04c82026c6765a9468e945385886c5722aa4db3fda47bd4d22d7ce451190f7d632dbefc0842c7fc0417f83e7e4c8d2724d83d64614a0ebcdffe062810734367b2e";
+
+std::string CSyncCheckpoint::strMasterPrivKey = "";
+
+// paycoin: verify signature of sync-checkpoint message
+>>>>>>> origin/Paycoin-master
 bool CSyncCheckpoint::CheckSignature()
 {
     CKey key;
@@ -386,7 +431,11 @@ bool CSyncCheckpoint::CheckSignature()
     return true;
 }
 
+<<<<<<< HEAD
 // ppcoin: process synchronized checkpoint
+=======
+// paycoin: process synchronized checkpoint
+>>>>>>> origin/Paycoin-master
 bool CSyncCheckpoint::ProcessSyncCheckpoint(CNode* pfrom)
 {
     if (!CheckSignature())

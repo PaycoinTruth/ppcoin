@@ -1,6 +1,10 @@
 #include "transactionrecord.h"
 
 #include "wallet.h"
+<<<<<<< HEAD
+=======
+#include "base58.h"
+>>>>>>> origin/Paycoin-master
 
 /* Return positive answer if transaction should be shown in list.
  */
@@ -42,9 +46,22 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
 
     if (showTransaction(wtx))
     {
+<<<<<<< HEAD
         if (wtx.IsCoinStake()) // ppcoin: coinstake transaction
         {
             parts.append(TransactionRecord(hash, nTime, TransactionRecord::StakeMint, "", -nDebit, wtx.GetValueOut()));
+=======
+        if (wtx.IsCoinStake()) // paycoin: coinstake transaction
+        {
+            TransactionRecord sub(hash, nTime, TransactionRecord::StakeMint, "", -nDebit, wtx.GetValueOut());
+            CTxDestination address;
+            CTxOut txout = wtx.vout[1];
+
+            if(ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address))
+                sub.address = CBitcoinAddress(address).ToString();
+
+            parts.append(sub);
+>>>>>>> origin/Paycoin-master
         }
         else if (nNet > 0 || wtx.IsCoinBase())
         {
@@ -56,6 +73,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                 if(wallet->IsMine(txout))
                 {
                     TransactionRecord sub(hash, nTime);
+<<<<<<< HEAD
                     CBitcoinAddress address;
                     sub.idx = parts.size(); // sequence number
                     sub.credit = txout.nValue;
@@ -69,6 +87,17 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                         // Received by Bitcoin Address
                         sub.type = TransactionRecord::RecvWithAddress;
                         sub.address = address.ToString();
+=======
+                    CTxDestination address;
+                    sub.idx = parts.size(); // sequence number
+                    sub.credit = txout.nValue;
+
+                    if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address))
+                    {
+                        // Received by Bitcoin Address
+                        sub.type = TransactionRecord::RecvWithAddress;
+                        sub.address = CBitcoinAddress(address).ToString();
+>>>>>>> origin/Paycoin-master
                     }
                     else
                     {
@@ -76,6 +105,14 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                         sub.type = TransactionRecord::RecvFromOther;
                         sub.address = mapValue["from"];
                     }
+<<<<<<< HEAD
+=======
+                    if (wtx.IsCoinBase())
+                    {
+                        // Generated
+                        sub.type = TransactionRecord::Generated;
+                    }
+>>>>>>> origin/Paycoin-master
 
                     parts.append(sub);
                 }
@@ -119,12 +156,21 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet *
                         continue;
                     }
 
+<<<<<<< HEAD
                     CBitcoinAddress address;
                     if (ExtractAddress(txout.scriptPubKey, address))
                     {
                         // Sent to Bitcoin Address
                         sub.type = TransactionRecord::SendToAddress;
                         sub.address = address.ToString();
+=======
+                    CTxDestination address;
+                    if (ExtractDestination(txout.scriptPubKey, address))
+                    {
+                        // Sent to Bitcoin Address
+                        sub.type = TransactionRecord::SendToAddress;
+                        sub.address = CBitcoinAddress(address).ToString();
+>>>>>>> origin/Paycoin-master
                     }
                     else
                     {
@@ -242,6 +288,10 @@ bool TransactionRecord::statusUpdateNeeded()
 
 std::string TransactionRecord::getTxID()
 {
+<<<<<<< HEAD
     return hash.ToString() + strprintf("-%03d", idx);
+=======
+    return hash.ToString(); // + strprintf("-%03d", idx);
+>>>>>>> origin/Paycoin-master
 }
 

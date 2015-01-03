@@ -65,6 +65,11 @@ private slots:
     void editLabel();
     void copyLabel();
     void copyAmount();
+<<<<<<< HEAD
+=======
+    void copyTransactionId();
+    void clearOrphans();
+>>>>>>> origin/Paycoin-master
 
 signals:
     void doubleClicked(const QModelIndex&);

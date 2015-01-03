@@ -1,6 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2011-2012 The PPCoin developers
+=======
+// Copyright (c) 2011-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_WALLET_H
@@ -10,12 +15,21 @@
 #include "key.h"
 #include "keystore.h"
 #include "script.h"
+<<<<<<< HEAD
+=======
+#include "walletdb.h"
+>>>>>>> origin/Paycoin-master
 
 extern bool fWalletUnlockMintOnly;
 
 class CWalletTx;
 class CReserveKey;
+<<<<<<< HEAD
 class CWalletDB;
+=======
+class COutput;
+class CCoinControl;
+>>>>>>> origin/Paycoin-master
 
 /** (client) version numbers for particular wallet features */
 enum WalletFeature
@@ -34,14 +48,22 @@ class CKeyPool
 {
 public:
     int64 nTime;
+<<<<<<< HEAD
     std::vector<unsigned char> vchPubKey;
+=======
+    CPubKey vchPubKey;
+>>>>>>> origin/Paycoin-master
 
     CKeyPool()
     {
         nTime = GetTime();
     }
 
+<<<<<<< HEAD
     CKeyPool(const std::vector<unsigned char>& vchPubKeyIn)
+=======
+    CKeyPool(const CPubKey& vchPubKeyIn)
+>>>>>>> origin/Paycoin-master
     {
         nTime = GetTime();
         vchPubKey = vchPubKeyIn;
@@ -62,8 +84,12 @@ public:
 class CWallet : public CCryptoKeyStore
 {
 private:
+<<<<<<< HEAD
     bool SelectCoinsMinConf(int64 nTargetValue, unsigned int nSpendTime, int nConfMine, int nConfTheirs, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet) const;
     bool SelectCoins(int64 nTargetValue, unsigned int nSpendTime, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet) const;
+=======
+    bool SelectCoins(int64 nTargetValue, unsigned int nSpendTime, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet, const CCoinControl *coinControl=NULL) const;
+>>>>>>> origin/Paycoin-master
 
     CWalletDB *pwalletdbEncryption;
 
@@ -106,19 +132,38 @@ public:
 
     std::map<uint256, CWalletTx> mapWallet;
     std::vector<uint256> vWalletUpdated;
+<<<<<<< HEAD
 
     std::map<uint256, int> mapRequestCount;
 
     std::map<CBitcoinAddress, std::string> mapAddressBook;
 
     std::vector<unsigned char> vchDefaultKey;
+=======
+    std::vector<uint256> vMintingWalletUpdated;
+
+    std::map<uint256, int> mapRequestCount;
+
+    std::map<CTxDestination, std::string> mapAddressBook;
+
+    CPubKey vchDefaultKey;
+>>>>>>> origin/Paycoin-master
 
     // check whether we are allowed to upgrade (or already support) to the named feature
     bool CanSupportFeature(enum WalletFeature wf) { return nWalletMaxVersion >= wf; }
 
+<<<<<<< HEAD
     // keystore implementation
     // Generate a new key
     std::vector<unsigned char> GenerateNewKey();
+=======
+    void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed=true, const CCoinControl *coinControl=NULL) const;
+    bool SelectCoinsMinConf(int64 nTargetValue, unsigned int nSpendTime, int nConfMine, int nConfTheirs, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet) const;
+
+    // keystore implementation
+    // Generate a new key
+    CPubKey GenerateNewKey();
+>>>>>>> origin/Paycoin-master
     // Adds a key to the store, and saves it to disk.
     bool AddKey(const CKey& key);
     // Adds a key to the store, without saving it to disk (used by LoadWallet)
@@ -127,9 +172,15 @@ public:
     bool LoadMinVersion(int nVersion) { nWalletVersion = nVersion; nWalletMaxVersion = std::max(nWalletMaxVersion, nVersion); return true; }
 
     // Adds an encrypted key to the store, and saves it to disk.
+<<<<<<< HEAD
     bool AddCryptedKey(const std::vector<unsigned char> &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
     // Adds an encrypted key to the store, without saving it to disk (used by LoadWallet)
     bool LoadCryptedKey(const std::vector<unsigned char> &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret) { SetMinVersion(FEATURE_WALLETCRYPT); return CCryptoKeyStore::AddCryptedKey(vchPubKey, vchCryptedSecret); }
+=======
+    bool AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
+    // Adds an encrypted key to the store, without saving it to disk (used by LoadWallet)
+    bool LoadCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret) { SetMinVersion(FEATURE_WALLETCRYPT); return CCryptoKeyStore::AddCryptedKey(vchPubKey, vchCryptedSecret); }
+>>>>>>> origin/Paycoin-master
     bool AddCScript(const CScript& redeemScript);
     bool LoadCScript(const CScript& redeemScript) { return CCryptoKeyStore::AddCScript(redeemScript); }
 
@@ -141,6 +192,10 @@ public:
     bool AddToWallet(const CWalletTx& wtxIn);
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pblock, bool fUpdate = false, bool fFindBlock = false);
     bool EraseFromWallet(uint256 hash);
+<<<<<<< HEAD
+=======
+    void ClearOrphans();
+>>>>>>> origin/Paycoin-master
     void WalletUpdateSpent(const CTransaction& prevout);
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false);
     int ScanForWalletTransaction(const uint256& hashTx);
@@ -150,12 +205,21 @@ public:
     int64 GetUnconfirmedBalance() const;
     int64 GetStake() const;
     int64 GetNewMint() const;
+<<<<<<< HEAD
     bool CreateTransaction(const std::vector<std::pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet);
     bool CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet);
     bool CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64 nSearchInterval, CTransaction& txNew);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey);
     std::string SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, bool fAskFee=false);
     std::string SendMoneyToBitcoinAddress(const CBitcoinAddress& address, int64 nValue, CWalletTx& wtxNew, bool fAskFee=false);
+=======
+    bool CreateTransaction(const std::vector<std::pair<CScript, int64> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, const CCoinControl *coinControl=NULL);
+    bool CreateTransaction(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, const CCoinControl *coinControl=NULL);
+    bool CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64 nSearchInterval, CTransaction& txNew, int64 nMoneySupply);
+    bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey);
+    std::string SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, bool fAskFee=false);
+    std::string SendMoneyToDestination(const CTxDestination &address, int64 nValue, CWalletTx& wtxNew, bool fAskFee=false);
+>>>>>>> origin/Paycoin-master
 
     bool NewKeyPool();
     bool TopUpKeyPool();
@@ -163,9 +227,15 @@ public:
     void ReserveKeyFromKeyPool(int64& nIndex, CKeyPool& keypool);
     void KeepKey(int64 nIndex);
     void ReturnKey(int64 nIndex);
+<<<<<<< HEAD
     bool GetKeyFromPool(std::vector<unsigned char> &key, bool fAllowReuse=true);
     int64 GetOldestKeyPoolTime();
     void GetAllReserveAddresses(std::set<CBitcoinAddress>& setAddress);
+=======
+    bool GetKeyFromPool(CPubKey &key, bool fAllowReuse=true);
+    int64 GetOldestKeyPoolTime();
+    void GetAllReserveKeys(std::set<CKeyID>& setAddress);
+>>>>>>> origin/Paycoin-master
 
     bool IsMine(const CTxIn& txin) const;
     int64 GetDebit(const CTxIn& txin) const;
@@ -234,15 +304,25 @@ public:
 
     int LoadWallet(bool& fFirstRunRet);
 
+<<<<<<< HEAD
     bool SetAddressBookName(const CBitcoinAddress& address, const std::string& strName);
 
     bool DelAddressBookName(const CBitcoinAddress& address);
+=======
+    bool SetAddressBookName(const CTxDestination& address, const std::string& strName);
+
+    bool DelAddressBookName(const CTxDestination& address);
+>>>>>>> origin/Paycoin-master
 
     void UpdatedTransaction(const uint256 &hashTx)
     {
         {
             LOCK(cs_wallet);
             vWalletUpdated.push_back(hashTx);
+<<<<<<< HEAD
+=======
+            vMintingWalletUpdated.push_back(hashTx);
+>>>>>>> origin/Paycoin-master
         }
     }
 
@@ -265,7 +345,11 @@ public:
 
     bool GetTransaction(const uint256 &hashTx, CWalletTx& wtx);
 
+<<<<<<< HEAD
     bool SetDefaultKey(const std::vector<unsigned char> &vchPubKey);
+=======
+    bool SetDefaultKey(const CPubKey &vchPubKey);
+>>>>>>> origin/Paycoin-master
 
     // signify that a particular wallet feature is now used. this may change nWalletVersion and nWalletMaxVersion if those are lower
     bool SetMinVersion(enum WalletFeature, CWalletDB* pwalletdbIn = NULL, bool fExplicit = false);
@@ -278,6 +362,12 @@ public:
 
     void FixSpentCoins(int& nMismatchSpent, int64& nBalanceInQuestion, bool fCheckOnly = false);
     void DisableTransaction(const CTransaction &tx);
+<<<<<<< HEAD
+=======
+
+    bool GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint64& nMaxWeight, uint64& nWeight);
+
+>>>>>>> origin/Paycoin-master
 };
 
 /** A key allocated from the key pool. */
@@ -286,7 +376,11 @@ class CReserveKey
 protected:
     CWallet* pwallet;
     int64 nIndex;
+<<<<<<< HEAD
     std::vector<unsigned char> vchPubKey;
+=======
+    CPubKey vchPubKey;
+>>>>>>> origin/Paycoin-master
 public:
     CReserveKey(CWallet* pwalletIn)
     {
@@ -301,7 +395,11 @@ public:
     }
 
     void ReturnKey();
+<<<<<<< HEAD
     std::vector<unsigned char> GetReservedKey();
+=======
+    CPubKey GetReservedKey();
+>>>>>>> origin/Paycoin-master
     void KeepKey();
 };
 
@@ -550,8 +648,13 @@ public:
         return nChangeCached;
     }
 
+<<<<<<< HEAD
     void GetAmounts(int64& nGeneratedImmature, int64& nGeneratedMature, std::list<std::pair<CBitcoinAddress, int64> >& listReceived,
                     std::list<std::pair<CBitcoinAddress, int64> >& listSent, int64& nFee, std::string& strSentAccount) const;
+=======
+    void GetAmounts(int64& nGeneratedImmature, int64& nGeneratedMature, std::list<std::pair<CTxDestination, int64> >& listReceived,
+                    std::list<std::pair<CTxDestination, int64> >& listSent, int64& nFee, std::string& strSentAccount) const;
+>>>>>>> origin/Paycoin-master
 
     void GetAccountAmounts(const std::string& strAccount, int64& nGenerated, int64& nReceived, 
                            int64& nSent, int64& nFee) const;
@@ -618,6 +721,31 @@ public:
     void RelayWalletTransaction();
 };
 
+<<<<<<< HEAD
+=======
+class COutput
+{
+public:
+    const CWalletTx *tx;
+    int i;
+    int nDepth;
+
+    COutput(const CWalletTx *txIn, int iIn, int nDepthIn)
+    {
+        tx = txIn; i = iIn; nDepth = nDepthIn;
+    }
+
+    std::string ToString() const
+    {
+        return strprintf("COutput(%s, %d, %d) [%s]", tx->GetHash().ToString().c_str(), i, nDepth, FormatMoney(tx->vout[i].nValue).c_str());
+    }
+
+    void print() const
+    {
+        printf("%s\n", ToString().c_str());
+    }
+};
+>>>>>>> origin/Paycoin-master
 
 /** Private key that includes an expiration date in case it never gets used. */
 class CWalletKey
@@ -658,7 +786,11 @@ public:
 class CAccount
 {
 public:
+<<<<<<< HEAD
     std::vector<unsigned char> vchPubKey;
+=======
+    CPubKey vchPubKey;
+>>>>>>> origin/Paycoin-master
 
     CAccount()
     {
@@ -667,7 +799,11 @@ public:
 
     void SetNull()
     {
+<<<<<<< HEAD
         vchPubKey.clear();
+=======
+        vchPubKey = CPubKey();
+>>>>>>> origin/Paycoin-master
     }
 
     IMPLEMENT_SERIALIZE

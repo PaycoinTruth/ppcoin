@@ -66,7 +66,11 @@ void QRCodeDialog::genCode()
 
 QString QRCodeDialog::getURI()
 {
+<<<<<<< HEAD
     QString ret = QString("ppcoin:%1").arg(address);
+=======
+    QString ret = QString("paycoin:%1").arg(address);
+>>>>>>> origin/Paycoin-master
 
     int paramCount = 0;
     if (ui->chkReqPayment->isChecked() && !ui->lnReqAmount->text().isEmpty())

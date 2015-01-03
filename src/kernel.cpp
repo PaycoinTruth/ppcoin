@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 // Copyright (c) 2012-2013 The PPCoin developers
+=======
+// Copyright (c) 2012-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -30,9 +35,12 @@ unsigned int nModifierInterval = MODIFIER_INTERVAL;
 static std::map<int, unsigned int> mapStakeModifierCheckpoints =
     boost::assign::map_list_of
     ( 0, 0x0e00670bu )
+<<<<<<< HEAD
     ( 19080, 0xad4e4d29u )
     ( 30583, 0xdc7bf136u )
     ( 99999, 0xf555cfd2u )
+=======
+>>>>>>> origin/Paycoin-master
     ;
 
 // Whether the given coinstake is subject to new v0.3 protocol
@@ -287,7 +295,11 @@ static bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64& nStakeModifier
     return true;
 }
 
+<<<<<<< HEAD
 // ppcoin kernel protocol
+=======
+// paycoin kernel protocol
+>>>>>>> origin/Paycoin-master
 // coinstake must meet hash target according to the protocol:
 // kernel (input 0) must meet the formula
 //     hash(nStakeModifier + txPrev.block.nTime + txPrev.offset + txPrev.nTime + txPrev.vout.n + nTime) < bnTarget * nCoinDayWeight

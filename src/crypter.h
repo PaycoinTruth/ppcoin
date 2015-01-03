@@ -76,10 +76,17 @@ public:
 
     void CleanKey()
     {
+<<<<<<< HEAD
         memset(&chKey, 0, sizeof chKey);
         memset(&chIV, 0, sizeof chIV);
         munlock(&chKey, sizeof chKey);
         munlock(&chIV, sizeof chIV);
+=======
+        OPENSSL_cleanse(chKey, sizeof(chKey));
+        OPENSSL_cleanse(chIV, sizeof(chIV));
+        munlock(chKey, sizeof(chKey));
+        munlock(chIV, sizeof(chIV));
+>>>>>>> origin/Paycoin-master
         fKeySet = false;
     }
 

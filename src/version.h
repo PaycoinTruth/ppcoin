@@ -1,5 +1,10 @@
 // Copyright (c) 2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2012-2013 The PPCoin developers
+=======
+// Copyright (c) 2012-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_VERSION_H
@@ -12,6 +17,7 @@
 //
 
 // These need to be macro's, as version.cpp's voodoo requires it
+<<<<<<< HEAD
 #define CLIENT_VERSION_MAJOR       0
 #define CLIENT_VERSION_MINOR       6
 #define CLIENT_VERSION_REVISION    3
@@ -28,6 +34,22 @@ extern const std::string CLIENT_BUILD;
 extern const std::string CLIENT_DATE;
 
 // ppcoin version - intended for display purpose ONLY
+=======
+
+// paycoin version - intended for display purpose only
+#define PEERUNITY_VERSION_MAJOR       0
+#define PEERUNITY_VERSION_MINOR       1
+#define PEERUNITY_VERSION_REVISION    2
+#define PEERUNITY_VERSION_BUILD       25
+
+static const int PEERUNITY_VERSION =
+                           1000000 * PEERUNITY_VERSION_MAJOR
+                         +   10000 * PEERUNITY_VERSION_MINOR
+                         +     100 * PEERUNITY_VERSION_REVISION
+                         +       1 * PEERUNITY_VERSION_BUILD;
+
+// paycoin version - reference for code tracking
+>>>>>>> origin/Paycoin-master
 #define PPCOIN_VERSION_MAJOR       0
 #define PPCOIN_VERSION_MINOR       4
 #define PPCOIN_VERSION_REVISION    0
@@ -39,16 +61,46 @@ static const int PPCOIN_VERSION =
                          +     100 * PPCOIN_VERSION_REVISION
                          +       1 * PPCOIN_VERSION_BUILD;
 
+<<<<<<< HEAD
+=======
+// bitcoin version - reference for code tracking
+#define BITCOIN_VERSION_MAJOR       0
+#define BITCOIN_VERSION_MINOR       6
+#define BITCOIN_VERSION_REVISION    3
+#define BITCOIN_VERSION_BUILD       0
+
+static const int BITCOIN_VERSION =
+                           1000000 * BITCOIN_VERSION_MAJOR
+                         +   10000 * BITCOIN_VERSION_MINOR 
+                         +     100 * BITCOIN_VERSION_REVISION
+                         +       1 * BITCOIN_VERSION_BUILD;
+
+static const int CLIENT_VERSION = BITCOIN_VERSION;
+
+extern const std::string CLIENT_NAME;
+extern const std::string CLIENT_BUILD;
+extern const std::string CLIENT_DATE;
+
+
+>>>>>>> origin/Paycoin-master
 //
 // network protocol versioning
 //
 
+<<<<<<< HEAD
 static const int PROTOCOL_VERSION = 60004;
+=======
+static const int PROTOCOL_VERSION = 70001;
+>>>>>>> origin/Paycoin-master
 
 // earlier versions not supported as of Feb 2012, and are disconnected
 // NOTE: as of bitcoin v0.6 message serialization (vSend, vRecv) still
 // uses MIN_PROTO_VERSION(209), where message format uses PROTOCOL_VERSION
+<<<<<<< HEAD
 static const int MIN_PROTO_VERSION = 209;
+=======
+static const int MIN_PROTO_VERSION = 70001;
+>>>>>>> origin/Paycoin-master
 
 // nTime field added to CAddress, starting with this version;
 // if possible, avoid requesting addresses nodes older than this

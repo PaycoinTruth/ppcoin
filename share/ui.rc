@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 bitcoin               ICON    "pixmaps/bitcoin.ico"
+=======
+bitcoin               ICON    "pixmaps/paycoin.ico"
+>>>>>>> origin/Paycoin-master
 
 #include "wx/msw/wx.rc"
 

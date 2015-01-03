@@ -2,11 +2,17 @@
 # Distributed under the MIT/X11 software license, see the accompanying
 # file license.txt or http://www.opensource.org/licenses/mit-license.php.
 
+<<<<<<< HEAD
 DEPSDIR:=/usr/i586-mingw32msvc
+=======
+DEPSDIR:=/usr/x86_64-w64-mingw32
+HOST:=x86_64-w64-mingw32
+>>>>>>> origin/Paycoin-master
 
 USE_UPNP:=0
 
 INCLUDEPATHS= \
+<<<<<<< HEAD
  -I"$(DEPSDIR)/boost_1_47_0" \
  -I"$(DEPSDIR)/db-4.8.30.NC/build_unix" \
  -I"$(DEPSDIR)/openssl-1.0.1g/include" \
@@ -19,6 +25,19 @@ LIBPATHS= \
  -L"$(DEPSDIR)/openssl-1.0.1g"
 
 LIBS= \
+=======
+ -I"$(DEPSDIR)" \
+ -I"$(DEPSDIR)/include" \
+ -I"$(CURDIR)/obj"
+
+LIBPATHS= \
+ -L"$(DEPSDIR)" \
+ -L"$(DEPSDIR)/lib"
+
+LIBS= \
+ -static-libgcc \
+ -static-libstdc++ \
+>>>>>>> origin/Paycoin-master
  -l boost_system-mt-s \
  -l boost_filesystem-mt-s \
  -l boost_program_options-mt-s \
@@ -27,7 +46,11 @@ LIBS= \
  -l ssl \
  -l crypto
 
+<<<<<<< HEAD
 DEFS=-D_MT -DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE
+=======
+DEFS=-D_MT -DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE -DUSE_IPV6
+>>>>>>> origin/Paycoin-master
 DEBUGFLAGS=-g
 CFLAGS=-O2 -w -Wno-invalid-offsetof -Wformat $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 
@@ -58,6 +81,10 @@ OBJS= \
     obj/main.o \
     obj/net.o \
     obj/protocol.o \
+<<<<<<< HEAD
+=======
+    obj/kernelrecord.o \
+>>>>>>> origin/Paycoin-master
     obj/bitcoinrpc.o \
     obj/rpcdump.o \
     obj/script.o \
@@ -67,7 +94,11 @@ OBJS= \
     obj/noui.o \
     obj/kernel.o
 
+<<<<<<< HEAD
 all: ppcoind.exe
+=======
+all: paycoind.exe
+>>>>>>> origin/Paycoin-master
 
 obj/build.h: FORCE
 	/bin/sh ../share/genbuild.sh obj/build.h
@@ -75,23 +106,41 @@ version.cpp: obj/build.h
 DEFS += -DHAVE_BUILD_INFO
 
 obj/%.o: %.cpp $(HEADERS)
+<<<<<<< HEAD
 	i586-mingw32msvc-g++ -c $(CFLAGS) -o $@ $<
 
 ppcoind.exe: $(OBJS:obj/%=obj/%)
 	i586-mingw32msvc-g++ $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
+=======
+	${HOST}-g++ -c $(CFLAGS) -o $@ $<
+
+paycoind.exe: $(OBJS:obj/%=obj/%)
+	${HOST}-g++ $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
+>>>>>>> origin/Paycoin-master
 
 TESTOBJS := $(patsubst test/%.cpp,obj-test/%.o,$(wildcard test/*.cpp))
 
 obj-test/%.o: test/%.cpp $(HEADERS)
+<<<<<<< HEAD
 	i586-mingw32msvc-g++ -c $(TESTDEFS) $(CFLAGS) -o $@ $<
 
 test_bitcoin.exe: $(TESTOBJS) $(filter-out obj/init.o,$(OBJS:obj/%=obj/%))
 	i586-mingw32msvc-g++ $(CFLAGS) -o $@ $(LIBPATHS) $^ -lboost_unit_test_framework $(LIBS)
+=======
+	${HOST}-g++ -c $(TESTDEFS) $(CFLAGS) -o $@ $<
+
+test_bitcoin.exe: $(TESTOBJS) $(filter-out obj/init.o,$(OBJS:obj/%=obj/%))
+	${HOST}-g++ $(CFLAGS) -o $@ $(LIBPATHS) $^ -lboost_unit_test_framework $(LIBS)
+>>>>>>> origin/Paycoin-master
 
 
 clean:
 	-rm -f obj/*.o
+<<<<<<< HEAD
 	-rm -f ppcoind.exe
+=======
+	-rm -f paycoind.exe
+>>>>>>> origin/Paycoin-master
 	-rm -f obj-test/*.o
 	-rm -f test_bitcoin.exe
 	-rm -f src/build.h

@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
+<<<<<<< HEAD
    <string>Peercoin (PPCoin) debug window</string>
+=======
+   <string>Paycoin (Paycoin) debug window</string>
+>>>>>>> origin/Paycoin-master
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>

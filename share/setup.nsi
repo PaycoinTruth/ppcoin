@@ -1,16 +1,29 @@
+<<<<<<< HEAD
 Name PPCoin
+=======
+Name Paycoin
+>>>>>>> origin/Paycoin-master
 
 RequestExecutionLevel highest
 SetCompressor /SOLID lzma
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
+<<<<<<< HEAD
 !define VERSION 0.4.0
 !define COMPANY "PPCoin project"
 !define URL http://github.com/ppcoin/ppcoin/
 
 # MUI Symbol Definitions
 !define MUI_ICON "../share/pixmaps/ppcoin.ico"
+=======
+!define VERSION 0.1.2.25
+!define COMPANY "Paycoin project"
+!define URL https://github.com/GAWMiners/paycoin/
+
+# MUI Symbol Definitions
+!define MUI_ICON "../share/pixmaps/paycoin.ico"
+>>>>>>> origin/Paycoin-master
 !define MUI_WELCOMEFINISHPAGE_BITMAP "../share/pixmaps/nsis-wizard.bmp"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_RIGHT
@@ -19,8 +32,13 @@ SetCompressor /SOLID lzma
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
+<<<<<<< HEAD
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER PPCoin
 !define MUI_FINISHPAGE_RUN $INSTDIR\ppcoin-qt.exe
+=======
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER Paycoin
+!define MUI_FINISHPAGE_RUN $INSTDIR\Paycoin.exe
+>>>>>>> origin/Paycoin-master
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "../share/pixmaps/nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
@@ -28,6 +46,12 @@ SetCompressor /SOLID lzma
 # Included files
 !include Sections.nsh
 !include MUI2.nsh
+<<<<<<< HEAD
+=======
+!if "" == "64"
+!include x64.nsh
+!endif
+>>>>>>> origin/Paycoin-master
 
 # Variables
 Var StartMenuGroup
@@ -45,14 +69,28 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
+<<<<<<< HEAD
 OutFile ppcoin-0.4.0-win32-setup.exe
 InstallDir $PROGRAMFILES\PPCoin
+=======
+OutFile Paycoin-${VERSION}-win-setup.exe
+!if "" == "64"
+InstallDir $PROGRAMFILES64\Paycoin
+!else
+InstallDir $PROGRAMFILES\Paycoin
+!endif
+>>>>>>> origin/Paycoin-master
 CRCCheck on
 XPStyle on
 BrandingText " "
 ShowInstDetails show
+<<<<<<< HEAD
 VIProductVersion 0.4.0.0
 VIAddVersionKey ProductName PPCoin
+=======
+VIProductVersion ${VERSION}.0
+VIAddVersionKey ProductName Paycoin
+>>>>>>> origin/Paycoin-master
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"
 VIAddVersionKey CompanyWebsite "${URL}"
@@ -66,6 +104,7 @@ ShowUninstDetails show
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
+<<<<<<< HEAD
     File ../release/ppcoin-qt.exe
     File /oname=license.txt ../COPYING
     File /oname=readme.txt ../doc/README_windows.txt
@@ -73,6 +112,17 @@ Section -Main SEC0000
     File ../src/ppcoind.exe
     SetOutPath $INSTDIR\src
     File /r /x *.exe /x *.o ../src\*.*
+=======
+    File ../release/Paycoin.exe
+    File /oname=license.txt ../COPYING
+    File /oname=readme.txt ../doc/README_windows.txt
+    SetOutPath $INSTDIR\daemon
+    File ../release/paycoind.exe
+#    SetOutPath $INSTDIR\doc
+#    File /r ../doc\*.*
+#    SetOutPath $INSTDIR\src
+#    File /r /x *.exe /x *.o ../src\*.*
+>>>>>>> origin/Paycoin-master
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
 
@@ -87,8 +137,13 @@ Section -post SEC0001
     WriteUninstaller $INSTDIR\uninstall.exe
     !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
     CreateDirectory $SMPROGRAMS\$StartMenuGroup
+<<<<<<< HEAD
     CreateShortcut "$SMPROGRAMS\$StartMenuGroup\PPCoin.lnk" $INSTDIR\ppcoin-qt.exe
     CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall PPCoin.lnk" $INSTDIR\uninstall.exe
+=======
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk" $INSTDIR\paycoin.exe
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk" $INSTDIR\uninstall.exe
+>>>>>>> origin/Paycoin-master
     !insertmacro MUI_STARTMENU_WRITE_END
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name)"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayVersion "${VERSION}"
@@ -98,12 +153,15 @@ Section -post SEC0001
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" UninstallString $INSTDIR\uninstall.exe
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoModify 1
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoRepair 1
+<<<<<<< HEAD
 
     # bitcoin: URI handling disabled for 0.6.0
     #    WriteRegStr HKCR "bitcoin" "URL Protocol" ""
     #    WriteRegStr HKCR "bitcoin" "" "URL:Bitcoin"
     #    WriteRegStr HKCR "bitcoin\DefaultIcon" "" $INSTDIR\bitcoin-qt.exe
     #    WriteRegStr HKCR "bitcoin\shell\open\command" "" '"$INSTDIR\bitcoin-qt.exe" "$$1"'
+=======
+>>>>>>> origin/Paycoin-master
 SectionEnd
 
 # Macro for selecting uninstaller sections
@@ -121,19 +179,34 @@ done${UNSECTION_ID}:
 
 # Uninstaller sections
 Section /o -un.Main UNSEC0000
+<<<<<<< HEAD
     Delete /REBOOTOK $INSTDIR\ppcoin-qt.exe
     Delete /REBOOTOK $INSTDIR\license.txt
     Delete /REBOOTOK $INSTDIR\readme.txt
     RMDir /r /REBOOTOK $INSTDIR\daemon
     RMDir /r /REBOOTOK $INSTDIR\src
+=======
+    Delete /REBOOTOK $INSTDIR\paycoin.exe
+    Delete /REBOOTOK $INSTDIR\license.txt
+    Delete /REBOOTOK $INSTDIR\readme.txt
+    RMDir /r /REBOOTOK $INSTDIR\daemon
+#    RMDir /r /REBOOTOK $INSTDIR\src
+#    RMDir /r /REBOOTOK $INSTDIR\src
+>>>>>>> origin/Paycoin-master
     DeleteRegValue HKCU "${REGKEY}\Components" Main
 SectionEnd
 
 Section -un.post UNSEC0001
     DeleteRegKey HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
+<<<<<<< HEAD
     Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall PPCoin.lnk"
     Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\PPCoin.lnk"
     Delete /REBOOTOK "$SMSTARTUP\PPCoin.lnk"
+=======
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk"
+    Delete /REBOOTOK "$SMSTARTUP\Paycoin.lnk"
+>>>>>>> origin/Paycoin-master
     Delete /REBOOTOK $INSTDIR\uninstall.exe
     Delete /REBOOTOK $INSTDIR\debug.log
     Delete /REBOOTOK $INSTDIR\db.log
@@ -141,7 +214,11 @@ Section -un.post UNSEC0001
     DeleteRegValue HKCU "${REGKEY}" Path
     DeleteRegKey /IfEmpty HKCU "${REGKEY}\Components"
     DeleteRegKey /IfEmpty HKCU "${REGKEY}"
+<<<<<<< HEAD
     DeleteRegKey HKCR "ppcoin"
+=======
+    DeleteRegKey HKCR "paycoin"
+>>>>>>> origin/Paycoin-master
     RmDir /REBOOTOK $SMPROGRAMS\$StartMenuGroup
     RmDir /REBOOTOK $INSTDIR
     Push $R0
@@ -154,6 +231,18 @@ SectionEnd
 # Installer functions
 Function .onInit
     InitPluginsDir
+<<<<<<< HEAD
+=======
+!if "" == "64"
+    ${If} ${RunningX64}
+      ; disable registry redirection (enable access to 64-bit portion of registry)
+      SetRegView 64
+    ${Else}
+      MessageBox MB_OK|MB_ICONSTOP "Cannot install 64-bit version on a 32-bit system."
+      Abort
+    ${EndIf}
+!endif
+>>>>>>> origin/Paycoin-master
 FunctionEnd
 
 # Uninstaller functions

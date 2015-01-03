@@ -12,7 +12,10 @@ using namespace std;
 using namespace boost;
 
 int nGotIRCAddresses = 0;
+<<<<<<< HEAD
 bool fGotExternalIP = false;
+=======
+>>>>>>> origin/Paycoin-master
 
 void ThreadIRCSeed2(void* parg);
 
@@ -216,7 +219,10 @@ void ThreadIRCSeed2(void* parg)
     printf("ThreadIRCSeed started\n");
     int nErrorWait = 10;
     int nRetryWait = 10;
+<<<<<<< HEAD
     bool fNameInUse = false;
+=======
+>>>>>>> origin/Paycoin-master
 
     while (!fShutdown)
     {
@@ -248,9 +254,16 @@ void ThreadIRCSeed2(void* parg)
                 return;
         }
 
+<<<<<<< HEAD
         string strMyName;
         if (addrLocalHost.IsRoutable() && !fUseProxy && !fNameInUse)
             strMyName = EncodeAddress(addrLocalHost);
+=======
+        CService addrLocal;
+        string strMyName;
+        if (GetLocal(addrLocal, &addrConnect))
+            strMyName = EncodeAddress(GetLocalAddress(&addrConnect));
+>>>>>>> origin/Paycoin-master
         else
             strMyName = strprintf("x%u", GetRand(1000000000));
 
@@ -265,7 +278,10 @@ void ThreadIRCSeed2(void* parg)
             if (nRet == 2)
             {
                 printf("IRC name already in use\n");
+<<<<<<< HEAD
                 fNameInUse = true;
+=======
+>>>>>>> origin/Paycoin-master
                 Wait(10);
                 continue;
             }
@@ -285,9 +301,14 @@ void ThreadIRCSeed2(void* parg)
             if (!fUseProxy && addrFromIRC.IsRoutable())
             {
                 // IRC lets you to re-nick
+<<<<<<< HEAD
                 fGotExternalIP = true;
                 addrLocalHost.SetIP(addrFromIRC);
                 strMyName = EncodeAddress(addrLocalHost);
+=======
+                AddLocal(addrFromIRC, LOCAL_IRC);
+                strMyName = EncodeAddress(GetLocalAddress(&addrConnect));
+>>>>>>> origin/Paycoin-master
                 Send(hSocket, strprintf("NICK %s\r", strMyName.c_str()).c_str());
             }
         }

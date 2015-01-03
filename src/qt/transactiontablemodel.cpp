@@ -253,6 +253,15 @@ void TransactionTableModel::update()
     }
 }
 
+<<<<<<< HEAD
+=======
+void TransactionTableModel::refresh()
+{
+    priv->refreshWallet();
+    emit dataChanged(index(0, 0), index(priv->size() - 1, Amount));
+}
+
+>>>>>>> origin/Paycoin-master
 int TransactionTableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
@@ -387,6 +396,10 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord *wtx, b
         return QString::fromStdString(wtx->address);
     case TransactionRecord::RecvWithAddress:
     case TransactionRecord::SendToAddress:
+<<<<<<< HEAD
+=======
+    case TransactionRecord::StakeMint:
+>>>>>>> origin/Paycoin-master
         return lookupAddress(wtx->address, tooltip);
     case TransactionRecord::SendToOther:
         return QString::fromStdString(wtx->address);
@@ -404,6 +417,10 @@ QVariant TransactionTableModel::addressColor(const TransactionRecord *wtx) const
     {
     case TransactionRecord::RecvWithAddress:
     case TransactionRecord::SendToAddress:
+<<<<<<< HEAD
+=======
+    case TransactionRecord::StakeMint:
+>>>>>>> origin/Paycoin-master
         {
         QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
         if(label.isEmpty())
@@ -433,7 +450,11 @@ QString TransactionTableModel::formatTxAmount(const TransactionRecord *wtx, bool
 
 QVariant TransactionTableModel::txStatusDecoration(const TransactionRecord *wtx) const
 {
+<<<<<<< HEAD
     if(wtx->type == TransactionRecord::Generated)
+=======
+    if(wtx->type == TransactionRecord::Generated || wtx->type == TransactionRecord::StakeMint)
+>>>>>>> origin/Paycoin-master
     {
         switch(wtx->status.maturity)
         {

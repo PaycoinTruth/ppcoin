@@ -1,6 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
+<<<<<<< HEAD
 // Copyright (c) 2011-2013 The PPCoin developers
+=======
+// Copyright (c) 2011-2015 The Peercoin developers
+// Copyright (c) 2014-2015 The Paycoin developers
+>>>>>>> origin/Paycoin-master
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -36,7 +41,11 @@ void ThreadOpenAddedConnections2(void* parg);
 void ThreadMapPort2(void* parg);
 #endif
 void ThreadDNSAddressSeed2(void* parg);
+<<<<<<< HEAD
 bool OpenNetworkConnection(const CAddress& addrConnect, bool fUseGrant = true);
+=======
+bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound = NULL, const char *strDest = NULL, bool fOneShot = false);
+>>>>>>> origin/Paycoin-master
 
 
 
@@ -44,6 +53,7 @@ bool OpenNetworkConnection(const CAddress& addrConnect, bool fUseGrant = true);
 // Global state variables
 //
 bool fClient = false;
+<<<<<<< HEAD
 bool fAllowDNS = false;
 static bool fUseUPnP = false;
 uint64 nLocalServices = (fClient ? 0 : NODE_NETWORK);
@@ -53,6 +63,23 @@ static CNode* pnodeLocalHost = NULL;
 uint64 nLocalHostNonce = 0;
 array<int, THREAD_MAX> vnThreadsRunning;
 static SOCKET hListenSocket = INVALID_SOCKET;
+=======
+static bool fUseUPnP = false;
+uint64 nLocalServices = (fClient ? 0 : NODE_NETWORK);
+CAddress addrSeenByPeer(CService("0.0.0.0", 0), nLocalServices);
+static CCriticalSection cs_mapLocalHost;
+static map<CService, int> mapLocalHost;
+static bool vfReachable[NET_MAX] = {};
+static bool vfLimited[NET_MAX] = {};
+static CNode* pnodeLocalHost = NULL;
+uint64 nLocalHostNonce = 0;
+#ifdef MAC_OSX
+boost::array<int, THREAD_MAX> vnThreadsRunning;
+#else
+array<int, THREAD_MAX> vnThreadsRunning;
+#endif
+static std::vector<SOCKET> vhListenSocket;
+>>>>>>> origin/Paycoin-master
 CAddrMan addrman;
 
 vector<CNode*> vNodes;
@@ -62,12 +89,26 @@ deque<pair<int64, CInv> > vRelayExpiration;
 CCriticalSection cs_mapRelay;
 map<CInv, int64> mapAlreadyAskedFor;
 
+<<<<<<< HEAD
+=======
+static deque<string> vOneShots;
+CCriticalSection cs_vOneShots;
+>>>>>>> origin/Paycoin-master
 
 set<CNetAddr> setservAddNodeAddresses;
 CCriticalSection cs_setservAddNodeAddresses;
 
 static CSemaphore *semOutbound = NULL;
 
+<<<<<<< HEAD
+=======
+void AddOneShot(string strDest)
+{
+    LOCK(cs_vOneShots);
+    vOneShots.push_back(strDest);
+}
+
+>>>>>>> origin/Paycoin-master
 unsigned short GetListenPort()
 {
     return (unsigned short)(GetArg("-port", GetDefaultPort()));
@@ -84,7 +125,48 @@ void CNode::PushGetBlocks(CBlockIndex* pindexBegin, uint256 hashEnd)
     PushMessage("getblocks", CBlockLocator(pindexBegin), hashEnd);
 }
 
+<<<<<<< HEAD
 
+=======
+// find 'best' local address for a particular peer
+bool GetLocal(CService& addr, const CNetAddr *paddrPeer)
+{
+    if (fUseProxy || mapArgs.count("-connect") || fNoListen)
+        return false;
+
+    int nBestCount = -1;
+    int nBestReachability = -1;
+    {
+        LOCK(cs_mapLocalHost);
+        for (map<CService, int>::iterator it = mapLocalHost.begin(); it != mapLocalHost.end(); it++)
+        {
+            int nCount = (*it).second;
+            int nReachability = (*it).first.GetReachabilityFrom(paddrPeer);
+            if (nReachability > nBestReachability || (nReachability == nBestReachability && nCount > nBestCount))
+            {
+                addr = (*it).first;
+                nBestReachability = nReachability;
+                nBestCount = nCount;
+            }
+        }
+    }
+    return nBestCount >= 0;
+}
+
+// get best local address for a particular peer as a CAddress
+CAddress GetLocalAddress(const CNetAddr *paddrPeer)
+{
+    CAddress ret(CService("0.0.0.0",0),0);
+    CService addr;
+    if (GetLocal(addr, paddrPeer))
+    {
+        ret = CAddress(addr);
+        ret.nServices = nLocalServices;
+        ret.nTime = GetAdjustedTime();
+    }
+    return ret;
+}
+>>>>>>> origin/Paycoin-master
 
 bool RecvLine(SOCKET hSocket, string& strLine)
 {
@@ -137,7 +219,112 @@ bool RecvLine(SOCKET hSocket, string& strLine)
     }
 }
 
+<<<<<<< HEAD
 
+=======
+// used when scores of local addresses may have changed
+// pushes better local address to peers
+void static AdvertizeLocal()
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+    {
+        if (pnode->fSuccessfullyConnected)
+        {
+            CAddress addrLocal = GetLocalAddress(&pnode->addr);
+            if (addrLocal.IsRoutable() && (CService)addrLocal != (CService)pnode->addrLocal)
+            {
+                pnode->PushAddress(addrLocal);
+                pnode->addrLocal = addrLocal;
+            }
+        }
+    }
+}
+
+// learn a new local address
+bool AddLocal(const CService& addr, int nScore)
+{
+    if (!addr.IsRoutable())
+        return false;
+
+    if (!GetBoolArg("-discover", true) && nScore < LOCAL_MANUAL)
+        return false;
+
+    if (IsLimited(addr))
+        return false;
+
+    printf("AddLocal(%s,%i)\n", addr.ToString().c_str(), nScore);
+
+    {
+        LOCK(cs_mapLocalHost);
+        mapLocalHost[addr] = std::max(nScore, mapLocalHost[addr]) + (mapLocalHost.count(addr) ? 1 : 0);
+        enum Network net = addr.GetNetwork();
+        vfReachable[net] = true;
+        if (net == NET_IPV6) vfReachable[NET_IPV4] = true;
+    }
+
+    AdvertizeLocal();
+
+    return true;
+}
+
+bool AddLocal(const CNetAddr& addr, int nScore, int port)
+{
+    if (port == -1)
+        port = GetListenPort();
+    return AddLocal(CService(addr, port), nScore);
+}
+
+/** Make a particular network entirely off-limits (no automatic connects to it) */
+void SetLimited(enum Network net, bool fLimited)
+{
+    if (net == NET_UNROUTABLE)
+        return;
+    LOCK(cs_mapLocalHost);
+    vfLimited[net] = fLimited;
+}
+
+bool IsLimited(enum Network net)
+{
+    LOCK(cs_mapLocalHost);
+    return vfLimited[net];
+}
+
+bool IsLimited(const CNetAddr &addr)
+{
+    return IsLimited(addr.GetNetwork());
+}
+
+/** vote for a local address */
+bool SeenLocal(const CService& addr)
+{
+    {
+        LOCK(cs_mapLocalHost);
+        if (mapLocalHost.count(addr) == 0)
+            return false;
+        mapLocalHost[addr]++;
+    }
+
+    AdvertizeLocal();
+
+    return true;
+}
+
+/** check whether a given address is potentially local */
+bool IsLocal(const CService& addr)
+{
+    LOCK(cs_mapLocalHost);
+    return mapLocalHost.count(addr) > 0;
+}
+
+/** check whether a given address is in a network we can probably connect to */
+bool IsReachable(const CNetAddr& addr)
+{
+    LOCK(cs_mapLocalHost);
+    enum Network net = addr.GetNetwork();
+    return vfReachable[net] && !vfLimited[net];
+}
+>>>>>>> origin/Paycoin-master
 
 bool GetMyExternalIP2(const CService& addrConnect, const char* pszGet, const char* pszKeyword, CNetAddr& ipRet)
 {
@@ -250,6 +437,7 @@ bool GetMyExternalIP(CNetAddr& ipRet)
 
 void ThreadGetMyExternalIP(void* parg)
 {
+<<<<<<< HEAD
     // Wait for IRC to get it first - disabled with ppcoin
     if (false && GetBoolArg("-irc", false))
     {
@@ -277,6 +465,13 @@ void ThreadGetMyExternalIP(void* parg)
                     pnode->PushAddress(addr);
             }
         }
+=======
+    CNetAddr addrLocalHost;
+    if (GetMyExternalIP(addrLocalHost))
+    {
+        printf("GetMyExternalIP() returned %s\n", addrLocalHost.ToStringIP().c_str());
+        AddLocal(addrLocalHost, LOCAL_HTTP);
+>>>>>>> origin/Paycoin-master
     }
 }
 
@@ -306,6 +501,18 @@ CNode* FindNode(const CNetAddr& ip)
     return NULL;
 }
 
+<<<<<<< HEAD
+=======
+CNode* FindNode(std::string addrName)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+        if (pnode->addrName == addrName)
+            return (pnode);
+    return NULL;
+}
+
+>>>>>>> origin/Paycoin-master
 CNode* FindNode(const CService& addr)
 {
     {
@@ -317,6 +524,7 @@ CNode* FindNode(const CService& addr)
     return NULL;
 }
 
+<<<<<<< HEAD
 CNode* ConnectNode(CAddress addrConnect, int64 nTimeout)
 {
     if ((CNetAddr)addrConnect == (CNetAddr)addrLocalHost)
@@ -346,6 +554,40 @@ CNode* ConnectNode(CAddress addrConnect, int64 nTimeout)
     {
         /// debug print
         printf("connected %s\n", addrConnect.ToString().c_str());
+=======
+CNode* ConnectNode(CAddress addrConnect, const char *pszDest, int64 nTimeout)
+{
+    if (pszDest == NULL) {
+        if (IsLocal(addrConnect))
+            return NULL;
+
+        // Look for an existing connection
+        CNode* pnode = FindNode((CService)addrConnect);
+        if (pnode)
+        {
+            if (nTimeout != 0)
+                pnode->AddRef(nTimeout);
+            else
+                pnode->AddRef();
+            return pnode;
+        }
+    }
+
+
+    /// debug print
+    printf("trying connection %s lastseen=%.1fhrs\n",
+        pszDest ? pszDest : addrConnect.ToString().c_str(),
+        pszDest ? 0 : (double)(addrConnect.nTime - GetAdjustedTime())/3600.0);
+
+    // Connect
+    SOCKET hSocket;
+    if (pszDest ? ConnectSocketByName(addrConnect, hSocket, pszDest, GetDefaultPort()) : ConnectSocket(addrConnect, hSocket))
+    {
+        addrman.Attempt(addrConnect);
+
+        /// debug print
+        printf("connected %s\n", pszDest ? pszDest : addrConnect.ToString().c_str());
+>>>>>>> origin/Paycoin-master
 
         // Set to nonblocking
 #ifdef WIN32
@@ -358,11 +600,19 @@ CNode* ConnectNode(CAddress addrConnect, int64 nTimeout)
 #endif
 
         // Add node
+<<<<<<< HEAD
         CNode* pnode = new CNode(hSocket, addrConnect, false);
+=======
+        CNode* pnode = new CNode(hSocket, addrConnect, pszDest ? pszDest : "", false);
+>>>>>>> origin/Paycoin-master
         if (nTimeout != 0)
             pnode->AddRef(nTimeout);
         else
             pnode->AddRef();
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Paycoin-master
         {
             LOCK(cs_vNodes);
             vNodes.push_back(pnode);
@@ -383,8 +633,13 @@ void CNode::CloseSocketDisconnect()
     if (hSocket != INVALID_SOCKET)
     {
         if (fDebug)
+<<<<<<< HEAD
             printf("%s ", DateTimeStrFormat(GetTime()).c_str());
         printf("disconnecting node %s\n", addr.ToString().c_str());
+=======
+            printf("%s ", DateTimeStrFormat("%x %H:%M:%S", GetTime()).c_str());
+        printf("disconnecting node %s\n", addrName.c_str());
+>>>>>>> origin/Paycoin-master
         closesocket(hSocket);
         hSocket = INVALID_SOCKET;
         vRecv.clear();
@@ -401,7 +656,11 @@ void CNode::PushVersion()
     /// when NTP implemented, change to just nTime = GetAdjustedTime()
     int64 nTime = (fInbound ? GetAdjustedTime() : GetTime());
     CAddress addrYou = (fUseProxy ? CAddress(CService("0.0.0.0",0)) : addr);
+<<<<<<< HEAD
     CAddress addrMe = (fUseProxy || !addrLocalHost.IsRoutable() ? CAddress(CService("0.0.0.0",0)) : addrLocalHost);
+=======
+    CAddress addrMe = GetLocalAddress(&addr);
+>>>>>>> origin/Paycoin-master
     RAND_bytes((unsigned char*)&nLocalHostNonce, sizeof(nLocalHostNonce));
     PushMessage("version", PROTOCOL_VERSION, nLocalServices, nTime, addrYou, addrMe,
                 nLocalHostNonce, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<string>()), nBestHeight);
@@ -439,7 +698,11 @@ bool CNode::Misbehaving(int howmuch)
 {
     if (addr.IsLocal())
     {
+<<<<<<< HEAD
         printf("Warning: local node %s misbehaving\n", addr.ToString().c_str());
+=======
+        printf("Warning: local node %s misbehaving\n", addrName.c_str());
+>>>>>>> origin/Paycoin-master
         return false;
     }
 
@@ -453,7 +716,11 @@ bool CNode::Misbehaving(int howmuch)
                 setBanned[addr] = banTime;
         }
         CloseSocketDisconnect();
+<<<<<<< HEAD
         printf("Disconnected %s for misbehavior (score=%d)\n", addr.ToString().c_str(), nMisbehavior);
+=======
+        printf("Disconnected %s for misbehavior (score=%d)\n", addrName.c_str(), nMisbehavior);
+>>>>>>> origin/Paycoin-master
         return true;
     }
     return false;
@@ -528,9 +795,14 @@ void ThreadSocketHandler2(void* parg)
                     // remove from vNodes
                     vNodes.erase(remove(vNodes.begin(), vNodes.end(), pnode), vNodes.end());
 
+<<<<<<< HEAD
                     if (pnode->fHasGrant)
                         semOutbound->post();
                     pnode->fHasGrant = false;
+=======
+                    // release outbound grant (if any)
+                    pnode->grantOutbound.Release();
+>>>>>>> origin/Paycoin-master
 
                     // close socket and cleanup
                     pnode->CloseSocketDisconnect();
@@ -599,9 +871,16 @@ void ThreadSocketHandler2(void* parg)
         FD_ZERO(&fdsetError);
         SOCKET hSocketMax = 0;
 
+<<<<<<< HEAD
         if(hListenSocket != INVALID_SOCKET)
             FD_SET(hListenSocket, &fdsetRecv);
         hSocketMax = max(hSocketMax, hListenSocket);
+=======
+        BOOST_FOREACH(SOCKET hListenSocket, vhListenSocket) {
+            FD_SET(hListenSocket, &fdsetRecv);
+            hSocketMax = max(hSocketMax, hListenSocket);
+        }
+>>>>>>> origin/Paycoin-master
         {
             LOCK(cs_vNodes);
             BOOST_FOREACH(CNode* pnode, vNodes)
@@ -642,16 +921,32 @@ void ThreadSocketHandler2(void* parg)
         //
         // Accept new connections
         //
+<<<<<<< HEAD
         if (hListenSocket != INVALID_SOCKET && FD_ISSET(hListenSocket, &fdsetRecv))
         {
             struct sockaddr_in sockaddr;
+=======
+        BOOST_FOREACH(SOCKET hListenSocket, vhListenSocket)
+        if (hListenSocket != INVALID_SOCKET && FD_ISSET(hListenSocket, &fdsetRecv))
+        {
+#ifdef USE_IPV6
+            struct sockaddr_storage sockaddr;
+#else
+            struct sockaddr sockaddr;
+#endif
+>>>>>>> origin/Paycoin-master
             socklen_t len = sizeof(sockaddr);
             SOCKET hSocket = accept(hListenSocket, (struct sockaddr*)&sockaddr, &len);
             CAddress addr;
             int nInbound = 0;
 
             if (hSocket != INVALID_SOCKET)
+<<<<<<< HEAD
                 addr = CAddress(sockaddr);
+=======
+                if (!addr.SetSockAddr((const struct sockaddr*)&sockaddr))
+                    printf("warning: unknown socket family\n");
+>>>>>>> origin/Paycoin-master
 
             {
                 LOCK(cs_vNodes);
@@ -681,7 +976,11 @@ void ThreadSocketHandler2(void* parg)
             else
             {
                 printf("accepted connection %s\n", addr.ToString().c_str());
+<<<<<<< HEAD
                 CNode* pnode = new CNode(hSocket, addr, true);
+=======
+                CNode* pnode = new CNode(hSocket, addr, "", true);
+>>>>>>> origin/Paycoin-master
                 pnode->AddRef();
                 {
                     LOCK(cs_vNodes);
@@ -884,8 +1183,12 @@ void ThreadMapPort2(void* parg)
     r = UPNP_GetValidIGD(devlist, &urls, &data, lanaddr, sizeof(lanaddr));
     if (r == 1)
     {
+<<<<<<< HEAD
         if (!addrLocalHost.IsRoutable())
         {
+=======
+        if (GetBoolArg("-discover", true)) {
+>>>>>>> origin/Paycoin-master
             char externalIPAddress[40];
             r = UPNP_GetExternalIPAddress(urls.controlURL, data.first.servicetype, externalIPAddress);
             if(r != UPNPCOMMAND_SUCCESS)
@@ -895,16 +1198,24 @@ void ThreadMapPort2(void* parg)
                 if(externalIPAddress[0])
                 {
                     printf("UPnP: ExternalIPAddress = %s\n", externalIPAddress);
+<<<<<<< HEAD
                     CAddress addrExternalFromUPnP(CService(externalIPAddress, 0), nLocalServices);
                     if (addrExternalFromUPnP.IsRoutable())
                         addrLocalHost = addrExternalFromUPnP;
+=======
+                    AddLocal(CNetAddr(externalIPAddress), LOCAL_UPNP);
+>>>>>>> origin/Paycoin-master
                 }
                 else
                     printf("UPnP: GetExternalIPAddress failed.\n");
             }
         }
 
+<<<<<<< HEAD
         string strDesc = "PPCoin " + FormatFullVersion();
+=======
+        string strDesc = "Paycoin " + FormatFullVersion();
+>>>>>>> origin/Paycoin-master
 #ifndef UPNPDISCOVER_SUCCESS
         /* miniupnpc 1.5 */
         r = UPNP_AddPortMapping(urls.controlURL, data.first.servicetype,
@@ -995,6 +1306,7 @@ void MapPort(bool /* unused fMapPort */)
 // Each pair gives a source name and a seed name.
 // The first name is used as information source for addrman.
 // The second name should resolve to a list of seed addresses.
+<<<<<<< HEAD
 // testnet dns seed begins with 't', all else are ppcoin dns seeds.
 static const char *strDNSSeed[][2] = {
     {"seed", "seed.ppcoin.net"},
@@ -1002,6 +1314,11 @@ static const char *strDNSSeed[][2] = {
     {"altcointech", "dnsseed.ppc.altcointech.net"},
     {"tnseed", "tnseed.ppcoin.net"},
     {"tnseedppc", "tnseedppc.ppcoin.net"},
+=======
+// testnet dns seed begins with 't', all else are paycoin dns seeds.
+static const char *strDNSSeed[][2] = {
+    {"dnsseed.paycoin.com", "dnsseed.paycoin.com"},
+>>>>>>> origin/Paycoin-master
 };
 
 void ThreadDNSAddressSeed(void* parg)
@@ -1028,11 +1345,16 @@ void ThreadDNSAddressSeed2(void* parg)
     printf("ThreadDNSAddressSeed started\n");
     int found = 0;
 
+<<<<<<< HEAD
     if (true /*!fTestNet*/)  // ppcoin enables dns seeding with testnet too
+=======
+    if (!fTestNet)
+>>>>>>> origin/Paycoin-master
     {
         printf("Loading addresses from DNS seeds (could take a while)\n");
 
         for (unsigned int seed_idx = 0; seed_idx < ARRAYLEN(strDNSSeed); seed_idx++) {
+<<<<<<< HEAD
             if (fTestNet && strDNSSeed[seed_idx][1][0] != 't') continue;
             if ((!fTestNet) && strDNSSeed[seed_idx][1][0] == 't') continue;
 
@@ -1050,6 +1372,29 @@ void ThreadDNSAddressSeed2(void* parg)
                 }
             }
             addrman.Add(vAdd, CNetAddr(strDNSSeed[seed_idx][0], true));
+=======
+            //if (fTestNet && strDNSSeed[seed_idx][1][0] != 't') continue;
+            //if ((!fTestNet) && strDNSSeed[seed_idx][1][0] == 't') continue;
+
+            if (fProxyNameLookup) {
+                AddOneShot(strDNSSeed[seed_idx][1]);
+            } else {
+                vector<CNetAddr> vaddr;
+                vector<CAddress> vAdd;
+                if (LookupHost(strDNSSeed[seed_idx][1], vaddr))
+                {
+                    BOOST_FOREACH(CNetAddr& ip, vaddr)
+                    {
+                        int nOneDay = 24*3600;
+                        CAddress addr = CAddress(CService(ip, GetDefaultPort()));
+                        addr.nTime = GetTime() - 3*nOneDay - GetRand(4*nOneDay); // use a random age between 3 and 7 days old
+                        vAdd.push_back(addr);
+                        found++;
+                    }
+                }
+                addrman.Add(vAdd, CNetAddr(strDNSSeed[seed_idx][0], true));
+            }
+>>>>>>> origin/Paycoin-master
         }
     }
 
@@ -1070,9 +1415,13 @@ void ThreadDNSAddressSeed2(void* parg)
 // Physical IP seeds: 32-bit IPv4 addresses: e.g. 178.33.22.32 = 0x201621b2
 unsigned int pnSeed[] =
 {
+<<<<<<< HEAD
     0x36a3b545, 0x3c1c26d8, 0x4031eb6d, 0x4d3463d1, 0x586a6854, 0x5da9ae65,
     0x6deb7318, 0x9083fb63, 0x961bf618, 0xcabd2e4e, 0xcb766dd5, 0xdd514518,
     0xdff010b8, 0xe9bb6044, 0xedb24a4c,
+=======
+    0xb68b8268, 0x65018268,
+>>>>>>> origin/Paycoin-master
 };
 
 void DumpAddresses()
@@ -1126,11 +1475,33 @@ void ThreadOpenConnections(void* parg)
     printf("ThreadOpenConnections exiting\n");
 }
 
+<<<<<<< HEAD
+=======
+void static ProcessOneShot()
+{
+    string strDest;
+    {
+        LOCK(cs_vOneShots);
+        if (vOneShots.empty())
+            return;
+        strDest = vOneShots.front();
+        vOneShots.pop_front();
+    }
+    CAddress addr;
+    CSemaphoreGrant grant(*semOutbound, true);
+    if (grant) {
+        if (!OpenNetworkConnection(addr, &grant, strDest.c_str(), true))
+            AddOneShot(strDest);
+    }
+}
+
+>>>>>>> origin/Paycoin-master
 void ThreadOpenConnections2(void* parg)
 {
     printf("ThreadOpenConnections started\n");
 
     // Connect to specific addresses
+<<<<<<< HEAD
     if (mapArgs.count("-connect"))
     {
         for (int64 nLoop = 0;; nLoop++)
@@ -1140,6 +1511,17 @@ void ThreadOpenConnections2(void* parg)
                 CAddress addr(CService(strAddr, GetDefaultPort(), fAllowDNS));
                 if (addr.IsValid())
                     OpenNetworkConnection(addr, false);
+=======
+    if (mapArgs.count("-connect") && mapMultiArgs["-connect"].size() > 0)
+    {
+        for (int64 nLoop = 0;; nLoop++)
+        {
+            ProcessOneShot();
+            BOOST_FOREACH(string strAddr, mapMultiArgs["-connect"])
+            {
+                CAddress addr;
+                OpenNetworkConnection(addr, NULL, strAddr.c_str());
+>>>>>>> origin/Paycoin-master
                 for (int i = 0; i < 10 && i < nLoop; i++)
                 {
                     Sleep(500);
@@ -1147,6 +1529,10 @@ void ThreadOpenConnections2(void* parg)
                         return;
                 }
             }
+<<<<<<< HEAD
+=======
+            Sleep(500);
+>>>>>>> origin/Paycoin-master
         }
     }
 
@@ -1154,6 +1540,11 @@ void ThreadOpenConnections2(void* parg)
     int64 nStart = GetTime();
     loop
     {
+<<<<<<< HEAD
+=======
+        ProcessOneShot();
+
+>>>>>>> origin/Paycoin-master
         vnThreadsRunning[THREAD_OPENCONNECTIONS]--;
         Sleep(500);
         vnThreadsRunning[THREAD_OPENCONNECTIONS]++;
@@ -1162,14 +1553,22 @@ void ThreadOpenConnections2(void* parg)
 
 
         vnThreadsRunning[THREAD_OPENCONNECTIONS]--;
+<<<<<<< HEAD
         semOutbound->wait();
+=======
+        CSemaphoreGrant grant(*semOutbound);
+>>>>>>> origin/Paycoin-master
         vnThreadsRunning[THREAD_OPENCONNECTIONS]++;
         if (fShutdown)
             return;
 
         // Add seed nodes if IRC isn't working
         bool fTOR = (fUseProxy && addrProxy.GetPort() == 9050);
+<<<<<<< HEAD
         if (addrman.size()==0 && (GetTime() - nStart > 60 || fTOR) && !fTestNet)
+=======
+        if (addrman.size()<10 && (GetTime() - nStart >= 60 || fTOR) && !fTestNet)
+>>>>>>> origin/Paycoin-master
         {
             std::vector<CAddress> vAdd;
             for (unsigned int i = 0; i < ARRAYLEN(pnSeed); i++)
@@ -1215,10 +1614,25 @@ void ThreadOpenConnections2(void* parg)
             CAddress addr = addrman.Select(10 + min(nOutbound,8)*10);
 
             // if we selected an invalid address, restart
+<<<<<<< HEAD
             if (!addr.IsIPv4() || !addr.IsValid() || setConnected.count(addr.GetGroup()) || addr == addrLocalHost)
                 break;
 
             nTries++;
+=======
+            if (!addr.IsValid() || setConnected.count(addr.GetGroup()) || IsLocal(addr))
+                break;
+
+            // If we didn't find an appropriate destination after trying 100 addresses fetched from addrman,
+            // stop this loop, and let the outer loop run again (which sleeps, adds seed nodes, recalculates
+            // already-connected network ranges, ...) before trying new addrman addresses.
+            nTries++;
+            if (nTries > 100)
+                break;
+
+            if (IsLimited(addr))
+                continue;
+>>>>>>> origin/Paycoin-master
 
             // only consider very recently tried nodes after 30 failed attempts
             if (nANow - addr.nLastTry < 600 && nTries < 30)
@@ -1233,9 +1647,13 @@ void ThreadOpenConnections2(void* parg)
         }
 
         if (addrConnect.IsValid())
+<<<<<<< HEAD
             OpenNetworkConnection(addrConnect);
         else
             semOutbound->post();
+=======
+            OpenNetworkConnection(addrConnect, &grant);
+>>>>>>> origin/Paycoin-master
     }
 }
 
@@ -1265,11 +1683,33 @@ void ThreadOpenAddedConnections2(void* parg)
     if (mapArgs.count("-addnode") == 0)
         return;
 
+<<<<<<< HEAD
+=======
+    if (fProxyNameLookup) {
+        while(!fShutdown) {
+            BOOST_FOREACH(string& strAddNode, mapMultiArgs["-addnode"]) {
+                CAddress addr;
+                CSemaphoreGrant grant(*semOutbound);
+                OpenNetworkConnection(addr, &grant, strAddNode.c_str());
+                Sleep(500);
+            }
+            vnThreadsRunning[THREAD_ADDEDCONNECTIONS]--;
+            Sleep(120000); // Retry every 2 minutes
+            vnThreadsRunning[THREAD_ADDEDCONNECTIONS]++;
+        }
+        return;
+    }
+
+>>>>>>> origin/Paycoin-master
     vector<vector<CService> > vservAddressesToAdd(0);
     BOOST_FOREACH(string& strAddNode, mapMultiArgs["-addnode"])
     {
         vector<CService> vservNode(0);
+<<<<<<< HEAD
         if(Lookup(strAddNode.c_str(), vservNode, GetDefaultPort(), fAllowDNS, 0))
+=======
+        if(Lookup(strAddNode.c_str(), vservNode, GetDefaultPort(), fNameLookup, 0))
+>>>>>>> origin/Paycoin-master
         {
             vservAddressesToAdd.push_back(vservNode);
             {
@@ -1283,7 +1723,11 @@ void ThreadOpenAddedConnections2(void* parg)
     {
         vector<vector<CService> > vservConnectAddresses = vservAddressesToAdd;
         // Attempt to connect to each IP for each addnode entry until at least one is successful per addnode entry
+<<<<<<< HEAD
         // (keeping in mind that addnode entries can have many IPs if fAllowDNS)
+=======
+        // (keeping in mind that addnode entries can have many IPs if fNameLookup)
+>>>>>>> origin/Paycoin-master
         {
             LOCK(cs_vNodes);
             BOOST_FOREACH(CNode* pnode, vNodes)
@@ -1298,8 +1742,13 @@ void ThreadOpenAddedConnections2(void* parg)
         }
         BOOST_FOREACH(vector<CService>& vserv, vservConnectAddresses)
         {
+<<<<<<< HEAD
             semOutbound->wait();
             OpenNetworkConnection(CAddress(*(vserv.begin())));
+=======
+            CSemaphoreGrant grant(*semOutbound);
+            OpenNetworkConnection(CAddress(*(vserv.begin())), &grant);
+>>>>>>> origin/Paycoin-master
             Sleep(500);
             if (fShutdown)
                 return;
@@ -1314,6 +1763,7 @@ void ThreadOpenAddedConnections2(void* parg)
     }
 }
 
+<<<<<<< HEAD
 bool static ReleaseGrant(bool fUseGrant) {
     if (fUseGrant)
         semOutbound->post();
@@ -1322,22 +1772,40 @@ bool static ReleaseGrant(bool fUseGrant) {
 
 // only call this function when semOutbound has been waited for
 bool OpenNetworkConnection(const CAddress& addrConnect, bool fUseGrant)
+=======
+// if succesful, this moves the passed grant to the constructed node
+bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound, const char *strDest, bool fOneShot)
+>>>>>>> origin/Paycoin-master
 {
     //
     // Initiate outbound network connection
     //
     if (fShutdown)
         return false;
+<<<<<<< HEAD
     if ((CNetAddr)addrConnect == (CNetAddr)addrLocalHost || !addrConnect.IsIPv4() ||
         FindNode((CNetAddr)addrConnect) || CNode::IsBanned(addrConnect))
         return ReleaseGrant(fUseGrant);
 
     vnThreadsRunning[THREAD_OPENCONNECTIONS]--;
     CNode* pnode = ConnectNode(addrConnect);
+=======
+    if (!strDest)
+        if (IsLocal(addrConnect) ||
+            FindNode((CNetAddr)addrConnect) || CNode::IsBanned(addrConnect) ||
+            FindNode(addrConnect.ToStringIPPort().c_str()))
+            return false;
+    if (strDest && FindNode(strDest))
+        return false;
+
+    vnThreadsRunning[THREAD_OPENCONNECTIONS]--;
+    CNode* pnode = ConnectNode(addrConnect, strDest);
+>>>>>>> origin/Paycoin-master
     vnThreadsRunning[THREAD_OPENCONNECTIONS]++;
     if (fShutdown)
         return false;
     if (!pnode)
+<<<<<<< HEAD
         return ReleaseGrant(fUseGrant);
     if (pnode->fHasGrant) {
         // node already has connection grant, release the one that was passed to us
@@ -1346,6 +1814,14 @@ bool OpenNetworkConnection(const CAddress& addrConnect, bool fUseGrant)
         pnode->fHasGrant = fUseGrant;
     }
     pnode->fNetworkNode = true;
+=======
+        return false;
+    if (grantOutbound)
+        grantOutbound->MoveTo(pnode->grantOutbound);
+    pnode->fNetworkNode = true;
+    if (fOneShot)
+        pnode->fOneShot = true;
+>>>>>>> origin/Paycoin-master
 
     return true;
 }
@@ -1434,7 +1910,11 @@ void ThreadMessageHandler2(void* parg)
     }
 }
 
+<<<<<<< HEAD
 // ppcoin: stake minter thread
+=======
+// paycoin: stake minter thread
+>>>>>>> origin/Paycoin-master
 void static ThreadStakeMinter(void* parg)
 {
     printf("ThreadStakeMinter started\n");
@@ -1460,11 +1940,18 @@ void static ThreadStakeMinter(void* parg)
 
 
 
+<<<<<<< HEAD
 bool BindListenPort(string& strError)
 {
     strError = "";
     int nOne = 1;
     addrLocalHost.SetPort(GetListenPort());
+=======
+bool BindListenPort(const CService &addrBind, string& strError)
+{
+    strError = "";
+    int nOne = 1;
+>>>>>>> origin/Paycoin-master
 
 #ifdef WIN32
     // Initialize Windows Sockets
@@ -1479,7 +1966,24 @@ bool BindListenPort(string& strError)
 #endif
 
     // Create socket for listening for incoming connections
+<<<<<<< HEAD
     hListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+=======
+#ifdef USE_IPV6
+    struct sockaddr_storage sockaddr;
+#else
+    struct sockaddr sockaddr;
+#endif
+    socklen_t len = sizeof(sockaddr);
+    if (!addrBind.GetSockAddr((struct sockaddr*)&sockaddr, &len))
+    {
+        strError = strprintf("Error: bind address family for %s not supported", addrBind.ToString().c_str());
+        printf("%s\n", strError.c_str());
+        return false;
+    }
+
+    SOCKET hListenSocket = socket(((struct sockaddr*)&sockaddr)->sa_family, SOCK_STREAM, IPPROTO_TCP);
+>>>>>>> origin/Paycoin-master
     if (hListenSocket == INVALID_SOCKET)
     {
         strError = strprintf("Error: Couldn't open socket for incoming connections (socket returned error %d)", WSAGetLastError());
@@ -1498,6 +2002,10 @@ bool BindListenPort(string& strError)
     setsockopt(hListenSocket, SOL_SOCKET, SO_REUSEADDR, (void*)&nOne, sizeof(int));
 #endif
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/Paycoin-master
 #ifdef WIN32
     // Set to nonblocking, incoming connections will also inherit this
     if (ioctlsocket(hListenSocket, FIONBIO, (u_long*)&nOne) == SOCKET_ERROR)
@@ -1510,6 +2018,7 @@ bool BindListenPort(string& strError)
         return false;
     }
 
+<<<<<<< HEAD
     // The sockaddr_in structure specifies the address family,
     // IP address, and port for the socket that is being bound
     struct sockaddr_in sockaddr;
@@ -1528,6 +2037,35 @@ bool BindListenPort(string& strError)
         return false;
     }
     printf("Bound to port %d\n", ntohs(sockaddr.sin_port));
+=======
+#ifdef USE_IPV6
+    // some systems don't have IPV6_V6ONLY but are always v6only; others do have the option
+    // and enable it by default or not. Try to enable it, if possible.
+    if (addrBind.IsIPv6()) {
+#ifdef IPV6_V6ONLY
+        setsockopt(hListenSocket, IPPROTO_IPV6, IPV6_V6ONLY, (void*)&nOne, sizeof(int));
+#endif
+#ifdef WIN32
+        int nProtLevel = 10 /* PROTECTION_LEVEL_UNRESTRICTED */;
+        int nParameterId = 23 /* IPV6_PROTECTION_LEVEl */;
+        // this call is allowed to fail
+        setsockopt(hListenSocket, IPPROTO_IPV6, nParameterId, (const char*)&nProtLevel, sizeof(int));
+#endif
+    }
+#endif
+
+    if (::bind(hListenSocket, (struct sockaddr*)&sockaddr, len) == SOCKET_ERROR)
+    {
+        int nErr = WSAGetLastError();
+        if (nErr == WSAEADDRINUSE)
+            strError = strprintf(_("Unable to bind to %s on this computer.  Paycoin is probably already running."), addrBind.ToString().c_str());
+        else
+            strError = strprintf(_("Unable to bind to %s on this computer (bind returned error %d, %s)"), addrBind.ToString().c_str(), nErr, strerror(nErr));
+        printf("%s\n", strError.c_str());
+        return false;
+    }
+    printf("Bound to %s\n", addrBind.ToString().c_str());
+>>>>>>> origin/Paycoin-master
 
     // Listen for incoming connections
     if (listen(hListenSocket, SOMAXCONN) == SOCKET_ERROR)
@@ -1537,6 +2075,7 @@ bool BindListenPort(string& strError)
         return false;
     }
 
+<<<<<<< HEAD
     return true;
 }
 
@@ -1558,6 +2097,20 @@ void StartNode(void* parg)
 
     if (pnodeLocalHost == NULL)
         pnodeLocalHost = new CNode(INVALID_SOCKET, CAddress(CService("127.0.0.1", 0), nLocalServices));
+=======
+    vhListenSocket.push_back(hListenSocket);
+
+    if (addrBind.IsRoutable() && GetBoolArg("-discover", true))
+        AddLocal(addrBind, LOCAL_BIND);
+
+    return true;
+}
+
+void static Discover()
+{
+    if (!GetBoolArg("-discover", true))
+        return;
+>>>>>>> origin/Paycoin-master
 
 #ifdef WIN32
     // Get local host ip
@@ -1569,11 +2122,15 @@ void StartNode(void* parg)
         {
             BOOST_FOREACH (const CNetAddr &addr, vaddr)
             {
+<<<<<<< HEAD
                 if (!addr.IsLocal())
                 {
                     addrLocalHost.SetIP(addr);
                     break;
                 }
+=======
+                AddLocal(addr, LOCAL_IF);
+>>>>>>> origin/Paycoin-master
             }
         }
     }
@@ -1588,6 +2145,7 @@ void StartNode(void* parg)
             if ((ifa->ifa_flags & IFF_UP) == 0) continue;
             if (strcmp(ifa->ifa_name, "lo") == 0) continue;
             if (strcmp(ifa->ifa_name, "lo0") == 0) continue;
+<<<<<<< HEAD
             char pszIP[100];
             if (ifa->ifa_addr->sa_family == AF_INET)
             {
@@ -1609,10 +2167,29 @@ void StartNode(void* parg)
                 if (inet_ntop(ifa->ifa_addr->sa_family, (void*)&(s6->sin6_addr), pszIP, sizeof(pszIP)) != NULL)
                     printf("ipv6 %s: %s\n", ifa->ifa_name, pszIP);
             }
+=======
+            if (ifa->ifa_addr->sa_family == AF_INET)
+            {
+                struct sockaddr_in* s4 = (struct sockaddr_in*)(ifa->ifa_addr);
+                CNetAddr addr(s4->sin_addr);
+                if (AddLocal(addr, LOCAL_IF))
+                    printf("ipv4 %s: %s\n", ifa->ifa_name, addr.ToString().c_str());
+            }
+#ifdef USE_IPV6
+            else if (ifa->ifa_addr->sa_family == AF_INET6)
+            {
+                struct sockaddr_in6* s6 = (struct sockaddr_in6*)(ifa->ifa_addr);
+                CNetAddr addr(s6->sin6_addr);
+                if (AddLocal(addr, LOCAL_IF))
+                    printf("ipv6 %s: %s\n", ifa->ifa_name, addr.ToString().c_str());
+            }
+#endif
+>>>>>>> origin/Paycoin-master
         }
         freeifaddrs(myaddrs);
     }
 #endif
+<<<<<<< HEAD
     printf("addrLocalHost = %s\n", addrLocalHost.ToString().c_str());
 
     if (fUseProxy || mapArgs.count("-connect") || fNoListen)
@@ -1625,6 +2202,35 @@ void StartNode(void* parg)
     {
         CreateThread(ThreadGetMyExternalIP, NULL);
     }
+=======
+
+    if (!fUseProxy && !mapArgs.count("-connect") && !fNoListen)
+    {
+        CreateThread(ThreadGetMyExternalIP, NULL);
+    }
+}
+
+void StartNode(void* parg)
+{
+#ifdef USE_UPNP
+#if USE_UPNP
+    fUseUPnP = GetBoolArg("-upnp", true);
+#else
+    fUseUPnP = GetBoolArg("-upnp", false);
+#endif
+#endif
+
+    if (semOutbound == NULL) {
+        // initialize semaphore
+        int nMaxOutbound = min(MAX_OUTBOUND_CONNECTIONS, (int)GetArg("-maxconnections", 125));
+        semOutbound = new CSemaphore(nMaxOutbound);
+    }
+
+    if (pnodeLocalHost == NULL)
+        pnodeLocalHost = new CNode(INVALID_SOCKET, CAddress(CService("127.0.0.1", 0), nLocalServices));
+
+    Discover();
+>>>>>>> origin/Paycoin-master
 
     //
     // Start threads
@@ -1643,7 +2249,11 @@ void StartNode(void* parg)
     // Get addresses from IRC and advertise ours
     // if (!CreateThread(ThreadIRCSeed, NULL))
     //     printf("Error: CreateThread(ThreadIRCSeed) failed\n");
+<<<<<<< HEAD
     // IRC disabled with ppcoin
+=======
+    // IRC disabled with paycoin
+>>>>>>> origin/Paycoin-master
     printf("IRC seeding/communication disabled\n");
 
     // Send and receive from sockets, accept connections
@@ -1669,7 +2279,11 @@ void StartNode(void* parg)
     // Generate coins in the background
     GenerateBitcoins(GetBoolArg("-gen", false), pwalletMain);
 
+<<<<<<< HEAD
     // ppcoin: mint proof-of-stake blocks in the background
+=======
+    // paycoin: mint proof-of-stake blocks in the background
+>>>>>>> origin/Paycoin-master
     if (!CreateThread(ThreadStakeMinter, pwalletMain))
         printf("Error: CreateThread(ThreadStakeMinter) failed\n");
 }
@@ -1723,9 +2337,16 @@ public:
         BOOST_FOREACH(CNode* pnode, vNodes)
             if (pnode->hSocket != INVALID_SOCKET)
                 closesocket(pnode->hSocket);
+<<<<<<< HEAD
         if (hListenSocket != INVALID_SOCKET)
             if (closesocket(hListenSocket) == SOCKET_ERROR)
                 printf("closesocket(hListenSocket) failed with error %d\n", WSAGetLastError());
+=======
+        BOOST_FOREACH(SOCKET hListenSocket, vhListenSocket)
+            if (hListenSocket != INVALID_SOCKET)
+                if (closesocket(hListenSocket) == SOCKET_ERROR)
+                    printf("closesocket(hListenSocket) failed with error %d\n", WSAGetLastError());
+>>>>>>> origin/Paycoin-master
 
 #ifdef WIN32
         // Shutdown Windows Sockets

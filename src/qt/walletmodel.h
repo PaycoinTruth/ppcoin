@@ -2,13 +2,29 @@
 #define WALLETMODEL_H
 
 #include <QObject>
+<<<<<<< HEAD
+=======
+#include <vector>
+#include <map>
+>>>>>>> origin/Paycoin-master
 
 #include "allocators.h" /* for SecureString */
 
 class OptionsModel;
 class AddressTableModel;
 class TransactionTableModel;
+<<<<<<< HEAD
 class CWallet;
+=======
+class MintingTableModel;
+class CWallet;
+class CKeyID;
+class CPubKey;
+class COutput;
+class COutPoint;
+class uint256;
+class CCoinControl;
+>>>>>>> origin/Paycoin-master
 
 class SendCoinsRecipient
 {
@@ -47,10 +63,18 @@ public:
 
     OptionsModel *getOptionsModel();
     AddressTableModel *getAddressTableModel();
+<<<<<<< HEAD
+=======
+    MintingTableModel *getMintingTableModel();
+>>>>>>> origin/Paycoin-master
     TransactionTableModel *getTransactionTableModel();
 
     qint64 getBalance() const;
     qint64 getStake() const;
+<<<<<<< HEAD
+=======
+    qint64 getNewMint() const;
+>>>>>>> origin/Paycoin-master
     qint64 getUnconfirmedBalance() const;
     int getNumTransactions() const;
     EncryptionStatus getEncryptionStatus() const;
@@ -61,7 +85,11 @@ public:
     // Return status record for SendCoins, contains error id + information
     struct SendCoinsReturn
     {
+<<<<<<< HEAD
         SendCoinsReturn(StatusCode status,
+=======
+        SendCoinsReturn(StatusCode status=Aborted,
+>>>>>>> origin/Paycoin-master
                          qint64 fee=0,
                          QString hex=QString()):
             status(status), fee(fee), hex(hex) {}
@@ -71,7 +99,11 @@ public:
     };
 
     // Send coins to a list of recipients
+<<<<<<< HEAD
     SendCoinsReturn sendCoins(const QList<SendCoinsRecipient> &recipients);
+=======
+    SendCoinsReturn sendCoins(const QList<SendCoinsRecipient> &recipients, const CCoinControl *coinControl=NULL);
+>>>>>>> origin/Paycoin-master
 
     // Wallet encryption
     bool setWalletEncrypted(bool encrypted, const SecureString &passphrase);
@@ -103,6 +135,21 @@ public:
 
     UnlockContext requestUnlock();
 
+<<<<<<< HEAD
+=======
+    bool getPubKey(const CKeyID &address, CPubKey& vchPubKeyOut) const;
+    void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
+    void listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const;
+
+    bool isLockedCoin(uint256 hash, unsigned int n) const;
+    void lockCoin(COutPoint& output);
+    void unlockCoin(COutPoint& output);
+    void listLockedCoins(std::vector<COutPoint>& vOutpts); 
+
+    void clearOrphans();
+    CWallet * getWallet();
+
+>>>>>>> origin/Paycoin-master
 private:
     CWallet *wallet;
 
@@ -111,10 +158,18 @@ private:
     OptionsModel *optionsModel;
 
     AddressTableModel *addressTableModel;
+<<<<<<< HEAD
+=======
+    MintingTableModel *mintingTableModel;
+>>>>>>> origin/Paycoin-master
     TransactionTableModel *transactionTableModel;
 
     // Cache some values to be able to detect changes
     qint64 cachedBalance;
+<<<<<<< HEAD
+=======
+    qint64 cachedStake;
+>>>>>>> origin/Paycoin-master
     qint64 cachedUnconfirmedBalance;
     qint64 cachedNumTransactions;
     EncryptionStatus cachedEncryptionStatus;

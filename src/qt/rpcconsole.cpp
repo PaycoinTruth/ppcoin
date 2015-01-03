@@ -303,7 +303,11 @@ void RPCConsole::clear()
                 "b { color: #006060; } "
                 );
 
+<<<<<<< HEAD
     message(CMD_REPLY, tr("Welcome to the PPCoin RPC console.<br>"
+=======
+    message(CMD_REPLY, tr("Welcome to the Paycoin RPC console.<br>"
+>>>>>>> origin/Paycoin-master
                           "Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.<br>"
                           "Type <b>help</b> for an overview of available commands."), true);
 }

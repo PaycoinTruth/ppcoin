@@ -8,6 +8,9 @@
 void ThreadIRCSeed(void* parg);
 
 extern int nGotIRCAddresses;
+<<<<<<< HEAD
 extern bool fGotExternalIP;
+=======
+>>>>>>> origin/Paycoin-master
 
 #endif

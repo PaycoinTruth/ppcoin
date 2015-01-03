@@ -1,8 +1,12 @@
 #include <boost/test/unit_test.hpp>
 
+<<<<<<< HEAD
 #include "main.h"
 #include "wallet.h"
 #include "util.h"
+=======
+#include "base58.h"
+>>>>>>> origin/Paycoin-master
 
 BOOST_AUTO_TEST_SUITE(base58_tests)
 

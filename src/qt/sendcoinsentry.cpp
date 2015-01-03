@@ -22,7 +22,11 @@ SendCoinsEntry::SendCoinsEntry(QWidget *parent) :
 #endif
 
 #if QT_VERSION >= 0x040700
+<<<<<<< HEAD
     ui->payTo->setPlaceholderText(tr("Enter a PPCoin address"));
+=======
+    ui->payTo->setPlaceholderText(tr("Enter a Paycoin address"));
+>>>>>>> origin/Paycoin-master
     ui->addAsLabel->setPlaceholderText(tr("Enter a label for this address to add it to your address book"));
 #endif
     setFocusPolicy(Qt::TabFocus);
@@ -68,6 +72,15 @@ void SendCoinsEntry::on_payTo_textChanged(const QString &address)
 void SendCoinsEntry::setModel(WalletModel *model)
 {
     this->model = model;
+<<<<<<< HEAD
+=======
+
+    // if(model && model->getOptionsModel())
+    //     connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
+
+    connect(ui->payAmount, SIGNAL(textChanged()), this, SIGNAL(payAmountChanged())); 
+
+>>>>>>> origin/Paycoin-master
     clear();
 }
 
